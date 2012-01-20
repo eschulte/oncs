@@ -1,0 +1,6 @@
+#+Title: ONCS are not conses
+#+Author: Eric Schulte
+#+License: GPLV3
+
+ONCS is a lisp virtual machine implemented as cons cells embedded in a
+homogeneous spatially extended medium of mixed processing and memory.
