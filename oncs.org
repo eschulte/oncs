@@ -1,6 +1,162 @@
-#+Title: ONCS are not conses
+# -*- org -*-
+#+Title: ONCs -- are not conses
 #+Author: Eric Schulte
 #+License: GPLV3
+#+Options: toc:nil ^:nil
+#+Style: <style>pre{display:table-cell;} #content{max-width:1000px;margin:auto;}</style>
 
-ONCS is a lisp virtual machine implemented as cons cells embedded in a
-homogeneous spatially extended medium of mixed processing and memory.
+ONCs is a lisp virtual machine implemented as cons cells embedded in a
+spatially extended medium of combined processing and memory elements.
+
+* What is an ONC?
+:  +--------------------------------------------+
+:  |       Header                Data Words     |
+:  | +------------------+  +------------------+ |
+:  | |                  |  |       car        | |
+:  | +------------------+  +------------------+ |
+:  |                       +------------------+ |
+:  |    Rule Table         |       cdr        | |
+:  | +------------------+  +------------------+ |
+:  | |     ------>      |  +------------------+ |
+:  | |     ------>      |  |       env        | |
+:  | +------------------+  +------------------+ |
+:  +--------------------------------------------+
+
+an ONC (/currently/) is composed of:
+- Data Words :: probably 64-bit
+  | car | either data or a pointer     |
+  | cdr | either data or a pointer     |
+  | env | a pointer to the environment |
+
+- Header :: with information like
+  | executable        | is it active (function) or passive (data)    |
+  | serial            | resolve car/cdr in serial or parallel        |
+  | weight/references | how big am I and how many things point to me |
+
+- Rule Table :: which can map words of data to actions
+  | =   | equality of car and cdr    |
+  | -   | subtract car and cdr       |
+  | +   | add car and cdr            |
+  | xor | bitwise xor of car and cdr |
+  | or  | bitwise or of car and cdr  |
+  | and | bitwise and of car and cdr |
+  | ... | more?                      |
+
+** more about the headers
+Some more information on the use of the header flags, hopefully most
+flags will just be bits (although some will be counters) and the
+header should fit into a word or two of memory.
+
+- executable :: This determines whether the ONC should start
+     processing itself.  This will generally be set to 1 for a
+     function and to 0 for data, however it could also be set to 0 for
+     a lazy function (which *is* data) which when set to 1 would then
+     run.  This could also be used to implement serial execution in
+     those cases where it is desired.  A list of functions could be
+     run in serial by setting this to 0 for all but the first function
+     and then mapping a function overtop which sequentially sets these
+     flags to 1.
+
+- serial :: This indicates whether the references (car and cdr) should
+     be resolved in serial or parallel.  On a function ONC this /may/
+     also be used to indicate if the function it associative which
+     would affect how the function can be applied to large
+     collections (maybe another associative flag would be needed).
+
+- weight/references :: When a function is called on data the two will
+     need to become co-located.  In some cases it will make more sense
+     to copy the function towards the data and in some cases it will
+     make more sense to move the data towards the function.
+
+     If each NOC has a weight or incoming reference count which
+     measures something like the size of the local reference net in
+     which the NOC is participating then this decision may be made
+     more intelligently.
+
+     Maybe different counters should be used for outgoing and incoming
+     references.
+
+** more on environments
+These resolve variables to values (addresses).  I imagine these would
+exists on many different levels in a hierarchy.  Each would be
+composed of a table mapping variables to values, and a pointer to the
+next-level environment if the variable is not defined locally.
+
+Each environment is composed of ONCs and each ONC can be thought of as
+a tiny environment which only resolves car and cdr.
+
+An ENV would basically be a list of =(var . val)= cons cells:
+: ((name1 . val1) (name2 . val2) (name3 . val3))
+
+For large environments a b-tree would be much faster allowing log(n)
+look up times.
+:            ^
+:            | env
+:          +---+              all lower level envs could
+:    car /-|   |-\ cdr        point back up to the top of
+:       /  +---+  \           the tree for quick return, if
+:      /           \          return is required... don't know
+:    +--+         +--+
+:    |  |         |  |
+:    +--+         +--+
+:   /    \       /    \
+:  +-+   +-+    +-+   +-+
+:  | |   | |    | |   | |
+:  +-+   +-+    +-+   +-+
+
+* What would execution look like?
+* COMMENT Publishing
+This code is used to publish this page to the =cs.unm.edu= webserver.
+#+begin_src emacs-lisp :results silent
+  (setq oncs-dir (file-name-directory (or load-file-name buffer-file-name)))
+  (unless (boundp 'org-publish-project-alist)
+    (setq org-publish-project-alist nil))
+  ;; the main html page
+  (add-to-list 'org-publish-project-alist
+               `("oncs-html"
+                  :base-extension "org"
+                  :base-directory ,oncs-dir
+                  :publishing-directory "/ssh:eschulte@moons.cs.unm.edu:~/public_html/code/oncs/"
+                  :publishing-function org-publish-org-to-html
+                  :style "<style type=\"text/css\">\n <!--/*--><![CDATA[/*><!--*/
+    .title  { text-align: center; }
+    .todo   { color: red; }
+    .done   { color: green; }
+    .tag    { background-color: #add8e6; font-weight:normal }
+    .timestamp { color: #bebebe; }
+    .timestamp-kwd { color: #5f9ea0; }
+    p.verse { margin-left: 3% }
+    p { text-align: justify }
+    pre {
+      background: #232323;
+      color: #e6e1dc;
+      border: 1pt solid #AEBDCC;
+      padding: 5pt;
+      overflow: auto;
+      display: table-cell;
+    }
+    table { border-collapse: collapse; }
+    td, th { vertical-align: top; }
+    dt { font-weight: bold; }
+    div.figure { padding: 0.5em; }
+    div.figure p { text-align: center; }
+    .linenr { font-size:smaller }
+    #content { max-width: 1000px; margin: auto; }
+    #postamble { color: gray; padding-top: 2em; font-size: 0.75em; }
+    /*]]>*/-->
+  </style>"))
+  ;; the contents of the base directory
+  (add-to-list 'org-publish-project-alist
+               `("oncs-data"
+                 :base-directory ,oncs-dir
+                 :include ("COPYING")
+                 :base-extension "lisp"
+                 :publishing-directory "/ssh:eschulte@moons.cs.unm.edu:~/public_html/code/oncs/"
+                 :publishing-function org-publish-attachment))
+  ;; a single combined project to publish both html and supporting materials
+  (add-to-list 'org-publish-project-alist
+               '("oncs" :components
+                 ("oncs-html"
+                  "oncs-data"
+                  "oncs-evolution")))
+#+end_src
