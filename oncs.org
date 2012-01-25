@@ -132,6 +132,30 @@ Should try to diagram out the execution of factorial.
 The above assumes both Booleans are represented as in λ-calc (i.e., T
 is =(λ x y . x)= and F is =(λ x y . y)=).
 
+Could expand to something like the following in the medium.
+
+:  +-------+  +-------+  +-------+
+:  |def|  -+->|fac|  -+->|   |nil|
+:  +-------+  +-------+  +-+-----+
+:                          |     
+:                          v     
+:                        +-------+  +-------+  +-------+
+:                        | λ |  -+->| x |  -+->|   |nil|
+:                        +-------+  +-------+  +-+-----+
+:                                                |     
+:                                                v     
+:                                              +-------+  +-------+  +-------+  +-------+
+:                                              |   |  -+->| x |  -+->|fac|  -+->|   |nil|
+:                                              +-+-----+  +-------+  +-------+  +-+-----+
+:                                                |                                |
+:                                                |                                v
+:                                                |                              +-------+  +-------+  +-------+
+:                                                |                              | - |  -+->| 1 |  -+->| x |nil|
+:                                                v                              +-------+  +-------+  +-------+
+:                                              +-------+  +-------+  +-------+
+:                                              | = |  -+->| x |  -+->| 0 |nil|
+:                                              +-------+  +-------+  +-------+
+
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.
 #+begin_src emacs-lisp :results silent
