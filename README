@@ -157,6 +157,38 @@ Could expand to something like the following in the medium.
 :                                              | = |  -+->| x |  -+->| 0 |nil|
 :                                              +-------+  +-------+  +-------+
 
+* What would an ONC cell (empty or otherwise) need to do?
+- pass messages
+- find nearby empty cells (for placing new ONCS)
+- maybe point to the environment
+
+actions
+- /quickly/ pass a message from one neighbor to another
+- declare itself as empty or full
+- perform local (in cell) computation
+- respond to message with either local data or the result of local
+  computation -- should it block until a result is computed?
+
+fac
+: 
+
+y-combinator
+: (def Ω)
+
+Factorial of 6
+1. With a combinator =Ω= and the recursive part of the factorial
+   function =f=
+   : f = (λ n ((= 0 n) 1 (* n (f (- n 1)))))
+   : Ω = (λ f (λ x (f (x x))) (λ x (f (x x))))
+2. combine these to create factorial
+   : fac = (Ω f)
+3. apply factorial to 6
+   : (Ω f) 6
+4. lookup Ω
+   : ((λ f (λ x (f (x x))) (λ x (f (x x)))) (λ n ((= 0 n) 1 (* n (f (- n 1)))))) 6
+5. apply the combinator
+   : 
+
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.
 #+begin_src emacs-lisp :results silent
