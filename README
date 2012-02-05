@@ -189,6 +189,30 @@ Factorial of 6
 5. apply the combinator
    : 
 
+* How to move an onc with its references
+When an onc moves to =new=, we need to start moving the car and cdr
+references before the first onc lands (parallel not serial).  Their
+targets become =new-car= and =new-cdr=.  How can they update their
+landing location as the original onc gets established.
+:   moves to location
+:   "new"            
+:        
+:    +---+
+:    |   | ---> moves to location
+:    +-+-+      "new cdr"        
+:      |                 
+:      v                 
+:  moves to location
+:  "new car"        
+
+sequence
+1. onc moves
+2. references follow
+3. upon landing onc finds open car and cdr spaces
+4. car and cdr land on top of onc, and follow these references to
+   their new homes
+5. and repeat...
+
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.
 #+begin_src emacs-lisp :results silent
