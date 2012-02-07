@@ -266,15 +266,15 @@ are data or reference, followed by contents.
 - 4 bit headers
 - 64-bit words
 
-message headers
-| 1 1 1 | variable |
-| 1 1 0 | local    |
-| 1 0 1 | car      |
-| 1 0 0 | cdr      |
-| 0 1 1 | message  |
-| 0 1 0 | env data |
-| 0 0 1 | car data |
-| 0 0 0 | cdr data |
+message headers -- 1 byte
+| 1 1 1 0 | variable | 7 |
+| 1 1 0 0 | local    | 3 |
+| 1 0 1 0 | car      | 5 |
+| 1 0 0 0 | cdr      | 1 |
+| 0 1 1 0 | message  | 6 |
+| 0 1 0 0 | env data | 2 |
+| 0 0 1 0 | car data | 4 |
+| 0 0 0 0 | cdr data | 0 |
 
 ** onc
 - onc header 64 bits
