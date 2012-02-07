@@ -266,15 +266,15 @@ are data or reference, followed by contents.
 - 4 bit headers
 - 64-bit words
 
-headers
-| 1 1 1 | variable   |
-| 1 1 0 | local      |
-| 1 0 1 | car        |
-| 1 0 0 | cdr        |
-| 0 1 1 | onc header |
-| 0 1 0 | message    |
-| 0 0 1 | car data   |
-| 0 0 0 | cdr data   |
+message headers
+| 1 1 1 | variable |
+| 1 1 0 | local    |
+| 1 0 1 | car      |
+| 1 0 0 | cdr      |
+| 0 1 1 | message  |
+| 0 1 0 | env data |
+| 0 0 1 | car data |
+| 0 0 0 | cdr data |
 
 ** onc
 - onc header 64 bits
@@ -283,7 +283,8 @@ headers
 - cdr 64 bits
 
 ** functions
-- convert an onc to a message stream
+- convert a linked onc structure to a message stream -- just
+  recursively convert oncs
 
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.

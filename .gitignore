@@ -2,3 +2,6 @@
 *.html
 *.tex
 *.pdf
+
+## compiled files
+onc
