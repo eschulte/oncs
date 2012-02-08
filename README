@@ -2,13 +2,80 @@
 #+Title: ONCs -- are not conses
 #+Author: Eric Schulte
 #+License: GPLV3
-#+Options: ^:nil
-#+Style: <style>pre{display:table-cell;} #content{max-width:1000px;margin:auto;}</style>
+#+Options: ^:nil toc:nil num:nil
+#+Style: <style>pre{display:table-cell;background:#232323;color:#e6e1dc;}</style>
+#+Style: <style>#content{max-width:1000px;margin:auto;}</style>
+#+Style: <style>.outline-text-2{margin-left: 2em;}.outline-text-3{margin-left: 3em;}</style>
 
 ONCs is a lisp virtual machine implemented as cons cells embedded in a
 spatially extended medium of combined processing and memory elements.
 
-* What is an ONC?
+* Distributed Processing and Storage
+: +--+--+--+--+--+--+--+--+
+: |  |  |  |  |  |  |  |  |
+: +--+--    ONCS    +--+--+   The machine is composed of a field of ONCs.
+: |  |  |  |  |  |  |  |  |
+: +--+--+--+--+--+--+--+--+
+: |  |  |  |  |  |  || |  |
+: +--+--+--+--+--+--++-+--+
+: |  |  |<-+--+-messages- |   Computation occurs in parallel in the form of
+: +--+--+--+--+--+--++-+--+   messages passing between ONCs.
+: |  |  |  |  |  |  |v |  |
+: +--+--+--+--+--+--+--+--+
+
+** ONC
+Each ONC serves both as a location for storage and local processing.
+ONCs have the following internal structure.
+#+begin_src C
+  struct onc        // +----------------+
+  {                 // |      ONC       |
+    long long hdr;  // | header    byte |
+    long long env;  // | env       word |
+    long long msg;  // | message   word |
+    long long car;  // | car       word |
+    long long cdr;  // | cdr       word |
+  };                // +----------------+
+#+end_src
+- header :: holds information controlling the execution of the ONC,
+     including how it responds to messages
+     | executable        | is it active (function) or passive (data)    |
+     | serial            | resolve car/cdr in serial or parallel        |
+     | weight/references | how big am I and how many things point to me |
+     | pass through      | just pass incoming messages through          |
+     | hold?             | not accepting messages                       |
+- environment :: a pointer to the environment which should be used to
+     resolve local variables
+- message :: a local work space in which incoming messages and
+     temporary addresses (e.g., used to direct transient messages)
+- car and cdr :: either raw data or the pointers with which linked
+     cons structures are built
+
+** Message
+Messages move information between ONCs.  Messages are streams of
+/headers/ and /payloads/.
+#+begin_src C
+  /* Message Payloads */
+  typedef unsigned long long word;
+  /* Message Headers */
+  typedef unsigned char header;
+#+end_src
+Payloads carry raw data and headers indicate how payloads are to be
+processed along the following rules.
+#+begin_src C
+  switch( head ){
+   case 7: /* 1 1 1 0 -- direct to value of payload in env */    break;
+   case 3: /* 1 1 0 0 -- direct to local direction in payload */ break;
+   case 5: /* 1 0 1 0 -- direct to value in car */               break;
+   case 1: /* 1 0 0 0 -- direct to value in cdr */               break;
+   case 6: /* 0 1 1 0 -- store payload in message */             break;
+   case 2: /* 0 1 0 0 -- store payload in env */                 break;
+   case 4: /* 0 0 1 0 -- store payload in car */                 break;
+   case 0: /* 0 0 0 0 -- store payload in cdr */                 break;
+   }
+#+end_src
+
+* COMMENT Pontification
+** What is an ONC?
 :  +--------------------------------------------+
 :  |       Header                Data Words     |
 :  | +------------------+  +------------------+ |
@@ -32,6 +99,7 @@ an ONC (/currently/) is composed of:
   | executable        | is it active (function) or passive (data)    |
   | serial            | resolve car/cdr in serial or parallel        |
   | weight/references | how big am I and how many things point to me |
+  | pass through      | just pass incoming messages through          |
 
 - Rule Table :: which can map words of data to actions
   | =   | equality of car and cdr    |
@@ -42,7 +110,7 @@ an ONC (/currently/) is composed of:
   | and | bitwise and of car and cdr |
   | ... | more?                      |
 
-** more about the headers
+*** more about the headers
 Some more information on the use of the header flags, hopefully most
 flags will just be bits (although some will be counters) and the
 header should fit into a word or two of memory.
@@ -76,7 +144,7 @@ header should fit into a word or two of memory.
      Maybe different counters should be used for outgoing and incoming
      references.
 
-** more on environments
+*** more on environments
 These resolve variables to values (addresses).  I imagine these would
 exists on many different levels in a hierarchy.  Each would be
 composed of a table mapping variables to values, and a pointer to the
@@ -104,7 +172,7 @@ look up times.
 :  | |   | |    | |   | |
 :  +-+   +-+    +-+   +-+
 
-* Language (non-VM) issues
+** Language (non-VM) issues
 Somewhere between lisp and λ-Calculus
 - lispy notation with macros
 - only single-arity functions with automatic currying with macro
@@ -122,7 +190,7 @@ Somewhere between lisp and λ-Calculus
   efficient parallelism (like clojure)
 - possibly function annotation (e.g., associative) like Fortress
 
-* What would execution look like?
+** What would execution look like?
 I don't know, hopefully naturally spreading out through the medium and
 then collapsing as computation completes and code is replaced with its
 results...
@@ -157,7 +225,7 @@ Could expand to something like the following in the medium.
 :                                              | = |  -+->| x |  -+->| 0 |nil|
 :                                              +-------+  +-------+  +-------+
 
-* What would an ONC cell (empty or otherwise) need to do?
+** What would an ONC cell (empty or otherwise) need to do?
 - pass messages
 - find nearby empty cells (for placing new ONCS)
 - maybe point to the environment
@@ -185,7 +253,7 @@ Factorial of 6
 6. apply =f= to =6=
    : ...
 
-* How to move an onc with its references
+** How to move an onc with its references
 When an onc moves to =new=, we need to start moving the car and cdr
 references before the first onc lands (parallel not serial).  Their
 targets become =new-car= and =new-cdr=.  How can they update their
@@ -209,8 +277,8 @@ sequence
    their new homes
 5. and repeat...
 
-* Objects and their structure and functions
-** reference
+** Objects and their structure and functions
+*** reference
 Three types of references
 - local reference, e.g., over two up one
 - variable references, e.g., the variable named =foo=
@@ -230,13 +298,13 @@ in order.
 So a message could be as follows which is just read from the top down
 :           Message                                           Message at cdr
 :   +--------------------+                                       of ref
-:   | Reference  ref     |          Message at ref          +---------------+        
+:   | Reference  ref     |          Message at ref          +---------------+
 :   |           ---------|       +------------------+       | Ref:   car    |        Message at car
 :   |            cdr     |       | Reference   cdr  |       |               |         of cdr of ref
 :   |           ---------|  ref  |          --------|  cdr  |               |  car   +------------+
 :   |            car     | ----> |             car  | ----> |---------------| ---->  | Pay: data  |
 :   |--------------------|       |------------------|       | Pay:   data   |        +------------+
-:   | Payload    data    |       | Payload  data    |       +---------------+        
+:   | Payload    data    |       | Payload  data    |       +---------------+
 :   +--------------------+       +------------------+
 :         follow ref                 follow cdr                 follow car             insert data
 
@@ -244,7 +312,7 @@ These could also be interspersed... after all large data blocks will
 necessarily have a cons structure (e.g., need to be split up amongst
 multiple oncs).
 
-** message
+*** message
 Mixed references and data, references are followed and data is
 inserted.  It may also be useful to have some sort of =split=
 operator, so that a reference at the front of a message could be
@@ -262,7 +330,7 @@ Formally let a message just be a list of words of arbitrary length,
 where words are as defined below, some indicator bit to say if they
 are data or reference, followed by contents.
 
-** words and headers
+*** words and headers
 - 4 bit headers
 - 64-bit words
 
@@ -276,15 +344,16 @@ message headers -- 1 byte
 | 0 0 1 0 | car data | 4 |
 | 0 0 0 0 | cdr data | 0 |
 
-** onc
+*** onc
 - onc header 64 bits
 - env 64 bits
 - car 64 bits
 - cdr 64 bits
 
-** functions
+*** functions
 - convert a linked onc structure to a message stream -- just
   recursively convert oncs
+- lookup a variable and send a message to that location
 
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.
@@ -331,7 +400,7 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                `("oncs-data"
                  :base-directory ,oncs-dir
                  :include ("COPYING")
-                 :base-extension "lisp"
+                 :base-extension "lisp\\|c"
                  :publishing-directory "/ssh:eschulte@moons.cs.unm.edu:~/public_html/code/oncs/"
                  :publishing-function org-publish-attachment))
   ;; a single combined project to publish both html and supporting materials
