@@ -3,7 +3,7 @@
 /* ONC */
 struct onc        // +----------------+
 {                 // |      ONC       |
-  long long hdr;  // | header    byte |
+  header hdr;     // | header    byte |
   long long env;  // | env       word |
   long long msg;  // | message   word |
   long long car;  // | car       word |
