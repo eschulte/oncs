@@ -3,9 +3,9 @@
 #+Author: Eric Schulte
 #+License: GPLV3
 #+Options: ^:nil toc:nil num:nil
-#+Style: <style>pre{display:table-cell;background:#232323;color:#e6e1dc;}</style>
-#+Style: <style>#content{max-width:1000px;margin:auto;}</style>
-#+Style: <style>.outline-text-2{margin-left: 2em;}.outline-text-3{margin-left: 3em;}</style>
+#+Style: <style type="text/css">pre{display:table-cell;background:#232323;color:#e6e1dc;}</style>
+#+Style: <style type="text/css">#content{max-width:1000px;margin:auto;}</style>
+#+Style: <style type="text/css">.outline-text-2{margin-left: 2em;}.outline-text-3{margin-left: 3em;}</style>
 
 ONCs is a lisp virtual machine implemented as cons cells embedded in a
 spatially extended medium of combined processing and memory elements.
@@ -54,19 +54,19 @@ ONCs have the following internal structure.
 Messages move information between ONCs.  Messages are streams of
 /headers/ and /payloads/.
 #+begin_src C
-  /* Message Payloads */
-  typedef unsigned long long word;
   /* Message Headers */
   typedef unsigned char header;
+  /* Message Payloads */
+  typedef unsigned long long word;
 #+end_src
 Payloads carry raw data and headers indicate how payloads are to be
 processed along the following rules.
 #+begin_src C
   switch( head ){
    case 7: /* 1 1 1 0 -- direct to value of payload in env */    break;
-   case 3: /* 1 1 0 0 -- direct to local direction in payload */ break;
-   case 5: /* 1 0 1 0 -- direct to value in car */               break;
-   case 1: /* 1 0 0 0 -- direct to value in cdr */               break;
+   case 3: /* 1 1 0 0 -- direct to local direction of payload */ break;
+   case 5: /* 1 0 1 0 -- direct to value of car */               break;
+   case 1: /* 1 0 0 0 -- direct to value of cdr */               break;
    case 6: /* 0 1 1 0 -- store payload in message */             break;
    case 2: /* 0 1 0 0 -- store payload in env */                 break;
    case 4: /* 0 0 1 0 -- store payload in car */                 break;
@@ -410,7 +410,7 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                `("oncs-data"
                  :base-directory ,oncs-dir
                  :include ("COPYING")
-                 :base-extension "c"
+                 :base-extension "c\\|txt"
                  :publishing-directory "/ssh:eschulte@moons.cs.unm.edu:~/public_html/code/oncs/"
                  :publishing-function org-publish-attachment))
   ;; a single combined project to publish both html and supporting materials
