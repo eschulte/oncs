@@ -24,7 +24,8 @@ struct onc oncs[SIZE][SIZE];
 long long messages[SIZE][SIZE];
 unsigned int message_types[SIZE][SIZE];
 
-void accept_message_header(struct onc self, header head){
+void accept_message_header
+(struct onc self, header head, unsigned int x, unsigned int y){
   switch( head ){
   case 7: /* 1 1 1 0 -- direct to value of payload in env */    break;
   case 3: /* 1 1 0 0 -- direct to local direction of payload */ break;
@@ -37,7 +38,8 @@ void accept_message_header(struct onc self, header head){
   }
 }
 
-void accept_message_payload(struct onc self, word payload){
+void accept_message_payload
+(struct onc self, word payload, unsigned int x, unsigned int y){
   switch( self.hdr ){
   case 7: /* 1 1 1 0 -- direct to value of payload in env */    break;
   case 3: /* 1 1 0 0 -- direct to local direction of payload */ break;
