@@ -1,16 +1,15 @@
 # -*- mode:org -*-
-#+Title: ONCs -- are not conses
+#+Title: Oncs are Not Conses
 #+Author: Eric Schulte
 #+License: GPLV3
 #+Options: ^:nil toc:nil num:nil
-#+Style: <style type="text/css">pre{display:table-cell;background:#232323;color:#e6e1dc;}</style>
-#+Style: <style type="text/css">#content{max-width:1000px;margin:auto;}</style>
-#+Style: <style type="text/css">.outline-text-2{margin-left: 2em;}.outline-text-3{margin-left: 3em;}</style>
+#+Style: <style type="text/css">pre{display:table-cell;background:#232323; color:#e6e1dc;}</style>
+#+Style: <style type="text/css">#content{max-width:1000px;margin:auto;} body{ font-size:small; }</style>
+#+Style: <style type="text/css">.outline-text-2{margin-left:2em;}.outline-text-3{margin-left:3em;}</style>
 
 ONCs is a lisp virtual machine implemented as cons cells embedded in a
 spatially extended medium of combined processing and memory elements.
 
-* Distributed Processing and Storage
 : +--+--+--+--+--+--+--+--+
 : |  |  |  |  |  |  |  |  |
 : +--+--    ONCS    +--+--+   The machine is composed of a field of ONCs.
@@ -25,7 +24,10 @@ spatially extended medium of combined processing and memory elements.
 
 ** ONC
 Each ONC serves both as a location for storage and local processing.
-ONCs have the following internal structure.
+ONCs are composed of a header which holds the state of the ONC, a
+message buffer, =car= and =cdr= which hold either raw data or links to
+other oncs, and an =env= pointer which points to the environment of
+the onc in which local variables are to be resolved.
 #+begin_src C
   struct onc        // +----------------+
   {                 // |      ONC       |
@@ -36,13 +38,17 @@ ONCs have the following internal structure.
     long long cdr;  // | cdr       word |
   };                // +----------------+
 #+end_src
-- header :: holds information controlling the execution of the ONC,
-     including how it responds to messages
-     | executable        | is it active (function) or passive (data)    |
-     | serial            | resolve car/cdr in serial or parallel        |
-     | weight/references | how big am I and how many things point to me |
-     | pass through      | just pass incoming messages through          |
-     | hold?             | not accepting messages                       |
+- header :: A byte which holds information controlling the execution
+     of the ONC, including how it responds to messages.  The first
+     four bits hold the following flags.
+     | executable | is it active (function) or passive (data) |
+     | serial     | resolve car/cdr in serial or parallel     |
+     | active     | does anyone point to me                   |
+     | hold       | not accepting incoming messages           |
+     The last four bits indicate how incoming payloads are handled
+     indicating if they are stored in fields of the current onc or
+     passed through to neighboring oncs in one of the four cardinal
+     directions.
 - environment :: a pointer to the environment which should be used to
      resolve local variables
 - message :: a local work space in which incoming messages and
@@ -53,12 +59,15 @@ ONCs have the following internal structure.
 ** Message
 Messages move information between ONCs.  Messages are streams of
 /headers/ and /payloads/.
+
 #+begin_src C
   /* Message Headers */
   typedef unsigned char header;
+
   /* Message Payloads */
   typedef unsigned long long word;
 #+end_src
+
 Payloads carry raw data and headers indicate how payloads are to be
 processed along the following rules.
 #+begin_src C
@@ -74,15 +83,13 @@ processed along the following rules.
    }
 #+end_src
 
-** States of ONCs -- header values and their meanings
-As mentioned above headers will have the following flags.
-| executable        | is it active (function) or passive (data)    |
-| serial            | resolve car/cdr in serial or parallel        |
-| weight/references | how big am I and how many things point to me |
-| pass through      | just pass incoming messages through          |
-| hold?             | not accepting messages                       |
-We can order these as follows into an 8-bit byte.
-: [ executable | serial | pass-through | hold | size...4.bits...]
+* COMMENT Tasks [0/1]
+** TODO moving 4 bits to and from byte sequences, and shifting bits
+for example
+- need to grab the last half of a header to get a direction
+- need to pop the 4-bit direction from a payload
+- then shift the contents of the payload by 4 bits
+- then add the four bits to the end of the payload
 
 * COMMENT Pontification
 ** What is an ONC?
@@ -380,28 +387,14 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                   :publishing-function org-publish-org-to-html
                   :style "<style type=\"text/css\">\n <!--/*--><![CDATA[/*><!--*/
     .title  { text-align: center; }
-    .todo   { color: red; }
-    .done   { color: green; }
-    .tag    { background-color: #add8e6; font-weight:normal }
-    .timestamp { color: #bebebe; }
-    .timestamp-kwd { color: #5f9ea0; }
     p.verse { margin-left: 3% }
     p { text-align: justify }
-    pre {
-      background: #232323;
-      color: #e6e1dc;
-      border: 1pt solid #AEBDCC;
-      padding: 5pt;
-      overflow: auto;
-      display: table-cell;
-    }
     table { border-collapse: collapse; }
     td, th { vertical-align: top; }
     dt { font-weight: bold; }
     div.figure { padding: 0.5em; }
     div.figure p { text-align: center; }
     .linenr { font-size:smaller }
-    #content { max-width: 1000px; margin: auto; }
     #postamble { color: gray; padding-top: 2em; font-size: 0.75em; }
     /*]]>*/-->
   </style>"))
@@ -419,5 +412,5 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                  ("oncs-html"
                   "oncs-data"
                   "oncs-evolution")))
-
+  
 #+end_src
