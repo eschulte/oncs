@@ -1,6 +1,11 @@
 #include <stdio.h>
 #define SIZE 1000
-#define QUEBITS 64064 /* TODO: assoc onc with every payload & header?  */
+
+/* Headers -- one type for both messages and oncs */
+typedef unsigned char header;
+
+/* Message Payloads */
+typedef unsigned long long word;
 
 /* ONC */
 struct onc        // +----------------+
@@ -12,14 +17,12 @@ struct onc        // +----------------+
   long long cdr;  // | cdr       word |
 };                // +----------------+
 
-/* Message Headers */
-typedef unsigned char header;
+/* Field of ONCs */
+struct onc oncs[SIZE][SIZE];
 
-/* Message Payloads */
-typedef unsigned long long word;
-
-/* Message Queue -- TODO: this shouldn't be global, just getting started */
-uchar mque[QUEBITS];
+/* Local Message Queues -- one per ONC */
+long long messages[SIZE][SIZE];
+unsigned int message_types[SIZE][SIZE];
 
 void accept_message_header(struct onc self, header head){
   switch( head ){
@@ -35,29 +38,31 @@ void accept_message_header(struct onc self, header head){
 }
 
 void accept_message_payload(struct onc self, word payload){
-  switch( head ){
+  switch( self.hdr ){
   case 7: /* 1 1 1 0 -- direct to value of payload in env */    break;
   case 3: /* 1 1 0 0 -- direct to local direction of payload */ break;
   case 5: /* 1 0 1 0 -- direct to value of car */               break;
   case 1: /* 1 0 0 0 -- direct to value of cdr */               break;
-  case 6: /* 0 1 1 0 */ onc.msg = payload;                      break;
-  case 2: /* 0 1 0 0 */ onc.env = payload;                      break;
-  case 4: /* 0 0 1 0 */ onc.car = payload;                      break;
-  case 0: /* 0 0 0 0 */ onc.cdr = payload;                      break;
+  case 6: /* 0 1 1 0 */ self.msg = payload;                     break;
+  case 2: /* 0 1 0 0 */ self.env = payload;                     break;
+  case 4: /* 0 0 1 0 */ self.car = payload;                     break;
+  case 0: /* 0 0 0 0 */ self.cdr = payload;                     break;
   }
 }
 
-struct onc medium[SIZE][SIZE];
-
 int main(int argc, const char* argv[]){
-  int steps = atoi(argv[1]);
-  int step, x, y;
+  int steps, step, x, y;
+  if(argc > 1)
+    steps = atoi(argv[1]);
+  else
+    steps = 0;
   for(step=0; step<=steps; step++){
     for(x=0; x<SIZE; x++){
       for(y=0; y<SIZE; y++){
-        
+
       }
     }
   }
+  printf("ONCs are not cons\n");
   return 0;
 }
