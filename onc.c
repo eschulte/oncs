@@ -1,21 +1,5 @@
 #include <stdio.h>
-#define SIZE 1000
-
-/* Headers -- one type for both messages and oncs */
-typedef unsigned char header;
-
-/* Message Payloads */
-typedef unsigned long long word;
-
-/* ONC */
-struct onc        // +----------------+
-{                 // |      ONC       |
-  header hdr;     // | header    byte |
-  long long env;  // | env       word |
-  long long msg;  // | message   word |
-  long long car;  // | car       word |
-  long long cdr;  // | cdr       word |
-};                // +----------------+
+#include "onc.h"
 
 /* Field of ONCs */
 struct onc oncs[SIZE][SIZE];
@@ -24,12 +8,32 @@ struct onc oncs[SIZE][SIZE];
 long long messages[SIZE][SIZE];
 unsigned int message_types[SIZE][SIZE];
 
+int main(int argc, const char* argv[]){
+  int steps, step, x, y;
+  if(argc > 1)
+    steps = atoi(argv[1]);
+  else
+    steps = 0;
+  for(step=0; step<=steps; step++){
+    for(x=0; x<SIZE; x++){
+      for(y=0; y<SIZE; y++){
+
+      }
+    }
+  }
+  printf("ONCs are not cons\n");
+  return 0;
+}
+
 void accept_message_header
 (struct onc self, header head, unsigned int x, unsigned int y){
+  unsigned int direction;
   switch( head ){
   case 7: /* 1 1 1 0 -- direct to value of payload in env */    break;
   case 3: /* 1 1 0 0 -- direct to local direction of payload */ break;
-  case 5: /* 1 0 1 0 -- direct to value of car */               break;
+  case 5: /* 1 0 1 0 -- direct to value of car */
+    
+    break;
   case 1: /* 1 0 0 0 -- direct to value of cdr */               break;
   case 6: /* 0 1 1 0 -- store payload in message */             break;
   case 2: /* 0 1 0 0 -- store payload in env */                 break;
@@ -52,19 +56,7 @@ void accept_message_payload
   }
 }
 
-int main(int argc, const char* argv[]){
-  int steps, step, x, y;
-  if(argc > 1)
-    steps = atoi(argv[1]);
-  else
-    steps = 0;
-  for(step=0; step<=steps; step++){
-    for(x=0; x<SIZE; x++){
-      for(y=0; y<SIZE; y++){
-
-      }
-    }
-  }
-  printf("ONCs are not cons\n");
-  return 0;
+/* pop direction from payload, push onto end and return */
+unsigned int pop_direction(word * payload){
+  
 }
