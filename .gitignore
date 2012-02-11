@@ -2,6 +2,8 @@
 *.html
 *.tex
 *.pdf
+*.fasl
+*.o
 
 ## compiled files
 onc
