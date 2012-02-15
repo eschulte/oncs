@@ -17,7 +17,6 @@
 
 ;;; Types of structures
 (defvar *word-size* 32)
-(defvar *world-size* '(100 100)) ;; <- '(1000 1000) blows the stack
 
 (defstruct (onc-header (:conc-name))
   (exe-p nil   :type boolean)
@@ -41,24 +40,18 @@
 (defun x (lst) (first lst))
 (defun y (lst) (second lst))
 
-(defun o-get (onc)
-  (case (dir (o-hdr onc))
-    (:north (aref *medium* (mod (- 1 (x (o-loc onc))) (x *world-size*))))
-    (:south (aref *medium* (mod (+ 1 (x (o-loc onc))) (x *world-size*))))
-    (:east  (aref *medium* (mod (+ 1 (y (o-loc onc))) (y *world-size*))))
-    (:west  (aref *medium* (mod (- 1 (y (o-loc onc))) (y *world-size*))))
-    (:car   (o-car onc))
-    (:cdr   (o-cdr onc))
-    (:msg   (o-msg onc))
-    (:env   (o-env onc))))
-
 
 ;;; objects in the world
-(defvar *medium* (make-array *world-size* :element-type 'onc)
+(defun make-torus-medium (world-size)
+  "Used to initialize the medium."
+  (let ((medium (make-array world-size :element-type 'onc)))
+    (loop :for x :below (x world-size) :do
+       (loop :for y :below (y world-size) :do
+          (setf (aref medium x y) (make-onc :loc (list x y)))))
+    medium))
+
+(defvar *medium* nil
   "The actual processing and memory medium in which computation occurs.")
-(loop :for x :below (x *world-size*) :do
-   (loop :for y :below (y *world-size*) :do
-      (setf (aref *medium* x y) (make-onc :loc (list x y)))))
 
 (defvar *environment* (make-hash-table) ;; TODO: implement in the medium
   "Placeholder environment which will eventually be implemented in the medium.")
@@ -67,6 +60,19 @@
 
 
 ;;; functions defining the physics of this machine
+(defun o-get (onc)
+  (let ((dim (third (type-of *medium*)))
+        (loc (o-loc onc)))
+    (case (dir (o-hdr onc))
+      (:north (aref *medium* (x loc) (mod (+ 1 (y loc)) (y dim))))
+      (:south (aref *medium* (x loc) (mod (- 1 (y loc)) (y dim))))
+      (:east  (aref *medium* (mod (+ 1 (x loc)) (x dim)) (y loc)))
+      (:west  (aref *medium* (mod (- 1 (x loc)) (x dim)) (y loc)))
+      (:car   (o-car onc))
+      (:cdr   (o-cdr onc))
+      (:msg   (o-msg onc))
+      (:env   (o-env onc)))))
+
 (defun accept-message (onc message)
   "Accept from message stream into onc."
   (if (keywordp message)
