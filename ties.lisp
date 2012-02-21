@@ -37,3 +37,5 @@
     (when (and (update (forward loc))
                (update (backward loc)))
       (setf (map )))))
+
+;; two overlaid planes, each octagonal
