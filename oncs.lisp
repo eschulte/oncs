@@ -64,6 +64,7 @@
   (let ((dim (third (type-of *medium*)))
         (loc (o-loc onc)))
     (case (dir (o-hdr onc))
+      ;; pointers to directions
       (:north (aref *medium* (x loc) (mod (+ 1 (y loc)) (y dim))))
       (:south (aref *medium* (x loc) (mod (- 1 (y loc)) (y dim))))
       (:east  (aref *medium* (mod (+ 1 (x loc)) (x dim)) (y loc)))
@@ -71,7 +72,9 @@
       (:car   (o-car onc))
       (:cdr   (o-cdr onc))
       (:msg   (o-msg onc))
-      (:env   (o-env onc)))))
+      (:env   (o-env onc))
+      ;; directives to action
+      (:act   ))))
 
 (defun accept-message (onc message)
   "Accept from message stream into onc."
@@ -79,7 +82,16 @@
       ;; if a keyword, save in header
       (setf (dir (o-hdr onc)) message)
       ;; otherwise it is data so handle appropriately given header-dir
-      (let ((location (o-get onc)))
-        (if (onc-p location)
-            (push (cons message location) *message-queue*)
-            (setf location message)))))
+      (let ((dim (third (type-of *medium*)))
+            (loc (o-loc onc)))
+        (flet ((push-place (message x y)
+                 (push message (aref *message-queue* x y))))
+          (case (dir (o-hdr onc))
+            (:north (push-place message (x loc) (mod (+ 1 (y loc)) (y dim))))
+            (:south (push-place message (x loc) (mod (- 1 (y loc)) (y dim))))
+            (:east  (push-place message (mod (+ 1 (x loc)) (x dim)) (y loc)))
+            (:west  (push-place message (mod (- 1 (x loc)) (x dim)) (y loc)))
+            (:car   (setf (o-car onc) message))
+            (:cdr   (setf (o-cdr onc) message))
+            (:msg   (setf (o-msg onc) message))
+            (:env   (setf (o-env onc) message)))))))
