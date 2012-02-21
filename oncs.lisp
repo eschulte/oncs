@@ -24,8 +24,16 @@
   (forward  nil :type list)
   (backward nil :type list))
 
-(defun follow (dir loc)
-  (map 'list #'+ loc (funcall dir (apply #'aref *medium* loc))))
+(defun comb (loc dir)   (map 'list #'+ loc dir))
+(defun at (loc)         (apply #'aref *medium* loc))
+(defun follow (dir loc) (comb loc (funcall dir (at loc))))
+(defun -> (loc)         (follow #'forward loc))
+(defun <- (loc)         (follow #'backward loc))
 
-(defun -> (loc) (follow #'forward loc))
-(defun <- (loc) (follow #'backward loc))
+(defun move (loc dir)
+  "Move the tie at LOC in DIR updating any refs."
+  (flet ((update (neighbor)
+           ))
+    (when (and (update (forward loc))
+               (update (backward loc)))
+      (setf (map )))))
