@@ -91,6 +91,30 @@ for example
 - then shift the contents of the payload by 4 bits
 - then add the four bits to the end of the payload
 
+* COMMENT Alternate
+Points connected by ties
+:             (+ 2 4)
+:       +--------+--------+
+:       |        |        |
+:     +-+-+    +-+-+    +-+-+
+:     | + |    | 2 |    | 4 |
+:     +---+    +---+    +---+
+
+A tie could be
+:   +---------+       +-----------+
+:   | (x1 y1) |       |    ...    |
+:   | ------- |-------| --------- |
+:   | (x2 y2) |       | (-x1 -y1) |
+:   +---------+       +-----------+
+:        |
+:        |
+:        |
+:   +-----------+
+:   | (-x2 -y2) |
+:   | --------- |
+:   |    ...    |
+:   +-----------+
+
 * COMMENT Pontification
 ** What is an ONC?
 :  +--------------------------------------------+
