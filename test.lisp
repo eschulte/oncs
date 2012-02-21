@@ -1,13 +1,13 @@
-;;; test-oncs.lisp --- Tests for Oncs
+;;; test.lisp --- Tests for Ties
 
 ;; Copyright (C) 2012  Eric Schulte
 
 ;;; Code:
-(in-package :oncs)
+(in-package :ties)
 (require :stefil)
 (use-package :stefil)
-(defsuite oncs-test)
-(in-suite oncs-test)
+(defsuite test-ties)
+(in-suite test-ties)
 
 (defixture short-chain
   (:setup

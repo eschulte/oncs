@@ -1,18 +1,16 @@
-;;; oncs.lisp --- Oncs are Not Conses
+;;; ties.lisp --- Ties between Places and Places bound by Ties
 
 ;; Copyright (C) 2012  Eric Schulte
 
 ;;; Commentary:
 
-;; ONCs is a lisp virtual machine implemented as cons cells embedded
-;; in a spatially extended medium of combined processing and memory
-;; elements.  See the README file in this directory for more
-;; information.
+;; A lisp virtual machine implemented as cons cells embedded in a
+;; spatially extended processing and memory medium.  See the README.
 
 ;;; Code:
 (require :alexandria)
-(defpackage #:oncs (:use :common-lisp :alexandria))
-(in-package :oncs)
+(defpackage #:ties (:use :common-lisp :alexandria))
+(in-package :ties)
 
 
 ;;; Types of structures
