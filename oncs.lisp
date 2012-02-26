@@ -33,7 +33,6 @@
     ((null a) nil)
     ((symbolp a) b)
     ((onc-p a)
-     ;; unless a lambda-expression hiding var
      (unless (and (consp (ocar a))
                   (eq :lambda (car (ocar a)))
                   (eq var (cdr (ocar a))))
@@ -52,9 +51,15 @@
                         (oequal (ocar a) (ocar b))
                         (oequal (ocdr a) (ocdr b))))))
 
-(defun to-onc (sexpr)
+(defun to-oncs (sexpr)
   "Read an SEXPR into an onc structure."
-  (if (and (consp sexpr) (not (eq :lambda (car sexpr))))
-      (make-onc :car (to-onc (car sexpr))
-                :cdr (to-onc (cdr sexpr)))
+  (if (consp sexpr)
+      (if (and (symbolp (car sexpr))
+               (or (equal :lambda (car sexpr)) (equal 'λ (car sexpr))))
+          (make-onc
+           :car `(:lambda ,(second sexpr))
+           :cdr (to-onc (third sexpr)))
+          (make-onc
+           :car (to-onc (car sexpr))
+           :cdr (to-onc (cdr sexpr))))
       sexpr))

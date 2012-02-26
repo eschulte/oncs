@@ -19,15 +19,16 @@
 
 (deftest test-simple-read ()
   (with-fixture simple-onc
-    (is (oequal (make-onc :car :a) (to-onc '(:a))))
+    (is (oequal (make-onc :car :a) (to-oncs '(:a))))
     (is (oequal
          (make-onc :car :a :cdr (make-onc :car :a))
-         (to-onc '(:a :a))))
-    (is (oequal *a* (to-onc '((:lambda :a) :a :a))))))
+         (to-oncs '(:a :a))))
+    (is (oequal *a* (to-oncs '(λ :a (:a :a)))))))
 
 (deftest simple-app-abs ()
   (with-fixture simple-onc
     (is (oequal (app-abs *a* :b)
-                (to-onc '(:b :b))))))
+                (to-oncs '(:b :b))))))
 
 ;; (test-oncs)
+
