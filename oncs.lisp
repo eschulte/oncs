@@ -43,16 +43,34 @@
     (error "attempt to apply expression which is not an abstraction."))
   (app-abs- (lambda-var a) (ocdr a) b))
 
+(defun free-variables (onc)
+  "Return the free variables of an onc."
+  #| TODO: implement |# )
+
+(defun uniquify (a c)
+  "Ensure the variable of abstraction A is unique in context C."
+  (let* ((taken (append (free-variables a) (free-variables b)))
+         (var (lambda-var a))
+         (new var))
+    (while (member var taken)
+      (setq new (make-symbol (concatenate 'string (symbol-name new) "0")))
+      (replace-all var new a))
+    a))
+
 (defun app-abs- (var a b)
   "[var->b]a"
-  (cond
-    ((equal var a) b)
-    ((onc-p a)
-     (unless (and (lambda-p (ocar a)) (eq var (lambda-var a)))
-       (setf (ocar a) (app-abs- var (ocar a) b))
-       (setf (ocdr a) (app-abs- var (ocdr a) b)))
-     a)
-    (t a)))
+  (if (equal var a) b
+      (progn
+        (cond
+          ((and (onc-p a) (lambda-p (ocar a)))
+           (unless (equal var (lambda-var a)) ; just skip if shadowed by var
+             (setf a (uniquify a b))
+             (setf (ocar a) (app-abs- var (ocar a) b))
+             (setf (ocdr a) (app-abs- var (ocdr a) b))))
+          ((onc-p a)
+           (setf (ocar a) (app-abs- var (ocar a) b))
+           (setf (ocdr a) (app-abs- var (ocdr a) b))))
+        a)))
 
 (defun to-oncs (sexpr)
   "Read an SEXPR into an onc structure."

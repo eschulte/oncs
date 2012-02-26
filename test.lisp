@@ -48,4 +48,7 @@
     (is (equal (from-oncs (app-abs (to-oncs *a*) :foo))
                '(:x :y (λ :b (:b :foo)) :foo (λ :a (:b :a)))))))
 
+(with-fixture complex-expression
+  (from-oncs (app-abs (to-oncs *a*) :b)))
+
 (test-oncs)
