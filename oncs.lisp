@@ -17,29 +17,6 @@
   "The basic building blocks of computation."
   (car nil) (cdr nil))
 
-;; (defstruct (ptr (:conc-name))
-;;   "The relative addresses used to connect oncs."
-;;   (x nil) (y nil))
-
-(defun app-abs (a b)
-  "Apply A to B."
-  (unless (and (consp (ocar a)) (eq :lambda (car (ocar a))))
-    (error "attempt to apply expression which is not an abstraction."))
-  (app-abs- (cdr (ocar a)) (ocdr a) b))
-
-(defun app-abs- (var a b)
-  "[var->b]a"
-  (cond
-    ((null a) nil)
-    ((symbolp a) b)
-    ((onc-p a)
-     (unless (and (consp (ocar a))
-                  (eq :lambda (car (ocar a)))
-                  (eq var (cdr (ocar a))))
-       (setf (ocar a) (app-abs- var (ocar a) b))
-       (setf (ocdr a) (app-abs- var (ocdr a) b)))
-     a)))
-
 (defun oequal (a b)
   "Test equality between oncs."
   (cond ((null a) (null b))
@@ -51,15 +28,50 @@
                         (oequal (ocar a) (ocar b))
                         (oequal (ocdr a) (ocdr b))))))
 
+(defun lambda-p (sexpr)
+  (and (consp sexpr)
+       (symbolp (car sexpr))
+       (or (equal (car sexpr) :lambda)
+           (equal (car sexpr) 'λ))))
+
+(defun lambda-var (onc)
+  (second (ocar onc)))
+
+(defun app-abs (a b)
+  "Apply A to B."
+  (unless (and (consp (ocar a)) (eq :lambda (car (ocar a))))
+    (error "attempt to apply expression which is not an abstraction."))
+  (app-abs- (lambda-var a) (ocdr a) b))
+
+(defun app-abs- (var a b)
+  "[var->b]a"
+  (cond
+    ((equal var a) b)
+    ((onc-p a)
+     (unless (and (lambda-p (ocar a)) (eq var (lambda-var a)))
+       (setf (ocar a) (app-abs- var (ocar a) b))
+       (setf (ocdr a) (app-abs- var (ocdr a) b)))
+     a)
+    (t a)))
+
 (defun to-oncs (sexpr)
   "Read an SEXPR into an onc structure."
-  (if (consp sexpr)
-      (if (and (symbolp (car sexpr))
-               (or (equal :lambda (car sexpr)) (equal 'λ (car sexpr))))
-          (make-onc
-           :car `(:lambda ,(second sexpr))
-           :cdr (to-onc (third sexpr)))
-          (make-onc
-           :car (to-onc (car sexpr))
-           :cdr (to-onc (cdr sexpr))))
-      sexpr))
+  (cond
+    ((lambda-p sexpr)
+     (when (> (length sexpr) 3)
+       (error "extra argument to λ:~S" (cdddr sexpr)))
+     (make-onc
+      :car `(:lambda ,(second sexpr))
+      :cdr (to-oncs (third sexpr))))
+    ((consp sexpr)
+     (make-onc
+      :car (to-oncs (car sexpr))
+      :cdr (to-oncs (cdr sexpr))))
+    (t sexpr)))
+
+(defun from-oncs (onc)
+  (if (onc-p onc)
+      (if (lambda-p (ocar onc))
+          (list 'λ (second (ocar onc)) (from-oncs (ocdr onc)))
+          (cons (from-oncs (ocar onc)) (from-oncs (ocdr onc))))
+      onc))

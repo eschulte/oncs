@@ -17,7 +17,12 @@
                     :cdr (make-onc :car :a)))))
   (:teardown))
 
-(deftest test-simple-read ()
+(defixture complex-expression
+  (:setup
+   (setf *a* '(λ :a (:x :y (λ :b (:b :a)) :a (λ :a (:b :a))))))
+  (:teardown))
+
+(deftest test-to-oncs ()
   (with-fixture simple-onc
     (is (oequal (make-onc :car :a) (to-oncs '(:a))))
     (is (oequal
@@ -25,10 +30,22 @@
          (to-oncs '(:a :a))))
     (is (oequal *a* (to-oncs '(λ :a (:a :a)))))))
 
+(deftest test-from-oncs ()
+  (is (equal (from-oncs (make-onc :car :a :cdr (make-onc :car :a)))
+             '(:a :a))))
+
 (deftest simple-app-abs ()
   (with-fixture simple-onc
     (is (oequal (app-abs *a* :b)
                 (to-oncs '(:b :b))))))
 
-;; (test-oncs)
+(deftest test-idempotent-onc-conversion ()
+  (with-fixture complex-expression
+    (is (equal *a* (from-oncs (to-oncs *a*))))))
 
+(deftest variable-hiding ()
+  (with-fixture complex-expression
+    (is (equal (from-oncs (app-abs (to-oncs *a*) :foo))
+               '(:x :y (λ :b (:b :foo)) :foo (λ :a (:b :a)))))))
+
+(test-oncs)
