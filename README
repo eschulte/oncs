@@ -27,8 +27,9 @@ Objects are linked cons structures which perform the following verbs
 * Code
 - pointers :: will be relative (x,y) coordinates
 - oncs :: will be used to build computational and memory structures
+     and may contain the following in their =car= and =cdr=.
   - nil
-  - another onc
+  - a pointer to another onc
   - a variable (symbol)
   - a lambda-symbol (a cons cell)
   - later inter primitives will be added (integers and integer ops)
@@ -44,7 +45,7 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                `("oncs-html"
                   :base-directory ,oncs-dir
                   :include ("README")
-                  :publishing-directory "/ssh:eschulte@moons.cs.unm.edu:~/public_html/code/oncs/"
+                  :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
                   :publishing-function org-publish-org-to-html
                   :style "<style type=\"text/css\">\n <!--/*--><![CDATA[/*><!--*/
     .title  { text-align: center; }
@@ -64,14 +65,12 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                `("oncs-data"
                  :base-directory ,oncs-dir
                  :include ("COPYING")
-                 :base-extension "c\\|txt"
-                 :publishing-directory "/ssh:eschulte@moons.cs.unm.edu:~/public_html/code/oncs/"
+                 :base-extension "c\\|txt\\|lisp"
+                 :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
                  :publishing-function org-publish-attachment))
   ;; a single combined project to publish both html and supporting materials
   (add-to-list 'org-publish-project-alist
                '("oncs" :components
                  ("oncs-html"
-                  "oncs-data"
-                  "oncs-evolution")))
-  
+                  "oncs-data")))
 #+end_src
