@@ -29,6 +29,8 @@
                         (oequal (ocdr a) (ocdr b))))))
 
 (defun lambda-p (onc &aux sexp)
+  "Check if ONC is a lambda abstraction.
+Works whether ONC is an onc or is a lambda cons."
   (setq sexp (if (onc-p onc) (ocar onc) onc))
   (and (consp sexp)
        (symbolp (car sexp))
@@ -36,6 +38,7 @@
            (equal (car sexp) 'λ))))
 
 (defun lambda-var (onc)
+  "Return the variable of a lambda abstraction (ONC or cons)."
   (second (if (onc-p onc) (ocar onc) onc)))
 
 (defun app-abs (a b)
@@ -54,6 +57,7 @@
       (when (and onc (not (member onc non-free))) (list onc))))
 
 (defun oreplace (onc item new)
+  "Replace ITEM with NEW in ONC."
   (cond ((onc-p onc) (make-onc :car (oreplace (ocar onc) item new)
                                :cdr (oreplace (ocdr onc) item new)))
         ((consp onc) (cons (oreplace (car onc) item new)
@@ -62,6 +66,7 @@
         (t onc)))
 
 (defun symbol-inc (symbol)
+  "Increment SYMBOL, used generating unique symbols."
   (intern (concatenate 'string (symbol-name symbol) "+")
           (if (keywordp symbol) "KEYWORD" *package*)))
 
@@ -69,7 +74,7 @@
   "Modify LEFT until it's `lambda-var' is unique in context RIGHT."
   (let ((taken (union (free-variables left) (free-variables right)))
         (var (lambda-var left)))
-    (loop :while (member var taken) :do 
+    (loop :while (member var taken) :do
        (setq new (symbol-inc var))
        (setf left (oreplace left var new))
        (setq var new))
@@ -106,6 +111,7 @@
     (t sexpr)))
 
 (defun from-oncs (onc)
+  "Return a cons tree of the given onc tree."
   (if (onc-p onc)
       (if (lambda-p onc)
           (list 'λ (second (ocar onc)) (from-oncs (ocdr onc)))
