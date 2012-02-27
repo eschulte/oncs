@@ -63,4 +63,9 @@
     (is (oequal (oreplace *a* :a :b)
                 (to-oncs '(λ :b (:b :b)))))))
 
+(deftest uniquify-with-work-to-do ()
+  (with-fixture complex-expression
+    (is (equal (lambda-var (uniquify (to-oncs '(λ :b (:b :d))) (to-oncs *a*)))
+               :B+))))
+
 (test-oncs)

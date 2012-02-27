@@ -61,13 +61,17 @@
         ((equal item onc) new)
         (t onc)))
 
+(defun symbol-inc (symbol)
+  (intern (concatenate 'string (symbol-name symbol) "+")
+          (if (keywordp symbol) "KEYWORD" *package*)))
+
 (defun uniquify (left right &aux new)
   "Modify LEFT until it's `lambda-var' is unique in context RIGHT."
   (let ((taken (union (free-variables left) (free-variables right)))
         (var (lambda-var left)))
     (loop :while (member var taken) :do 
-       (setq new (make-symbol (concatenate 'string (symbol-name new) "0")))
-       (replace var new a)
+       (setq new (symbol-inc var))
+       (setf left (oreplace left var new))
        (setq var new))
     left))
 
