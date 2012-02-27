@@ -22,6 +22,12 @@
    (setf *a* '(λ :a (:x :y (λ :b (:b :a)) :a (λ :a (:b :a))))))
   (:teardown))
 
+(defixture true-and-false
+  (:setup
+   (setf true  '(λ :t (λ :f :t)))
+   (setf false '(λ :t (λ :f :f))))
+  (:teardown))
+
 (deftest test-to-oncs ()
   (with-fixture simple-onc
     (is (oequal (make-onc :car :a) (to-oncs '(:a))))
@@ -72,5 +78,12 @@
   (with-fixture complex-expression
     (is (equal (from-oncs (app-abs (to-oncs *a*) :b))
                '(:X :Y (Λ :B+ (:B+ :B)) :B (Λ :A (:B :A)))))))
+
+(deftest evalutation-with-church-constants-true-and-false ()
+  (with-fixture true-and-false
+    (is (equal (from-oncs (oeval (oeval (to-oncs (list true :foo :bar)))))
+               '(:foo)))
+    (is (equal (from-oncs (oeval (oeval (to-oncs (list false :foo :bar)))))
+               '(:bar)))))
 
 (test-oncs)
