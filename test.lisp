@@ -68,4 +68,9 @@
     (is (equal (lambda-var (uniquify (to-oncs '(λ :b (:b :d))) (to-oncs *a*)))
                :B+))))
 
+(deftest unique-var-for-app-abs ()
+  (with-fixture complex-expression
+    (is (equal (from-oncs (app-abs (to-oncs *a*) :b))
+               '(:X :Y (Λ :B+ (:B+ :B)) :B (Λ :A (:B :A)))))))
+
 (test-oncs)
