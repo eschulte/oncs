@@ -43,13 +43,13 @@
 (defun oequal (a b)
   "Test equality between oncs."
   (cond ((null a) (null b))
-        ((symbolp a) (equal a b))
         ((consp a) (and (consp b)
                         (oequal (car a) (car b))
                         (oequal (cdr a) (cdr b))))
         ((onc-p a) (and (onc-p b)
                         (oequal (ocar a) (ocar b))
-                        (oequal (ocdr a) (ocdr b))))))
+                        (oequal (ocdr a) (ocdr b))))
+        (t (equal a b))))
 
 (defun oreplace (onc item new)
   "Replace ITEM with NEW in ONC."
@@ -134,8 +134,20 @@ Works whether ONC is an onc or is a lambda cons."
 (defun fix (onc &optional max &aux last)
   "Evaluate ONC until a fixed point is found.
 Optional argument MAX limits the number of evaluations."
-  (loop :until (or (oequal last onc) (and max (= max 0))) :do
-     (when max (1- max))
+  (loop :until (oequal last onc) :do
+     (when max
+       (if (= max 0)
+           (error "Failed to find fixed point")
+           (setq max (1- max))))
      (setf last onc)
      (setf onc (oeval onc)))
   onc)
+
+(defvar *max-eval-depth* 100
+  "Maximum number of calls to `oeval' when calculating `fix' before giving up.")
+
+(defun lambda-repl ()
+  "Lambda calculus REPL."
+  (loop :for expr = (progn (format t "~&λ> ") (read *standard-input* nil :eof))
+     :until (equal :eof expr)
+     :do (format t "~&~S" (from-oncs (fix (to-oncs expr) *max-eval-depth*)))))
