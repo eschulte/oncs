@@ -117,3 +117,16 @@ Works whether ONC is an onc or is a lambda cons."
            (setf (ocar a) (app-abs- var (ocar a) b))
            (setf (ocdr a) (app-abs- var (ocdr a) b))))
         a)))
+
+(defun oeval (onc)
+  "Evaluate ONCS"
+  (if (onc-p onc)
+      (let ((car (oeval (ocar onc)))
+            (cdr (oeval (ocdr onc))))
+        (if (and (onc-p car) (lambda-p car))
+            (if (onc-p cdr)
+                (make-onc :car (app-abs car (ocar cdr))
+                          :cdr (ocdr cdr))
+                (app-abs car cdr))
+            (make-onc :car car :cdr cdr)))
+      onc))
