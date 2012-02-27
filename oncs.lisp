@@ -130,3 +130,12 @@ Works whether ONC is an onc or is a lambda cons."
                 (app-abs car cdr))
             (make-onc :car car :cdr cdr)))
       onc))
+
+(defun fix (onc &optional max &aux last)
+  "Evaluate ONC until a fixed point is found.
+Optional argument MAX limits the number of evaluations."
+  (loop :until (or (oequal last onc) (and max (= max 0))) :do
+     (when max (1- max))
+     (setf last onc)
+     (setf onc (oeval onc)))
+  onc)

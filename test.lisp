@@ -81,9 +81,9 @@
 
 (deftest evalutation-with-church-constants-true-and-false ()
   (with-fixture true-and-false
-    (is (equal (from-oncs (oeval (oeval (to-oncs (list true :foo :bar)))))
+    (is (equal (from-oncs (fix (to-oncs (list true :foo :bar))))
                '(:foo)))
-    (is (equal (from-oncs (oeval (oeval (to-oncs (list false :foo :bar)))))
+    (is (equal (from-oncs (fix (to-oncs (list false :foo :bar))))
                '(:bar)))))
 
 (test-oncs)
