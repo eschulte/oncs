@@ -48,7 +48,14 @@
     (is (equal (from-oncs (app-abs (to-oncs *a*) :foo))
                '(:x :y (λ :b (:b :foo)) :foo (λ :a (:b :a)))))))
 
-(with-fixture complex-expression
-  (from-oncs (app-abs (to-oncs *a*) :b)))
+(deftest free-variable-calculation ()
+  (with-fixture complex-expression
+    (is (null (set-difference (free-variables (to-oncs *a*))
+                              '(:B :Y :X))))))
+
+(deftest uniquify-is-not-overly-agressive ()
+  (let ((left (to-oncs '(λ :a (:a :b :c :d))))
+        (right (to-oncs '(λ :a (:b :c :d)))))
+    (is (oequal (uniquify left right) left))))
 
 (test-oncs)

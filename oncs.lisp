@@ -28,14 +28,15 @@
                         (oequal (ocar a) (ocar b))
                         (oequal (ocdr a) (ocdr b))))))
 
-(defun lambda-p (sexpr)
-  (and (consp sexpr)
-       (symbolp (car sexpr))
-       (or (equal (car sexpr) :lambda)
-           (equal (car sexpr) 'λ))))
+(defun lambda-p (onc &aux sexp)
+  (setq sexp (if (onc-p onc) (ocar onc) onc))
+  (and (consp sexp)
+       (symbolp (car sexp))
+       (or (equal (car sexp) :lambda)
+           (equal (car sexp) 'λ))))
 
 (defun lambda-var (onc)
-  (second (ocar onc)))
+  (second (if (onc-p onc) (ocar onc) onc)))
 
 (defun app-abs (a b)
   "Apply A to B."
@@ -43,26 +44,31 @@
     (error "attempt to apply expression which is not an abstraction."))
   (app-abs- (lambda-var a) (ocdr a) b))
 
-(defun free-variables (onc)
+(defun free-variables (onc &optional non-free)
   "Return the free variables of an onc."
-  #| TODO: implement |# )
+  (if (onc-p onc)
+      (if (lambda-p onc)
+          (free-variables (ocdr onc) (cons (lambda-var onc) non-free))
+          (union (free-variables (ocar onc) non-free)
+                 (free-variables (ocdr onc) non-free)))
+      (when (and onc (not (member onc non-free))) (list onc))))
 
-(defun uniquify (a c)
-  "Ensure the variable of abstraction A is unique in context C."
-  (let* ((taken (append (free-variables a) (free-variables b)))
-         (var (lambda-var a))
+(defun uniquify (left right)
+  "Modify LEFT until it's `lambda-var' is unique in context RIGHT."
+  (let* ((taken (union (free-variables left) (free-variables right)))
+         (var (lambda-var left))
          (new var))
-    (while (member var taken)
-      (setq new (make-symbol (concatenate 'string (symbol-name new) "0")))
-      (replace-all var new a))
-    a))
+    (loop :while (member new taken) :do 
+       (setq new (make-symbol (concatenate 'string (symbol-name new) "0")))
+       (replace-all var new a))
+    left))
 
 (defun app-abs- (var a b)
   "[var->b]a"
   (if (equal var a) b
       (progn
         (cond
-          ((and (onc-p a) (lambda-p (ocar a)))
+          ((and (onc-p a) (lambda-p a))
            (unless (equal var (lambda-var a)) ; just skip if shadowed by var
              (setf a (uniquify a b))
              (setf (ocar a) (app-abs- var (ocar a) b))
@@ -89,7 +95,7 @@
 
 (defun from-oncs (onc)
   (if (onc-p onc)
-      (if (lambda-p (ocar onc))
+      (if (lambda-p onc)
           (list 'λ (second (ocar onc)) (from-oncs (ocdr onc)))
           (cons (from-oncs (ocar onc)) (from-oncs (ocdr onc))))
       onc))
