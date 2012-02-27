@@ -53,14 +53,22 @@
                  (free-variables (ocdr onc) non-free)))
       (when (and onc (not (member onc non-free))) (list onc))))
 
-(defun uniquify (left right)
+(defun oreplace (onc item new)
+  (cond ((onc-p onc) (make-onc :car (oreplace (ocar onc) item new)
+                               :cdr (oreplace (ocdr onc) item new)))
+        ((consp onc) (cons (oreplace (car onc) item new)
+                           (oreplace (cdr onc) item new)))
+        ((equal item onc) new)
+        (t onc)))
+
+(defun uniquify (left right &aux new)
   "Modify LEFT until it's `lambda-var' is unique in context RIGHT."
-  (let* ((taken (union (free-variables left) (free-variables right)))
-         (var (lambda-var left))
-         (new var))
-    (loop :while (member new taken) :do 
+  (let ((taken (union (free-variables left) (free-variables right)))
+        (var (lambda-var left)))
+    (loop :while (member var taken) :do 
        (setq new (make-symbol (concatenate 'string (symbol-name new) "0")))
-       (replace-all var new a))
+       (replace var new a)
+       (setq var new))
     left))
 
 (defun app-abs- (var a b)
