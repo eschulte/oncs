@@ -17,20 +17,27 @@
   "The basic building blocks of computation."
   (car nil) (cdr nil))
 
+(defun lambda-p (onc)
+  "Check if ONC is a lambda abstraction.
+Works whether ONC is an onc or is a lambda cons."
+  (let ((sexp (if (onc-p onc) (ocar onc) onc)))
+    (and (consp sexp) (member (car sexp) '(:lambda λ)))))
+
+(defun lambda-var (onc)
+  "Return the variable of a lambda abstraction (ONC or cons)."
+  (second (if (onc-p onc) (ocar onc) onc)))
+
 (defun to-oncs (sexpr)
   "Read an SEXPR into an onc structure."
-  (cond
-    ((lambda-p sexpr)
-     (when (> (length sexpr) 3)
-       (error "extra argument to λ:~S" (cdddr sexpr)))
-     (make-onc
-      :car `(:lambda ,(second sexpr))
-      :cdr (to-oncs (third sexpr))))
-    ((consp sexpr)
-     (make-onc
-      :car (to-oncs (car sexpr))
-      :cdr (to-oncs (cdr sexpr))))
-    (t sexpr)))
+  (cond ((lambda-p sexpr)
+         (when (> (length sexpr) 3)
+           (error "extra argument to λ:~S" (cdddr sexpr)))
+         (make-onc :car `(:lambda ,(second sexpr))
+                   :cdr (to-oncs (third sexpr))))
+        ((consp sexpr) (make-onc
+                        :car (to-oncs (car sexpr))
+                        :cdr (to-oncs (cdr sexpr))))
+        (t sexpr)))
 
 (defun from-oncs (onc)
   "Return a cons tree of the given onc tree."
@@ -60,19 +67,6 @@
         ((equal item onc) new)
         (t onc)))
 
-(defun lambda-p (onc &aux sexp)
-  "Check if ONC is a lambda abstraction.
-Works whether ONC is an onc or is a lambda cons."
-  (setq sexp (if (onc-p onc) (ocar onc) onc))
-  (and (consp sexp)
-       (symbolp (car sexp))
-       (or (equal (car sexp) :lambda)
-           (equal (car sexp) 'λ))))
-
-(defun lambda-var (onc)
-  "Return the variable of a lambda abstraction (ONC or cons)."
-  (second (if (onc-p onc) (ocar onc) onc)))
-
 (defun free-variables (onc &optional non-free)
   "Return the free variables of an onc."
   (if (onc-p onc)
@@ -99,23 +93,21 @@ Works whether ONC is an onc or is a lambda cons."
 
 (defun app-abs (a b)
   "Apply A to B."
-  (unless (and (consp (ocar a)) (eq :lambda (car (ocar a))))
-    (error "attempt to apply expression which is not an abstraction."))
+  (unless (lambda-p a) (error "attempt to apply non-abstraction: ~S" a))
   (app-abs- (lambda-var a) (ocdr a) b))
 
 (defun app-abs- (var a b)
-  "[var->b]a"
+  "[var|->b]a"
   (if (equal var a) b
       (progn
-        (cond
-          ((and (onc-p a) (lambda-p a))
-           (unless (equal var (lambda-var a)) ; just skip if shadowed by var
-             (setf a (uniquify a b))
-             (setf (ocar a) (app-abs- var (ocar a) b))
-             (setf (ocdr a) (app-abs- var (ocdr a) b))))
-          ((onc-p a)
-           (setf (ocar a) (app-abs- var (ocar a) b))
-           (setf (ocdr a) (app-abs- var (ocdr a) b))))
+        (cond ((and (onc-p a) (lambda-p a))
+               (unless (equal var (lambda-var a)) ; skip if shadowed by var
+                 (setf a (uniquify a b))
+                 (setf (ocar a) (app-abs- var (ocar a) b))
+                 (setf (ocdr a) (app-abs- var (ocdr a) b))))
+              ((onc-p a)
+               (setf (ocar a) (app-abs- var (ocar a) b))
+               (setf (ocdr a) (app-abs- var (ocdr a) b))))
         a)))
 
 (defun oeval (onc)
@@ -135,10 +127,9 @@ Works whether ONC is an onc or is a lambda cons."
   "Evaluate ONC until a fixed point is found.
 Optional argument MAX limits the number of evaluations."
   (loop :until (oequal last onc) :do
-     (when max
-       (if (= max 0)
-           (error "Failed to find fixed point")
-           (setq max (1- max))))
+     (when max (if (= max 0)
+                   (error "Failed to find fixed point")
+                   (setq max (1- max))))
      (setf last onc)
      (setf onc (oeval onc)))
   onc)

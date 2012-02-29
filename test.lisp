@@ -7,12 +7,13 @@
 (defsuite test-oncs)
 (in-suite test-oncs)
 
-(defvar onc (make-onc
-             :car '(:lambda :a)
-             :cdr (make-onc
-                   :car :a
-                   :cdr (make-onc :car :a)))
-  "Variable used for tests.")
+(defixture onc
+  (:setup (setq onc (make-onc
+                     :car '(:lambda :a)
+                     :cdr (make-onc
+                           :car :a
+                           :cdr (make-onc :car :a)))))
+  (:teardown))
 
 (defvar expr '(λ :a (:x :y (λ :b (:b :a)) :a (λ :a (:b :a))))
   "Variable used for tests.")
@@ -28,15 +29,16 @@
   (is (oequal
        (make-onc :car :a :cdr (make-onc :car :a))
        (to-oncs '(:a :a))))
-  (is (oequal onc (to-oncs '(λ :a (:a :a))))))
+  (with-fixture onc
+    (is (oequal onc (to-oncs '(λ :a (:a :a)))))))
 
 (deftest from-a-simple-oncs ()
   (is (equal (from-oncs (make-onc :car :a :cdr (make-onc :car :a)))
              '(:a :a))))
 
 (deftest simple-app-abs ()
-  (is (oequal (app-abs onc :b)
-              (to-oncs '(:b :b)))))
+  (with-fixture onc
+    (is (oequal (app-abs onc :b) (to-oncs '(:b :b))))))
 
 (deftest idempotent-onc-conversion ()
   (is (equal expr (from-oncs (to-oncs expr)))))
@@ -55,8 +57,9 @@
     (is (oequal (uniquify left right) left))))
 
 (deftest oreplace-in-simple-expression ()
-  (is (oequal (oreplace onc :a :b)
-              (to-oncs '(λ :b (:b :b))))))
+  (with-fixture onc
+    (is (oequal (oreplace onc :a :b)
+                (to-oncs '(λ :b (:b :b)))))))
 
 (deftest uniquify-with-work-to-do ()
   (is (equal (lambda-var (uniquify (to-oncs '(λ :b (:b :d))) (to-oncs expr)))
