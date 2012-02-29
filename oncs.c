@@ -1,14 +1,9 @@
 #include <stdio.h>
 #define SIZE 100
-/*
-  ptr.hdr meaning:
-  0 -> nil
-  1 -> local pointer (car,cdr)
-  2 -> integer add car and cdr
-  3 -> when symbol interpret car as the symbol
-*/
+
 typedef struct { int hdr, car, cdr; } ptr;
-typedef struct { ptr car, cdr; } onc;
+typedef struct { ptr var, arg, tkn; } msg;
+typedef struct { ptr car, cdr, msg; } onc;
 
 onc world[SIZE][SIZE];
 
@@ -19,3 +14,5 @@ int main(int argc, char* argv){
   world[0][0].cdr.hdr = 0;
   printf(" world[0][0].hdr=%d\n", world[0][0].car.hdr);
 }
+
+void handle_lambda_message(onc self){ /* propagate lambda-msg in onc.msg,  */ }
