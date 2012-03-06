@@ -101,7 +101,7 @@ Works whether ONC is an onc or is a lambda cons."
   (if (equal var a) b
       (progn
         (cond ((and (onc-p a) (lambda-p a))
-               (unless (equal var (lambda-var a)) ; skip if shadowed by var
+               (unless (equal var (lambda-var a)) ; skip shadowed var
                  (setf a (uniquify a b))
                  (setf (ocar a) (app-abs- var (ocar a) b))
                  (setf (ocdr a) (app-abs- var (ocdr a) b))))

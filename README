@@ -24,17 +24,17 @@ Objects are linked cons structures which perform the following verbs
 - evaporation
 
 Pointer -- header indicating type of contents, then car and cdr
-| header | interpretation          |
-|--------+-------------------------|
-|      0 | nil                     |
-|      1 | local pointer (car,cdr) |
-|      2 | integer car+cdr         |
-|      3 | symbol car+cdr          |
+| header | interpretation                       |
+|--------+--------------------------------------|
+|      0 | nil                                  |
+|      1 | local pointer (car,cdr)              |
+|      2 | integer car+cdr                      |
+|      3 | symbol car (cdr for disambiguation?) |
 
 Messages -- lambda-application
-- lambda variable
-- pointer to argument
-- pointer to list of protected variable names
+| var | lambda variable                             |
+| car | pointer to argument                         |
+| cdr | pointer to list of protected variable names |
 
 Onc -- car, cdr and msg pointers
 
