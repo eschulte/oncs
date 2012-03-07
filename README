@@ -8,10 +8,16 @@
 #+Style: <style type="text/css">.outline-text-2{margin-left:2em;}.outline-text-3{margin-left:3em;}</style>
 
 * Design
-To enable function application we will need a mechanism for the object
-of application to /traverse/ another structure and potentially replace
-variables in that structure.  After traversal is completed the object
-will need to be removed.
+There is a large grid /world/ of ONC structures linked by local
+relative pointers.  These structures perform calculations through
+\lambda-application.  All of the action consists of passing messages between
+ONCS.  Messages are used to maintain reference counts and duplicate
+and replace linked ONC structures, all in the service of
+\lambda-application.  Once this is working I'll add primitive integer
+operations, then look to porting to GPU and IXM.
+
+See file:oncs.h for an overview of the functions and objects being
+used.  See file:oncs.lisp for a simulation of the world in lisp.
 
 - ONC :: are linked structures composed of
      #+begin_src C
@@ -34,19 +40,18 @@ will need to be removed.
      |      4 | \lambda same as symbol                     |
 
 - Messages :: passed between oncs, indicate next action for an onc to take
-     | type  | ptr | actions and value interpretations           |
-     |-------+-----+---------------------------------------------|
-     | empty |     | do nothing                                  |
-     |       | var | nil                                         |
-     |-------+-----+---------------------------------------------|
-     | ref   |     | increment or decrement ref counts           |
-     |       | var | integer                                     |
-     |-------+-----+---------------------------------------------|
-     | app   |     | perform \lambda application                       |
-     |       | var | \lambda variable                                  |
-     |       | car | pointer to argument                         |
-     |       | cdr | pointer to list of protected variable names |
-     |-------+-----+---------------------------------------------|
+     | type  | ptr       | actions and value interpretations     |
+     |-------+-----------+---------------------------------------|
+     | empty |           | do nothing                            |
+     |       | hdr       | nil                                   |
+     |-------+-----------+---------------------------------------|
+     | ref   |           | increment or decrement ref counts     |
+     |       | hdr       | integer                               |
+     |-------+-----------+---------------------------------------|
+     | app   |           | perform \lambda application                 |
+     |       | hdr       | link                                  |
+     |       | (car,cdr) | pointer to onc of (var . replacement) |
+     |-------+-----------+---------------------------------------|
 
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.
