@@ -9,26 +9,29 @@ coord open_space(coord place){
   free.x = place.x;
   free.y = place.y;
   int tmp = 1;
-  do{
-    /* cycle around original place
-     * ===========================
-     *        ^       1
-     *        |    ^ --> |
-     *       3|   1|     |2
-     *        | <------- v
-     *               2
-     */
+  /* cycle around original place
+   * ===========================
+   *        ^       1
+   *        |    ^ --> |
+   *       3|   1|     |2
+   *        | <------- v
+   *               2
+   */
+  for(tmp=1; tmp<SIZE*SIZE; tmp++){
     switch(tmp % 4){
     case 1: free.y = WRAP(free.y + tmp/2); break;
     case 2: free.x = WRAP(free.x + tmp/2); break;
     case 3: free.y = WRAP(free.y - tmp/2); break;
     case 0: free.x = WRAP(free.x - tmp/2); break;
     }
-    if(tmp >= SIZE * SIZE)
-      printf("ERROR: exhausted free space\n");
-  } while(AT(free).refs != 0);
-  AT(free).refs = 1;
-  return free;
+    if(AT(free).refs == 0) break;
+  }
+  if(tmp == SIZE*SIZE) {
+    printf("ERROR: exhausted free space\n");
+  } else {
+    AT(free).refs = 1;
+    return free;
+  }
 }
 
 void duplicate_ptr(ptr from, ptr to, coord from_coord, coord to_coord){
