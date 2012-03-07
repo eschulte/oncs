@@ -31,30 +31,32 @@ coord open_space(coord place){
   return free;
 }
 
-coord duplicate(coord from, coord to){
-  switch(AT(from).car.hdr){
+void duplicate_ptr(ptr from, ptr to, coord to_coord){
+  coord from_ptr, to_ptr;
+  switch(from.hdr){
   case NIL: break;
-  case LOCAL:                   /* copy reference */
-    coord from_car;
-    from_car.x = AT(from.car.car);
-    from_car.y = AT(from.car.cdr);
-    coord to_car;
-    to_car = open_space(to);
-    AT(to).car.hdr = LOCAL;
-    AT(to).car.car = to_car.x;
-    AT(to).car.cdr = to_car.y;
-    duplicate(from_car, to_car);
+  case LOCAL:
+    from_ptr.x = from.car;
+    from_ptr.y = from.cdr;
+    to_ptr = open_space(to_coord);
+    to.hdr = LOCAL;
+    to.car = to_ptr.x;
+    to.cdr = to_ptr.y;
+    duplicate(from_ptr, to_ptr);
     break;
   case INTEGER:
   case SYMBOL:
-  case LAMBDA:                  /* copy literal */
-    AT(to).car = AT(from).car;  /* TODO: need to explicitly duplicate? */
+  case LAMBDA:
+    COPY_PTR(to,from);
     break;
   }
-  if(AT(from).car != NIL){
-    tmp = open_space(to)
-  }
-};
+}
+
+void duplicate(coord from, coord to){
+  duplicate_ptr(AT(from).car, AT(to).car, to);
+  duplicate_ptr(AT(from).cdr, AT(to).cdr, to);
+  duplicate_ptr(AT(from).msg, AT(to).msg, to);
+}
 
 /* TODO: this will inf loop */
 int main(int argc, char* argv){

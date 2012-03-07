@@ -9,8 +9,9 @@
 #define SIZE 100
 #define AT(point) world[point.x][point.y]
 
-/* control flow */
+/* operations and control flow */
 #define EXIT(msg) printf(msg); goto bail;
+#define COPY_PTR(x,y) x.hdr = y.hdr; x.car = y.car; x.cdr = y.cdr;
 
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
@@ -21,11 +22,14 @@ typedef struct { ptr car, cdr, msg; int refs; } onc;
 /* return the coord of the nearest open space */
 coord open_space(coord place);
 
+/* duplicate a pointer */
+void duplicate_ptr(ptr from, ptr to, coord to_coord);
+
 /* duplicate a linked structure */
-coord duplicate(coord from, coord to);
+void duplicate(coord from, coord to);
 
 /* traverse structure at COORD replacing FROM with TO */
-coord replace(coord place, coord from, coord to);
+void replace(coord place, coord from, coord to);
 
 /* run the onc at PLACE according to its contents and message */
 void run(coord place);
@@ -33,9 +37,10 @@ void run(coord place);
 /* which functions call which functions
  * ====================================
  *
- * open_space:
- *  duplicate: open_space
- *    replace: duplicate
- *        run: replace
+ *    open_space :
+ * duplicate_ptr : open_space
+ *     duplicate : duplicate_ptr
+ *       replace : duplicate
+ *           run : replace
  *
  */
