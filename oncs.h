@@ -11,7 +11,6 @@
 #define WRAP(x) x%SIZE
 
 /* operations and control flow */
-#define EXIT(msg) printf(msg); goto bail;
 #define COPY_PTR(x,y) x.hdr = y.hdr; x.car = y.car; x.cdr = y.cdr;
 
 /* structures inhabiting the world */

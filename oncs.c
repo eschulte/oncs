@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include "oncs.h"
 
@@ -28,6 +29,7 @@ coord open_space(coord place){
   }
   if(tmp == SIZE*SIZE) {
     printf("ERROR: exhausted free space\n");
+    exit(1);
   } else {
     AT(free).refs = 1;
     return free;
@@ -78,6 +80,5 @@ int main(int argc, char* argv){
   place.x = 0;
   place.y = 0;
   printf("world[0][0].refs=%d\n", AT(place).refs);
-  quit: /* exit successfully */   return 0;
-  bail: /* exit with an errors */ return 1;
+  return 0;
 }
