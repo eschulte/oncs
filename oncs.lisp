@@ -1,4 +1,4 @@
-;;; oncs.lisp --- Oncs are Not Conses
+;;; oncs.lisp --- A distributed lisp virtual machine
 
 ;; Copyright (C) 2012  Eric Schulte
 

@@ -1,15 +1,11 @@
 # -*- mode:org -*-
-#+Title: Oncs -- Oncs are Not Conses
+#+Title: Oncs -- A distributed lisp virtual machine
 #+Author: Eric Schulte
 #+License: GPLV3
 #+Options: ^:nil toc:nil num:nil
 #+Style: <style type="text/css">pre{display:table-cell;background:#232323; color:#e6e1dc;}</style>
-#+Style: <style type="text/css">#content{max-width:1000px;margin:auto;} body{ font-size:small; }</style>
+#+Style: <style type="text/css">#content{max-width:1000px;margin:auto;} body{ font-size:small; } table{ font-size:small; }</style>
 #+Style: <style type="text/css">.outline-text-2{margin-left:2em;}.outline-text-3{margin-left:3em;}</style>
-
-#+begin_center
-A distributed lisp virtual machine
-#+end_center
 
 * Design
 To enable function application we will need a mechanism for the object
@@ -17,46 +13,40 @@ of application to /traverse/ another structure and potentially replace
 variables in that structure.  After traversal is completed the object
 will need to be removed.
 
-Objects are linked cons structures which perform the following verbs
-- replace self with the value at a pointer filtering through protected list
-- propagate an application message through an onc tree
-- find free space for setting car/cdr to a pointer
-- evaporation
+- ONC :: are linked structures composed of
+     #+begin_src C
+       typedef struct { ptr car, cdr, msg; int refs; } onc;
+     #+end_src
+     which perform the following actions
+     - replace self with the value at a pointer uniquifying variables
+     - propagate an application message through self
+     - find free space for setting car/cdr to a pointer
+     - reference count maintenance, an onc with ref \equiv 0 is considered
+       free space
 
-Pointer -- header indicating type of contents, then car and cdr
-| header | interpretation                       |
-|--------+--------------------------------------|
-|      0 | nil                                  |
-|      1 | local pointer (car,cdr)              |
-|      2 | integer car+cdr                      |
-|      3 | symbol car (cdr for disambiguation?) |
-|      4 | lambda same as symbol                |
+- Pointer :: header indicating type of contents, then car and cdr
+     | header | interpretation                       |
+     |--------+--------------------------------------|
+     |      0 | nil                                  |
+     |      1 | local pointer (car,cdr)              |
+     |      2 | integer car+cdr                      |
+     |      3 | symbol car (cdr for disambiguation?) |
+     |      4 | \lambda same as symbol                     |
 
-Messages
-|-------+-----+---------------------------------------------|
-| app   |     | perform lambda application                  |
-|       | var | lambda variable                             |
-|       | car | pointer to argument                         |
-|       | cdr | pointer to list of protected variable names |
-|-------+-----+---------------------------------------------|
-| ref   |     | increment or decrement ref counts           |
-|       | var | integer                                     |
-|-------+-----+---------------------------------------------|
-| empty |     |                                             |
-|       | var | nil                                         |
-|-------+-----+---------------------------------------------|
-
-Onc -- car, cdr and msg pointers
-
-* Code
-- pointers :: will be relative (x,y) coordinates
-- oncs :: will be used to build computational and memory structures
-     and may contain the following in their =car= and =cdr=.
-  - nil
-  - a pointer to another onc
-  - a variable (symbol)
-  - a lambda-symbol (a cons cell)
-  - later inter primitives will be added (integers and integer ops)
+- Messages :: passed between oncs, indicate next action for an onc to take
+     | type  | ptr | actions and value interpretations           |
+     |-------+-----+---------------------------------------------|
+     | empty |     | do nothing                                  |
+     |       | var | nil                                         |
+     |-------+-----+---------------------------------------------|
+     | ref   |     | increment or decrement ref counts           |
+     |       | var | integer                                     |
+     |-------+-----+---------------------------------------------|
+     | app   |     | perform \lambda application                       |
+     |       | var | \lambda variable                                  |
+     |       | car | pointer to argument                         |
+     |       | cdr | pointer to list of protected variable names |
+     |-------+-----+---------------------------------------------|
 
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.
@@ -89,7 +79,7 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                `("oncs-data"
                  :base-directory ,oncs-dir
                  :include ("COPYING")
-                 :base-extension "c\\|txt\\|lisp"
+                 :base-extension "h\\|c\\|txt\\|lisp"
                  :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
                  :publishing-function org-publish-attachment))
   ;; a single combined project to publish both html and supporting materials
