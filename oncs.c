@@ -3,29 +3,29 @@
 #include "oncs.h"
 
 onc world[SIZE][SIZE];
-cmsg queue[QLENGTH]; /* TODO: store queued messages in the onc world */
+msg queue[QLENGTH]; /* TODO: store queued messages in the onc world */
 int qbeg, qend = 0;
 
-void enqueue(coord coord, msg msg){
+void enqueue(coord coord, ptr msg){
   int i;
   for(i=0;i<QLENGTH;i++)
-    if(queue[QWRAP(qbeg + i)].msg.var.hdr == NIL)
+    if(queue[QWRAP(qbeg + i)].msg.hdr == NIL)
       break;
   if(i == (QLENGTH - 1)){
     printf("ERROR: queue overflow\n");
     exit(1);
   }
   COPY_COORD(queue[QWRAP(qbeg + i)].coord, coord);
-  COPY_MSG(queue[QWRAP(qbeg + i)].msg, msg);
+  COPY_PTR(queue[QWRAP(qbeg + i)].msg, msg);
   qbeg = QWRAP(qbeg+1);
 }
 
-msg dequeue(){
+ptr dequeue(){
   int i;
   for(i=0;i<QLENGTH;i++){
     if(QWRAP(qend+i) == qbeg)
       break;
-    if(queue[QWRAP(qend+i)].msg.var.hdr != NIL){
+    if(queue[QWRAP(qend+i)].msg.hdr != NIL){
       qend = QWRAP(qend+i+1);
       return queue[QWRAP(qend-1)].msg;
     }
