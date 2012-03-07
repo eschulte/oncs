@@ -30,11 +30,21 @@ Pointer -- header indicating type of contents, then car and cdr
 |      1 | local pointer (car,cdr)              |
 |      2 | integer car+cdr                      |
 |      3 | symbol car (cdr for disambiguation?) |
+|      4 | lambda same as symbol                |
 
-Messages -- lambda-application
-| var | lambda variable                             |
-| car | pointer to argument                         |
-| cdr | pointer to list of protected variable names |
+Messages
+|-------+-----+---------------------------------------------|
+| app   |     | perform lambda application                  |
+|       | var | lambda variable                             |
+|       | car | pointer to argument                         |
+|       | cdr | pointer to list of protected variable names |
+|-------+-----+---------------------------------------------|
+| ref   |     | increment or decrement ref counts           |
+|       | var | integer                                     |
+|-------+-----+---------------------------------------------|
+| empty |     |                                             |
+|       | var | nil                                         |
+|-------+-----+---------------------------------------------|
 
 Onc -- car, cdr and msg pointers
 

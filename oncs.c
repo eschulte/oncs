@@ -3,6 +3,34 @@
 #include "oncs.h"
 
 onc world[SIZE][SIZE];
+cmsg queue[QLENGTH]; /* TODO: store queued messages in the onc world */
+int qbeg, qend = 0;
+
+void enqueue(coord coord, msg msg){
+  int i;
+  for(i=0;i<QLENGTH;i++)
+    if(queue[QWRAP(qbeg + i)].msg.var.hdr == NIL)
+      break;
+  if(i == (QLENGTH - 1)){
+    printf("ERROR: queue overflow\n");
+    exit(1);
+  }
+  COPY_COORD(queue[QWRAP(qbeg + i)].coord, coord);
+  COPY_MSG(queue[QWRAP(qbeg + i)].msg, msg);
+  qbeg = QWRAP(qbeg+1);
+}
+
+msg dequeue(){
+  int i;
+  for(i=0;i<QLENGTH;i++){
+    if(QWRAP(qend+i) == qbeg)
+      break;
+    if(queue[QWRAP(qend+i)].msg.var.hdr != NIL){
+      qend = QWRAP(qend+i+1);
+      return queue[QWRAP(qend-1)].msg;
+    }
+  }
+}
 
 /* return the coord of the nearest open space */
 coord open_space(coord place){
@@ -28,7 +56,7 @@ coord open_space(coord place){
     if(AT(free).refs == 0) break;
   }
   if(tmp == SIZE*SIZE) {
-    printf("ERROR: exhausted free space\n");
+    printf("ERROR: exhausted world\n");
     exit(1);
   } else {
     AT(free).refs = 1;
@@ -73,12 +101,12 @@ void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
   }
 }
 
-/* TODO: this will inf loop */
 int main(int argc, char* argv){
   printf("oncs are not conses.\n");
   coord place;
-  place.x = 0;
-  place.y = 0;
+  place.x = place.y = 0;
   printf("world[0][0].refs=%d\n", AT(place).refs);
+  /* TODO: loop through oncs in random order calling run */
+  /* TODO: scan through message applying them to oncs with empty msg slots */
   return 0;
 }
