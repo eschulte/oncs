@@ -8,6 +8,7 @@
 /* world size and access */
 #define SIZE 100
 #define AT(point) world[point.x][point.y]
+#define WRAP(x) x%SIZE
 
 /* operations and control flow */
 #define EXIT(msg) printf(msg); goto bail;
@@ -23,13 +24,13 @@ typedef struct { ptr car, cdr, msg; int refs; } onc;
 coord open_space(coord place);
 
 /* duplicate a pointer */
-void duplicate_ptr(ptr from, ptr to, coord to_coord);
+void duplicate_ptr(ptr from, ptr to, coord from_coord, coord to_coord);
 
 /* duplicate a linked structure */
 void duplicate(coord from, coord to);
 
 /* traverse structure at COORD replacing FROM with TO */
-void replace(coord place, coord from, coord to);
+void replace(coord place, int var, coord to);
 
 /* run the onc at PLACE according to its contents and message */
 void run(coord place);
