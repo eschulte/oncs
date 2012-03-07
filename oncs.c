@@ -27,8 +27,34 @@ coord open_space(coord place){
     if(tmp >= SIZE * SIZE)
       printf("ERROR: exhausted free space\n");
   } while(AT(free).refs != 0);
+  AT(free).refs = 1;
   return free;
 }
+
+coord duplicate(coord from, coord to){
+  switch(AT(from).car.hdr){
+  case NIL: break;
+  case LOCAL:                   /* copy reference */
+    coord from_car;
+    from_car.x = AT(from.car.car);
+    from_car.y = AT(from.car.cdr);
+    coord to_car;
+    to_car = open_space(to);
+    AT(to).car.hdr = LOCAL;
+    AT(to).car.car = to_car.x;
+    AT(to).car.cdr = to_car.y;
+    duplicate(from_car, to_car);
+    break;
+  case INTEGER:
+  case SYMBOL:
+  case LAMBDA:                  /* copy literal */
+    AT(to).car = AT(from).car;  /* TODO: need to explicitly duplicate? */
+    break;
+  }
+  if(AT(from).car != NIL){
+    tmp = open_space(to)
+  }
+};
 
 /* TODO: this will inf loop */
 int main(int argc, char* argv){
