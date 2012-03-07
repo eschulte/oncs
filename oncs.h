@@ -29,3 +29,13 @@ coord replace(coord place, coord from, coord to);
 
 /* run the onc at PLACE according to its contents and message */
 void run(coord place);
+
+/* which functions call which functions
+ * ====================================
+ *
+ * open_space:
+ *  duplicate: open_space
+ *    replace: duplicate
+ *        run: replace
+ *
+ */

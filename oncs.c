@@ -10,7 +10,14 @@ coord open_space(coord place){
   free.y = place.y;
   int tmp = 1;
   do{
-    /* cycle around original place */
+    /* cycle around original place
+     * ===========================
+     *        ^       1
+     *        |    ^ --> |
+     *       3|   1|     |2
+     *        | <------- v
+     *               2
+     */
     switch(tmp % 4){
     case 1: free.y = (free.y + tmp/2) % SIZE; break;
     case 2: free.x = (free.x + tmp/2) % SIZE; break;
