@@ -34,7 +34,7 @@ coord open_space(coord place){
 void duplicate_ptr(ptr from, ptr to, coord from_coord, coord to_coord){
   coord from_ptr, to_ptr;
   switch(from.hdr){
-  case NIL: break;
+  case NIL: to.hdr = NIL; break;
   case LOCAL:
     from_ptr.x = WRAP(from_coord.x + from.car);
     from_ptr.y = WRAP(from_coord.y + from.cdr);
@@ -58,16 +58,13 @@ void duplicate(coord from, coord to){
   duplicate_ptr(AT(from).msg, AT(to).msg, from, to);
 }
 
-void replace(coord place, int var, coord to){
-  ptr it = AT(place).car;
-  switch(it.hdr){
-  case NIL: break;
-  case LOCAL:
-    /* replace at local position */
-    break;
-  case INTEGER:
-  case SYMBOL:
-  case LAMBDA: break;
+void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
+  switch(to.hdr){
+  case NIL:
+  case INTEGER: break;
+  case LAMBDA: if(to.car == var) break;
+  case SYMBOL: if(to.car != var) break;
+  case LOCAL: duplicate_ptr(new, to, new_coord, to_coord); break;
   }
 }
 

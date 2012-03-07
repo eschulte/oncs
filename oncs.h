@@ -30,7 +30,7 @@ void duplicate_ptr(ptr from, ptr to, coord from_coord, coord to_coord);
 void duplicate(coord from, coord to);
 
 /* traverse structure at COORD replacing FROM with TO */
-void replace(coord place, int var, coord to);
+void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord);
 
 /* run the onc at PLACE according to its contents and message */
 void run(coord place);
@@ -41,7 +41,7 @@ void run(coord place);
  *    open_space :
  * duplicate_ptr : open_space
  *     duplicate : duplicate_ptr
- *       replace : duplicate
+ *   replace_ptr : duplicate_ptr
  *           run : replace
  *
  */
