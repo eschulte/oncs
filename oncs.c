@@ -101,6 +101,29 @@ void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
   }
 }
 
+void run(coord place){
+  coord tmp_coord;
+  switch(AT(place).msg.hdr){
+  case INTEGER:
+    AT(place).refs += AT(place).msg.car;
+    if(AT(place).car.hdr == LOCAL){
+      tmp_coord.x = AT(place).car.car;
+      tmp_coord.y = AT(place).car.cdr;
+      enqueue(tmp_coord, AT(place).msg);
+    }
+    if(AT(place).cdr.hdr == LOCAL){
+      tmp_coord.x = AT(place).cdr.car;
+      tmp_coord.y = AT(place).cdr.cdr;
+      enqueue(tmp_coord, AT(place).msg);
+    }
+    break;
+  case LAMBDA:
+    /* lambda application */
+    break;
+  }
+  AT(place).msg.hdr = NIL;
+}
+
 int main(int argc, char* argv){
   printf("oncs are not conses.\n");
   coord place;
