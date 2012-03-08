@@ -15,8 +15,8 @@ void enqueue(coord coord, ptr msg){
     printf("ERROR: queue overflow\n");
     exit(1);
   }
-  COPY_COORD(queue[QWRAP(qbeg + i)].coord, coord);
-  COPY_PTR(queue[QWRAP(qbeg + i)].msg, msg);
+  queue[QWRAP(qbeg + i)].coord = coord;
+  queue[QWRAP(qbeg + i)].msg = msg;
   qbeg = QWRAP(qbeg+1);
 }
 
@@ -79,7 +79,7 @@ void duplicate_ptr(ptr from, ptr to, coord from_coord, coord to_coord){
     break;
   case INTEGER:
   case SYMBOL:
-  default: COPY_PTR(to,from); break; /* LAMBDA */
+  default: to = from; break; /* LAMBDA */
   }
 }
 

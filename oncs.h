@@ -5,15 +5,11 @@
 #define SYMBOL  3
 
 /* world size and access */
-#define SIZE 100
-#define QLENGTH 10000
+#define SIZE 10
+#define QLENGTH 1000
 #define AT(point) world[point.x][point.y]
 #define WRAP(x) x%SIZE
 #define QWRAP(x) x%QLENGTH
-
-/* operations and control flow */
-#define COPY_COORD(a,b) a.x = b.x; a.y = b.y;
-#define COPY_PTR(x,y) x.hdr = y.hdr; x.car = y.car; x.cdr = y.cdr;
 
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
@@ -24,6 +20,9 @@ typedef struct { ptr car, cdr, msg; int refs; } onc;
 /* message queue operations */
 void enqueue(coord coord, ptr msg);
 ptr dequeue();
+
+/* print the world to STDOUT */
+void show_world();
 
 /* return the coord of the nearest open space */
 coord open_space(coord place);
@@ -45,6 +44,8 @@ void run(coord place);
 
 /* which functions call which functions
  * ====================================
+ *      show_ptr :
+ *    show_world : show_ptr
  *    open_space :
  * duplicate_ptr : open_space
  *     duplicate : duplicate_ptr
