@@ -32,6 +32,32 @@ ptr dequeue(){
   }
 }
 
+void show_ptr(ptr ptr){
+  switch(ptr.hdr){
+  case NIL:     printf("_"); break;
+  case LOCAL:   printf("^"); break;
+  case INTEGER: printf("i"); break;
+  case SYMBOL:  printf("s"); break;
+  default:      printf("l"); break;
+  }
+}
+
+void show_world(){
+  onc tmp;
+  int i, j;
+  for(i=0;i<SIZE;i++){
+    for(j=0;j<SIZE;j++){
+      tmp = world[j][i];
+      printf("["); show_ptr(tmp.msg);
+      printf(","); show_ptr(tmp.car);
+      printf(","); show_ptr(tmp.cdr);
+      printf("]");
+      if(j<(SIZE-1)) printf(" ");
+    }
+    printf("\n");
+  }
+}
+
 /* return the coord of the nearest open space */
 coord open_space(coord place){
   coord free;
@@ -125,8 +151,15 @@ void run(coord place){
 int main(int argc, char* argv){
   printf("oncs are not conses.\n");
   coord place;
-  place.x = place.y = 0;
-  printf("world[0][0].refs=%d\n", AT(place).refs);
+  place.x = place.y = 2;
+  AT(place).car.hdr = 32;       /* LAMBDA 32 */
+  AT(place).cdr.hdr = 1;        /* LOCAL */
+  AT(place).cdr.car = 1;
+  AT(place).cdr.cdr = 0;
+  place.x = 3;
+  AT(place).car.hdr = 3;        /* SYMBOL */
+  AT(place).car.car = 32;       /* 32 */
+  show_world();
   /* TODO: loop through oncs in random order calling run */
   /* TODO: scan through message applying them to oncs with empty msg slots */
   return 0;
