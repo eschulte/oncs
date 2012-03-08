@@ -45,16 +45,21 @@ void show_ptr(ptr ptr){
 void show_world(){
   onc tmp;
   int i, j;
-  for(i=0;i<SIZE;i++){
-    for(j=0;j<SIZE;j++){
+  printf("\n");
+  fflush(stdout);
+  for(i=0;i<SIZE;i++) {
+    for(j=0;j<SIZE;j++) {
       tmp = world[j][i];
-      printf("["); show_ptr(tmp.msg);
-      printf(","); show_ptr(tmp.car);
-      printf(","); show_ptr(tmp.cdr);
-      printf("]");
+      if(tmp.refs > 0) {
+        printf("["); show_ptr(tmp.msg);
+        printf(","); show_ptr(tmp.car);
+        printf(","); show_ptr(tmp.cdr);
+        printf("]");
+      } else printf("       ");
       if(j<(SIZE-1)) printf(" ");
     }
     printf("\n");
+    fflush(stdout);
   }
 }
 
@@ -63,7 +68,7 @@ coord open_space(coord place){
   coord free;
   free.x = place.x;
   free.y = place.y;
-  int tmp = 1;
+  int cntrl, index;
   /* cycle around original place
    * ===========================
    *        ^       1
@@ -72,20 +77,27 @@ coord open_space(coord place){
    *        | <------- v
    *               2
    */
-  for(tmp=1; tmp<SIZE*SIZE; tmp++){
-    switch(tmp % 4){
-    case 1: free.y = WRAP(free.y + tmp/2); break;
-    case 2: free.x = WRAP(free.x + tmp/2); break;
-    case 3: free.y = WRAP(free.y - tmp/2); break;
-    case 0: free.x = WRAP(free.x - tmp/2); break;
+  cntrl = 2;
+  for(index=1; index<SIZE*SIZE; index++){
+    printf("%d %d %d %d [%d]\n",
+           index, cntrl, (cntrl/2), (index % (cntrl/2)),
+           AT(free).refs);
+    if((index % (cntrl/2)) == 0) {
+      cntrl++;
+    } else {
+      switch(cntrl % 4){
+      case 1: free.y = WRAP(free.y + 1); break;
+      case 2: free.x = WRAP(free.x + 1); break;
+      case 3: free.y = WRAP(free.y - 1); break;
+      case 4: free.x = WRAP(free.x - 1); break;
+      }
     }
     if(AT(free).refs == 0) break;
   }
-  if(tmp == SIZE*SIZE) {
+  if(index == (SIZE*SIZE-1)) {
     printf("ERROR: exhausted world\n");
     exit(1);
   } else {
-    AT(free).refs = 1;
     return free;
   }
 }
@@ -149,8 +161,8 @@ void run(coord place){
 }
 
 int main(int argc, char* argv){
-  printf("oncs are not conses.\n");
-  coord place;
+  int i;
+  coord place, new;
   place.x = place.y = 2;
   AT(place).car.hdr = 32;       /* LAMBDA 32 */
   AT(place).cdr.hdr = 1;        /* LOCAL */
@@ -159,7 +171,12 @@ int main(int argc, char* argv){
   place.x = 3;
   AT(place).car.hdr = 3;        /* SYMBOL */
   AT(place).car.car = 32;       /* 32 */
-  show_world();
+  for(i=0;i<90;i++){
+    show_world();
+    sleep(1);
+    new = open_space(place);
+    AT(place).refs = 1;
+  }
   /* TODO: loop through oncs in random order calling run */
   /* TODO: scan through message applying them to oncs with empty msg slots */
   return 0;
