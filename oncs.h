@@ -3,7 +3,6 @@
 #define LOCAL   1
 #define INTEGER 2
 #define SYMBOL  3
-#define LAMBDA  4
 
 /* world size and access */
 #define SIZE 100

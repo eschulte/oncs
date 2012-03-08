@@ -79,9 +79,7 @@ void duplicate_ptr(ptr from, ptr to, coord from_coord, coord to_coord){
     break;
   case INTEGER:
   case SYMBOL:
-  case LAMBDA:
-    COPY_PTR(to,from);
-    break;
+  default: COPY_PTR(to,from); break; /* LAMBDA */
   }
 }
 
@@ -95,9 +93,11 @@ void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
   switch(to.hdr){
   case NIL:
   case INTEGER: break;
-  case LAMBDA: if(to.car == var) break;
   case SYMBOL: if(to.car != var) break;
-  case LOCAL: duplicate_ptr(new, to, new_coord, to_coord); break;
+  case LOCAL:
+  default:
+    if(to.hdr > 3 && to.hdr == var) break; /* LAMBDA shadow */
+    duplicate_ptr(new, to, new_coord, to_coord); break;
   }
 }
 
@@ -117,9 +117,7 @@ void run(coord place){
       enqueue(tmp_coord, AT(place).msg);
     }
     break;
-  case LAMBDA:
-    /* lambda application */
-    break;
+  default: /* LAMBDA application */ break;
   }
   AT(place).msg.hdr = NIL;
 }
