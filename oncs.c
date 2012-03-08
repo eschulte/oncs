@@ -65,10 +65,6 @@ void show_world(){
 
 /* return the coord of the nearest open space */
 coord open_space(coord place){
-  coord free;
-  free.x = place.x;
-  free.y = place.y;
-  int cntrl, index;
   /* cycle around original place
    * ===========================
    *        ^       1
@@ -77,28 +73,29 @@ coord open_space(coord place){
    *        | <------- v
    *               2
    */
-  cntrl = 2;
-  for(index=1; index<SIZE*SIZE; index++){
-    printf("%d %d %d %d [%d]\n",
-           index, cntrl, (cntrl/2), (index % (cntrl/2)),
-           AT(free).refs);
-    if((index % (cntrl/2)) == 0) {
+  int index, cntrl, tried;
+  index = cntrl = tried = 0;
+  do {
+    if (index == (cntrl/2)) {
+      index = 0;
       cntrl++;
     } else {
+      index++;
+      tried++;
       switch(cntrl % 4){
-      case 1: free.y = WRAP(free.y + 1); break;
-      case 2: free.x = WRAP(free.x + 1); break;
-      case 3: free.y = WRAP(free.y - 1); break;
-      case 4: free.x = WRAP(free.x - 1); break;
+      case 0: place.y = WRAP(place.y + 1); break;
+      case 1: place.x = WRAP(place.x + 1); break;
+      case 2: place.y = WRAP(place.y - 1); break;
+      case 3: place.x = WRAP(place.x - 1); break;
       }
     }
-    if(AT(free).refs == 0) break;
-  }
-  if(index == (SIZE*SIZE-1)) {
+    if (AT(place).refs == 0) break;
+  } while (tried <= SIZE*SIZE);
+  if (tried >= SIZE*SIZE) {
     printf("ERROR: exhausted world\n");
     exit(1);
   } else {
-    return free;
+    return place;
   }
 }
 
@@ -164,18 +161,20 @@ int main(int argc, char* argv){
   int i;
   coord place, new;
   place.x = place.y = 2;
+  AT(place).refs = 1;
   AT(place).car.hdr = 32;       /* LAMBDA 32 */
   AT(place).cdr.hdr = 1;        /* LOCAL */
   AT(place).cdr.car = 1;
   AT(place).cdr.cdr = 0;
   place.x = 3;
+  AT(place).refs = 1;
   AT(place).car.hdr = 3;        /* SYMBOL */
   AT(place).car.car = 32;       /* 32 */
-  for(i=0;i<90;i++){
+  for(i=0;i<120;i++){
+    new = open_space(place);
     show_world();
     sleep(1);
-    new = open_space(place);
-    AT(place).refs = 1;
+    AT(new).refs = 1;
   }
   /* TODO: loop through oncs in random order calling run */
   /* TODO: scan through message applying them to oncs with empty msg slots */
