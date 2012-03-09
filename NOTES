@@ -1,0 +1,66 @@
+# -*- mode:org -*-
+
+* how to include a library that needs to create state
+i.e., a header file that creates its own local variables... should it
+have an init function?
+
+maybe just add an init function like with the IXM collector
+
+* other message types
+- refresh (or some such) to indicate to a higher level portion of your
+  structure that you have changed
+- ready to be applied (for when I become a lambda and want to let the
+  next level up know) -- although this would require up-pointers
+
+* is it worth holding pointers to higher level
+similar to the =env= pointer in earlier instantiating
+
+* reverse-- lambdas matching lambdas with their applications
+while
+: (\lambda ..tons of stuff..)(argument)
+seems like it would require lots of message passing to apply, the same
+isn't true for
+: (...tons of stuff...\lambda)(argument)
+
+the key is just to start the application from the next level up
+
+* COMMENT Publishing
+This code is used to publish this page to the =cs.unm.edu= webserver.
+#+begin_src emacs-lisp :results silent
+  (setq oncs-dir (file-name-directory (or load-file-name buffer-file-name)))
+  (unless (boundp 'org-publish-project-alist)
+    (setq org-publish-project-alist nil))
+  ;; the main html page
+  (add-to-list 'org-publish-project-alist
+               `("oncs-html"
+                  :base-directory ,oncs-dir
+                  :include ("README")
+                  :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
+                  :publishing-function org-publish-org-to-html
+                  :style "<style type=\"text/css\">\n <!--/*--><![CDATA[/*><!--*/
+    .title  { text-align: center; }
+    p.verse { margin-left: 3% }
+    p { text-align: justify }
+    table { border-collapse: collapse; }
+    td, th { vertical-align: top; }
+    dt { font-weight: bold; }
+    div.figure { padding: 0.5em; }
+    div.figure p { text-align: center; }
+    .linenr { font-size:smaller }
+    #postamble { color: gray; padding-top: 2em; font-size: 0.75em; }
+    /*]]>*/-->
+  </style>"))
+  ;; the contents of the base directory
+  (add-to-list 'org-publish-project-alist
+               `("oncs-data"
+                 :base-directory ,oncs-dir
+                 :include ("COPYING")
+                 :base-extension "h\\|c\\|txt\\|lisp"
+                 :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
+                 :publishing-function org-publish-attachment))
+  ;; a single combined project to publish both html and supporting materials
+  (add-to-list 'org-publish-project-alist
+               '("oncs" :components
+                 ("oncs-html"
+                  "oncs-data")))
+#+end_src
