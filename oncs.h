@@ -8,7 +8,7 @@
 #define SIZE 10
 #define QLENGTH 1000
 #define AT(point) world[point.x][point.y]
-#define WRAP(x) x%SIZE
+#define WRAP(x) (SIZE+x)%SIZE
 #define QWRAP(x) x%QLENGTH
 
 /* structures inhabiting the world */
@@ -16,6 +16,11 @@ typedef struct { int x, y; } coord;
 typedef struct { int hdr, car, cdr; } ptr;
 typedef struct { ptr msg; coord coord; } msg;
 typedef struct { ptr car, cdr, msg; int refs; } onc;
+
+/* global state */
+extern onc world[SIZE][SIZE];
+extern msg queue[];
+extern int qbeg, qend;
 
 /* message queue operations */
 void enqueue(coord coord, ptr msg);

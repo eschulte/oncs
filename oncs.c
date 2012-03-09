@@ -3,7 +3,7 @@
 #include "oncs.h"
 
 onc world[SIZE][SIZE];
-msg queue[QLENGTH]; /* TODO: store queued messages in the onc world */
+msg queue[QLENGTH];
 int qbeg, qend = 0;
 
 void enqueue(coord coord, ptr msg){
@@ -85,8 +85,8 @@ coord open_space(coord place){
       switch(cntrl % 4){
       case 0: place.y = WRAP(place.y + 1); break;
       case 1: place.x = WRAP(place.x + 1); break;
-      case 2: place.y = WRAP(place.y - 1); break;
-      case 3: place.x = WRAP(place.x - 1); break;
+      case 2: place.y = WRAP(place.y + (SIZE - 1)); break;
+      case 3: place.x = WRAP(place.x + (SIZE - 1)); break;
       }
     }
     if (AT(place).refs == 0) break;
@@ -139,7 +139,7 @@ void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
 void run(coord place){
   coord tmp_coord;
   switch(AT(place).msg.hdr){
-  case INTEGER:
+  case INTEGER:                 /* update number of references */
     AT(place).refs += AT(place).msg.car;
     if(AT(place).car.hdr == LOCAL){
       tmp_coord.x = AT(place).car.car;
@@ -155,28 +155,4 @@ void run(coord place){
   default: /* LAMBDA application */ break;
   }
   AT(place).msg.hdr = NIL;
-}
-
-int main(int argc, char* argv){
-  int i;
-  coord place, new;
-  place.x = place.y = 2;
-  AT(place).refs = 1;
-  AT(place).car.hdr = 32;       /* LAMBDA 32 */
-  AT(place).cdr.hdr = 1;        /* LOCAL */
-  AT(place).cdr.car = 1;
-  AT(place).cdr.cdr = 0;
-  place.x = 3;
-  AT(place).refs = 1;
-  AT(place).car.hdr = 3;        /* SYMBOL */
-  AT(place).car.car = 32;       /* 32 */
-  for(i=0;i<120;i++){
-    new = open_space(place);
-    show_world();
-    sleep(1);
-    AT(new).refs = 1;
-  }
-  /* TODO: loop through oncs in random order calling run */
-  /* TODO: scan through message applying them to oncs with empty msg slots */
-  return 0;
 }

@@ -1,5 +1,6 @@
 # -*- mode:org -*-
 
+* should probably replace make =msg= hold two pointers
 * how to include a library that needs to create state
 i.e., a header file that creates its own local variables... should it
 have an init function?
@@ -15,7 +16,7 @@ maybe just add an init function like with the IXM collector
 * is it worth holding pointers to higher level
 similar to the =env= pointer in earlier instantiating
 
-* reverse-- lambdas matching lambdas with their applications
+* reverse lambdas -- matching lambdas with their applications
 while
 : (\lambda ..tons of stuff..)(argument)
 seems like it would require lots of message passing to apply, the same
@@ -24,6 +25,7 @@ isn't true for
 
 the key is just to start the application from the next level up
 
+* eventually replace the global queue with something that lives in ONC world
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.
 #+begin_src emacs-lisp :results silent
