@@ -7,7 +7,7 @@
 #+Style: <style type="text/css">#content{max-width:1000px;margin:auto;} body{ font-size:small; } table{ font-size:small; }</style>
 #+Style: <style type="text/css">.outline-text-2{margin-left:2em;}.outline-text-3{margin-left:3em;}</style>
 
-* Design
+* Overview
 There is a large grid /world/ of ONC structures linked by local
 relative pointers.  These structures perform calculations through
 \lambda-application.  All of the action consists of passing messages between
@@ -24,11 +24,11 @@ used.  See file:oncs.lisp for a simulation of the world in lisp.
        typedef struct { ptr car, cdr, msg; int refs; } onc;
      #+end_src
      which perform the following actions
-     - replace self with the value at a pointer uniquifying variables
-     - propagate an application message through self
-     - find free space for setting car/cdr to a pointer
-     - reference count maintenance, an onc with ref \equiv 0 is considered
-       free space
+  - replace self with the value at a pointer uniquifying variables
+  - propagate an application message through self
+  - find free space for setting car/cdr to a pointer
+  - reference count maintenance, an onc with ref \equiv 0 is considered
+    free space
 
 - Pointer :: header indicating type of contents, then car and cdr
      | header | interpretation                       |
@@ -39,19 +39,35 @@ used.  See file:oncs.lisp for a simulation of the world in lisp.
      |      3 | symbol car (cdr for disambiguation?) |
      |      4 | \lambda same as symbol                     |
 
-- Messages :: passed between oncs, indicate next action for an onc to take
-     | type  | ptr       | actions and value interpretations     |
-     |-------+-----------+---------------------------------------|
-     | empty |           | do nothing                            |
-     |       | hdr       | nil                                   |
-     |-------+-----------+---------------------------------------|
-     | ref   |           | increment or decrement ref counts     |
-     |       | hdr       | integer                               |
-     |-------+-----------+---------------------------------------|
-     | app   |           | perform \lambda application                 |
-     |       | hdr       | link                                  |
-     |       | (car,cdr) | pointer to onc of (var . replacement) |
-     |-------+-----------+---------------------------------------|
+- Messages :: passed between oncs, indicate next action for an onc to
+     take, broken out by header type below
+  - =NIL= runs the holding loop
+  - =LOCAL= /open/
+  - =INTEGER= increments or decrements the ref counter by the given
+    value
+  - =SYMBOL= /open/
+  - =LAMBDA= performs lambda application using one ptr to specify the
+    variable to be replaced and the second the specify the replacement
+    value
+
+* COMMENT Notes
+** other message types
+- refresh (or some such) to indicate to a higher level portion of your
+  structure that you have changed
+- ready to be applied (for when I become a lambda and want to let the
+  next level up know) -- although this would require up-pointers
+
+** is it worth holding pointers to higher level
+similar to the =env= pointer in earlier instantiating
+
+** reverse-- lambdas matching lambdas with their applications
+while
+: (\lambda ..tons of stuff..)(argument)
+seems like it would require lots of message passing to apply, the same
+isn't true for
+: (...tons of stuff...\lambda)(argument)
+
+the key is just to start the application from the next level up
 
 * COMMENT Publishing
 This code is used to publish this page to the =cs.unm.edu= webserver.
