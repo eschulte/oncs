@@ -1,9 +1,9 @@
-*.txt
-*.html
-*.tex
-*.pdf
-*.fasl
-*.o
+**/*.txt
+**/*.html
+**/*.tex
+**/*.pdf
+**/*.fasl
+**/*.o
 
 ## compiled files
 oncs
