@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <stdio.h>
+
 /* types of pointers */
 #define NIL     0
 #define LOCAL   1
