@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
   SHOULD(population() == 2);
   if(verbose_p) show_world();
 
-  /* duplicate 32 times */
+  /* duplicate 16 times */
   int flip,counter;
   flip = counter = 0;
   do{
