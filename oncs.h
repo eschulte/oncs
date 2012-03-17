@@ -14,6 +14,11 @@
 #define AT(point) world[point.x][point.y]
 #define WRAP(x) (SIZE+x)%SIZE
 #define QWRAP(x) x%QLENGTH
+#define DUPLICATE_LOCAL(place, near, tmp_from, tmp_to) { \
+    tmp_from.x = place.car;                              \
+    tmp_from.y = place.cdr;                              \
+    tmp_to = open_space(near);                           \
+    duplicate(tmp_to, tmp_from); }
 
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
@@ -30,7 +35,16 @@ extern int qbeg, qend;
 void enqueue(msg msg);
 msg dequeue();
 
-/* return the coord of the nearest open space */
+/* return the coord of the nearest open space
+ * 
+ * cycle around original place
+ * ===========================
+ *        ^       1
+ *        |    ^ --> |
+ *       3|   1|     |2
+ *        | <------- v
+ *               2
+ */
 coord open_space(coord place);
 
 /* duplicate a linked structure */

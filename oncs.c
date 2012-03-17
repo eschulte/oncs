@@ -30,16 +30,7 @@ msg dequeue(){
   }
 }
 
-/* return the coord of the nearest open space */
 coord open_space(coord place){
-  /* cycle around original place
-   * ===========================
-   *        ^       1
-   *        |    ^ --> |
-   *       3|   1|     |2
-   *        | <------- v
-   *               2
-   */
   int index, cntrl, tried;
   index = cntrl = tried = 0;
   do {
@@ -67,20 +58,12 @@ coord open_space(coord place){
 }
 
 void duplicate(coord to, coord from){
-  coord tmp_from, tmp_to;
+  coord t1, t2;
   AT(to) = AT(from);
-  if(AT(to).car.hdr == LOCAL){
-    tmp_from.x = AT(to).car.car;
-    tmp_from.y = AT(to).car.cdr;
-    tmp_to = open_space(to);
-    duplicate(tmp_to, tmp_from);
-  }
-  if(AT(to).cdr.hdr == LOCAL){
-    tmp_from.x = AT(to).cdr.car;
-    tmp_from.y = AT(to).cdr.cdr;
-    tmp_to = open_space(to);
-    duplicate(tmp_to, tmp_from);
-  }
+  AT(to).refs = 1;
+  AT(to).mcar.hdr = AT(to).mcdr.hdr = NIL;
+  if(AT(to).car.hdr == LOCAL) DUPLICATE_LOCAL(AT(to).car, to, t1, t2);
+  if(AT(to).cdr.hdr == LOCAL) DUPLICATE_LOCAL(AT(to).cdr, to, t1, t2);
 }
 
 void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
