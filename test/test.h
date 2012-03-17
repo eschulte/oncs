@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdarg.h>
-#include "../oncs.h"
+#include <oncs.h>
 
 #define SHOULD(x) if(!(x)) fail_p=1;
 
