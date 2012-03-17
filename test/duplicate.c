@@ -6,8 +6,8 @@ int main(int argc, char *argv[]){
   coord place, new;
 
   /* setup world */
-  new.x = 3;
-  new.y = place.x = place.y = 2;
+  new.x = 1;
+  new.y = place.x = place.y = 0;
   place_lambda(place, 32);
   place_cdr_local(place, new);
   place_symbol(new, 32);
@@ -15,26 +15,20 @@ int main(int argc, char *argv[]){
   SHOULD(population() == 2);
   if(verbose_p) show_world();
 
-  /* duplicate two linked oncs */
-  new.x = new.y = 4;
-  duplicate(new, place);
-
-  SHOULD(population() == 4);
-  if(verbose_p) show_world();
-
-  /* duplicate four more times */
-  int k,l,counter;
-  counter = 0;
-  for(l=1;l<=4;l++){
-    for(k=1;k<=4;k++){
+  /* duplicate 32 times */
+  int flip,counter;
+  flip = counter = 0;
+  do{
+    if(flip) new.x = WRAP(new.x+1);
+    else     new.y = WRAP(new.y+1);
+    flip = !flip;
+    if(AT(new).refs == 0){
       counter++;
-      new.x = 4+k % SIZE;
-      new.y = 4+l % SIZE;
       duplicate(new, place);
       if(verbose_p) show_world();
-      SHOULD(population() == (4 + (2 * counter)));
+      SHOULD(population() == 2 + (2 * counter));
     }
-  }
+  } while (counter <= 16);
 
   /* return indicates success or failure */
   return fail_p;
