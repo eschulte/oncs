@@ -1,7 +1,18 @@
 # -*- mode:org -*-
 
+* at some point replace all structs with binary data
+  :PROPERTIES:
+  :CUSTOM_ID: no-structs
+  :END:
+apparently every element of a struct is as large as the largest
+structure, better to just use binary blobs and do my own pointer
+arithmetic (macros should suffice).
+
 * DONE should probably make =msg= its own structure
 It should hold two pointers rather than just a single pointer.
+
+once things are working we can replace this with something more
+efficient (see [[#no-structs]]).
 
 * DONE how to include a library that needs to create state
 i.e., a header file that creates its own local variables... should it
