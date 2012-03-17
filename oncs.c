@@ -26,6 +26,7 @@ msg dequeue(){
     return queue[tmp];
   } else {
     printf("ERROR: queue underflow\n");
+    exit(1);
   }
 }
 
