@@ -6,6 +6,7 @@
 #define LOCAL   1
 #define INTEGER 2
 #define SYMBOL  3
+#define LAMBDA  4
 
 /* world size and access */
 #define SIZE 10
@@ -17,17 +18,17 @@
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
 typedef struct { int hdr, car, cdr; } ptr;
-typedef struct { ptr msg; coord coord; } msg;
-typedef struct { ptr car, cdr, msg; int refs; } onc;
+typedef struct { ptr mcar,mcdr; coord coord; } msg;
+typedef struct { ptr car, cdr, mcar, mcdr; int refs; } onc;
 
 /* global state */
 extern onc world[SIZE][SIZE];
-extern msg queue[];
+extern msg queue[QLENGTH];
 extern int qbeg, qend;
 
 /* message queue operations */
-void enqueue(coord coord, ptr msg);
-ptr dequeue();
+void enqueue(coord coord, ptr mcar, ptr mcdr);
+msg dequeue();
 
 /* print the world to STDOUT */
 void show_world();

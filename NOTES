@@ -1,11 +1,27 @@
 # -*- mode:org -*-
 
-* should probably replace make =msg= hold two pointers
-* how to include a library that needs to create state
+* DONE should probably make =msg= its own structure
+It should hold two pointers rather than just a single pointer.
+
+* DONE how to include a library that needs to create state
 i.e., a header file that creates its own local variables... should it
 have an init function?
 
-maybe just add an init function like with the IXM collector
+just declare in both the .h and .c files
+- oncs.h
+  #+begin_src C
+  /* global state */
+  extern onc world[SIZE][SIZE];
+  extern msg queue[];
+  extern int qbeg, qend;
+  #+end_src
+
+- oncs.c
+  #+begin_src C
+  onc world[SIZE][SIZE];
+  msg queue[QLENGTH];
+  int qbeg, qend = 0;
+  #+end_src
 
 * other message types
 - refresh (or some such) to indicate to a higher level portion of your
