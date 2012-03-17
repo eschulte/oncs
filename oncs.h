@@ -30,14 +30,8 @@ extern int qbeg, qend;
 void enqueue(msg msg);
 msg dequeue();
 
-/* print the world to STDOUT */
-void show_world();
-
 /* return the coord of the nearest open space */
 coord open_space(coord place);
-
-/* duplicate a pointer */
-void duplicate_ptr(ptr from, ptr to, coord from_coord, coord to_coord);
 
 /* duplicate a linked structure */
 void duplicate(coord from, coord to);
@@ -53,12 +47,9 @@ void run(coord place);
 
 /* which functions call which functions
  * ====================================
- *      show_ptr :
- *    show_world : show_ptr
  *    open_space :
- * duplicate_ptr : open_space
- *     duplicate : duplicate_ptr
- *   replace_ptr : duplicate_ptr
- *       message : 
+ *     duplicate :
+ *   replace_ptr :
+ *       message :
  *           run : replace message
  */

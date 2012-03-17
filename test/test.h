@@ -14,6 +14,11 @@ void init(int argc, char *argv[]);
 /* logging */
 int debug(const char *format, ...);
 
+/* world queries */
+void show_ptr(ptr ptr);
+void show_world();
+int population();
+
 /* world building */
 void place_lambda(coord place, int variable);
 void place_symbol(coord place, int variable);

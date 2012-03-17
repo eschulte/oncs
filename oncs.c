@@ -30,38 +30,6 @@ msg dequeue(){
   }
 }
 
-void show_ptr(ptr ptr){
-  switch(ptr.hdr){
-  case NIL:     printf("_"); break;
-  case LOCAL:   printf("^"); break;
-  case INTEGER: printf("i"); break;
-  case SYMBOL:  printf("s"); break;
-  case LAMBDA:  printf("l"); break;
-  default:      printf("?"); break;
-  }
-}
-
-void show_world(){
-  onc tmp;
-  int i, j;
-  printf("\n");
-  fflush(stdout);
-  for(i=0;i<SIZE;i++) {
-    for(j=0;j<SIZE;j++) {
-      tmp = world[j][i];
-      if(tmp.refs > 0) {
-        printf("["); show_ptr(tmp.mcar);
-        printf(","); show_ptr(tmp.car);
-        printf(","); show_ptr(tmp.cdr);
-        printf("]");
-      } else printf("       ");
-      if(j<(SIZE-1)) printf(" ");
-    }
-    printf("\n");
-    fflush(stdout);
-  }
-}
-
 /* return the coord of the nearest open space */
 coord open_space(coord place){
   /* cycle around original place
@@ -98,30 +66,21 @@ coord open_space(coord place){
   }
 }
 
-void duplicate_ptr(ptr from, ptr to, coord from_coord, coord to_coord){
-  coord from_ptr, to_ptr;
-  switch(from.hdr){
-  case NIL: to.hdr = NIL; break;
-  case LOCAL:
-    from_ptr.x = WRAP(from_coord.x + from.car);
-    from_ptr.y = WRAP(from_coord.y + from.cdr);
-    to_ptr = open_space(to_coord);
-    to.hdr = LOCAL;
-    to.car = to_ptr.x;
-    to.cdr = to_ptr.y;
-    duplicate(from_ptr, to_ptr);
-    break;
-  case INTEGER:
-  case SYMBOL:
-  case LAMBDA: to = from; break;
+void duplicate(coord to, coord from){
+  coord tmp_from, tmp_to;
+  AT(to) = AT(from);
+  if(AT(to).car.hdr == LOCAL){
+    tmp_from.x = AT(to).car.car;
+    tmp_from.y = AT(to).car.cdr;
+    tmp_to = open_space(to);
+    duplicate(tmp_to, tmp_from);
   }
-}
-
-void duplicate(coord from, coord to){
-  duplicate_ptr(AT(from).car, AT(to).car, from, to);
-  duplicate_ptr(AT(from).cdr, AT(to).cdr, from, to);
-  duplicate_ptr(AT(from).mcar, AT(to).mcar, from, to);
-  duplicate_ptr(AT(from).mcdr, AT(to).mcdr, from, to);
+  if(AT(to).cdr.hdr == LOCAL){
+    tmp_from.x = AT(to).cdr.car;
+    tmp_from.y = AT(to).cdr.cdr;
+    tmp_to = open_space(to);
+    duplicate(tmp_to, tmp_from);
+  }
 }
 
 void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
@@ -130,7 +89,7 @@ void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
   case INTEGER: break;
   case SYMBOL: if(to.car != var) break;
   case LAMBDA: if(to.hdr == var) break;
-  case LOCAL: duplicate_ptr(new, to, new_coord, to_coord); break;
+  case LOCAL:  /* TODO: duplicate locally */ break;
   }
 }
 
