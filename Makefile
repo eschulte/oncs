@@ -1,7 +1,7 @@
 CC=gcc
 TESTS = \
 	test/open_space	\
-	test/basic_queue
+	test/queue
 
 all: vm
 
