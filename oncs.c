@@ -6,30 +6,26 @@ onc world[SIZE][SIZE];
 msg queue[QLENGTH];
 int qbeg, qend = 0;
 
-void enqueue(coord coord, ptr mcar, ptr mcdr){
+void enqueue(msg msg){
   int i;
   for(i=0;i<QLENGTH;i++)
-    if(queue[QWRAP(qbeg + i)].mcar.hdr == NIL)
+    if(queue[QWRAP(qend + i)].mcar.hdr == NIL)
       break;
   if(i == (QLENGTH - 1)){
     printf("ERROR: queue overflow\n");
     exit(1);
   }
-  queue[QWRAP(qbeg + i)].coord = coord;
-  queue[QWRAP(qbeg + i)].mcar = mcar;
-  queue[QWRAP(qbeg + i)].mcdr = mcdr;
-  qbeg = QWRAP(qbeg+1);
+  queue[QWRAP(qend + i)] = msg;
+  qend = QWRAP(qend+1);
 }
 
 msg dequeue(){
-  int i;
-  for(i=0;i<QLENGTH;i++){
-    if(QWRAP(qend+i) == qbeg)
-      break;
-    if(queue[QWRAP(qend+i)].mcar.hdr != NIL){
-      qend = QWRAP(qend+i+1);
-      return queue[QWRAP(qend-1)];
-    }
+  int tmp = qbeg;
+  if(queue[tmp].mcar.hdr != NIL){
+    qbeg = QWRAP(qbeg+1);
+    return queue[tmp];
+  } else {
+    printf("ERROR: queue underflow\n");
   }
 }
 
@@ -138,20 +134,21 @@ void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
 }
 
 void run(coord place){
-  coord tmp_coord;
+  msg msg;
   switch(AT(place).mcar.hdr){
   case INTEGER:                 /* update number of references */
     AT(place).refs += AT(place).mcar.car;
+    msg.mcar = AT(place).mcar;
+    msg.mcdr = AT(place).mcdr;
     if(AT(place).car.hdr == LOCAL){
-      tmp_coord.x = AT(place).car.car;
-      tmp_coord.y = AT(place).car.cdr;
-      enqueue(tmp_coord, AT(place).mcar, AT(place).mcdr);
+      msg.coord.x = AT(place).car.car;
+      msg.coord.y = AT(place).car.cdr;
     }
     if(AT(place).cdr.hdr == LOCAL){
-      tmp_coord.x = AT(place).cdr.car;
-      tmp_coord.y = AT(place).cdr.cdr;
-      enqueue(tmp_coord, AT(place).mcar, AT(place).mcdr);
+      msg.coord.x = AT(place).cdr.car;
+      msg.coord.y = AT(place).cdr.cdr;
     }
+    enqueue(msg);
     break;
   default: /* LAMBDA application */ break;
   }

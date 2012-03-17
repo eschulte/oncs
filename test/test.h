@@ -2,6 +2,8 @@
 #include <stdarg.h>
 #include "../oncs.h"
 
+#define SHOULD(x) if(!(x)) fail_p=1;
+
 /* global state */
 extern int verbose_p;
 extern int fail_p;

@@ -27,7 +27,7 @@ extern msg queue[QLENGTH];
 extern int qbeg, qend;
 
 /* message queue operations */
-void enqueue(coord coord, ptr mcar, ptr mcdr);
+void enqueue(msg msg);
 msg dequeue();
 
 /* print the world to STDOUT */
