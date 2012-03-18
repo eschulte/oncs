@@ -55,7 +55,7 @@ void show_queue(){
     case SYMBOL:  c='s'; break;
     case LAMBDA:  c='l'; break;
     }
-    printf("[(%d,%d),%c]", msg.coord.x, msg.coord.y, c);
+    printf("(%d,%d)%c", msg.coord.x, msg.coord.y, c);
   }
   printf("\n");
 }

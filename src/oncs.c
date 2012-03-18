@@ -81,7 +81,6 @@ void run_queue(){
 
 void update_ref_msg(coord place, int diff){
   msg msg;
-  printf("(%d,%d)+=%d\n", place.x, place.y, diff);
   msg.coord = place;
   msg.mcar.hdr = INTEGER;
   msg.mcar.car = diff;
@@ -94,40 +93,52 @@ void run(coord place){
   switch(AT(place).mcar.hdr){
   case NIL: /* waiting loop */
     if(AT(place).car.hdr == LOCAL){
+      /* point t1 at abstraction */
       t1.x = AT(place).car.car;
       t1.y = AT(place).car.cdr;
+      /* apply car to cdr and replace self with result */
       if(AT(t1).car.hdr == LAMBDA){
-        msg.coord = t1;
+        /* build lambda message from car and send to myself */
+        msg.coord = place;
         msg.mcar.hdr = LAMBDA;
-        msg.mcar.car = 0;
+        msg.mcar.car = AT(t1).car.car;
         msg.mcdr = AT(place).cdr;
         if(AT(place).cdr.hdr == LOCAL){
-          t1.x = AT(place).cdr.car; t1.y = AT(place).cdr.cdr;
-          update_ref_msg(t1, 1);
+          /* point t2 at second half of application */
+          t2.x = AT(place).cdr.car; t2.y = AT(place).cdr.cdr;
+          update_ref_msg(t2, 1);
         }
         enqueue(msg);
+        /* replace self with body of lambda expression (cadr) */
+        update_ref_msg(t2, -1); /* self no longer points to cdr */
+        t2.x = AT(t1).cdr.car; t2.y = AT(t1).cdr.cdr;
+        AT(place).car = AT(t2).car;
+        AT(place).cdr = AT(t2).cdr;
+        /* remove lambda expression */
+        AT(t1).refs = 0;
+        AT(t2).refs = 0;
       }
     }
   case LOCAL: case SYMBOL: /* undefined */ break;
   case INTEGER: /* update number of references */
     AT(place).refs += AT(place).mcar.car;
     msg.mcar = AT(place).mcar;
-    msg.mcdr = AT(place).mcdr;
     if(AT(place).car.hdr == LOCAL){
       msg.coord.x = AT(place).car.car;
       msg.coord.y = AT(place).car.cdr;
+      enqueue(msg);
     }
     if(AT(place).cdr.hdr == LOCAL){
       msg.coord.x = AT(place).cdr.car;
       msg.coord.y = AT(place).cdr.cdr;
+      enqueue(msg);
     }
-    enqueue(msg);
     break;
   case LAMBDA: /* perform lambda application */
     t1.x = AT(place).mcdr.car; t1.y = AT(place).mcdr.cdr;
-    update_ref_msg(t1, -1);
     LAMBDA_APP(AT(place).car, msg, t1, t2);
     LAMBDA_APP(AT(place).cdr, msg, t1, t2);
+    update_ref_msg(t1, -1);
     break;
   }
   AT(place).mcar.hdr = NIL;
