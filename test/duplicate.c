@@ -8,8 +8,10 @@ int main(int argc, char *argv[]){
   /* setup world */
   new.x = 1;
   new.y = place.x = place.y = 0;
+  AT(place).refs++;
   LAMBDA_SET(place, 32);
   LOCAL_SET(place, cdr, new);
+  AT(new).refs++;
   SYMBOL_SET(new, car, 32);
 
   SHOULD(population() == 2);

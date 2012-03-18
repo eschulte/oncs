@@ -8,6 +8,8 @@ int main(int argc, char *argv[]){
   coord place, new;
   new.x = 3;
   new.y = place.x = place.y = 2;
+  AT(place).refs++;
+  AT(new).refs++;
   LAMBDA_SET(place, 32);
   LOCAL_SET(place, cdr, new);
   SYMBOL_SET(new, car, 32);

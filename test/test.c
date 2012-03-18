@@ -95,24 +95,28 @@ void simple_app(coord place){
   int hold = verbose_p;
   verbose_p = 0;
   /* setup world: ((lambda x (x x)) (1 2 3)) */
-  debug("(%d,%d) -- ((lambda x (x x)) (1 2 3))\n", place.x, place.y);
   AT(place).refs++;
+  debug("(%d,%d) -- ((lambda x (x x)) (1 2 3))\n", place.x, place.y);
   tmp1 = open_space(place);
+  AT(tmp1).refs++;
   LOCAL_SET(place, car, tmp1);
   debug("(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
   tmp2 = open_space(place);
+  AT(tmp2).refs++;
   LOCAL_SET(place, cdr, tmp2);
   debug("(%d,%d) -- (1 2 3)\n", tmp2.x, tmp2.y);
   /* (lambda x (x x)) */
   place = tmp1;
   LAMBDA_SET(place, 1);
   tmp1 = open_space(place);
+  AT(tmp1).refs++;
   debug("(%d,%d) -- (x x)\n", tmp1.x, tmp1.y);
   LOCAL_SET(place, cdr, tmp1);
   /* (x x) */
   place = tmp1;
   SYMBOL_SET(place, car, 1);
   tmp1 = open_space(place);
+  AT(tmp1).refs++;
   debug("(%d,%d) -- (_ x)\n", tmp1.x, tmp1.y);
   LOCAL_SET(place, cdr, tmp1);
   SYMBOL_SET(tmp1, car, 1);
@@ -120,10 +124,12 @@ void simple_app(coord place){
   /* (1 2 3) */
   place = tmp2;
   tmp2 = open_space(place);
+  AT(tmp2).refs++;
   INTEGER_SET(place, car, 1);
   LOCAL_SET(place, cdr, tmp2);
   place = tmp2;
   tmp2 = open_space(place);
+  AT(tmp2).refs++;
   debug("(%d,%d) -- (_ 2 _)\n", place.x, place.y);
   INTEGER_SET(place, car, 2);
   LOCAL_SET(place, cdr, tmp2);
