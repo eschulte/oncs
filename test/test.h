@@ -16,10 +16,11 @@ void init(int argc, char *argv[]);
 int debug(const char *format, ...);
 
 /* world queries */
+int queue_population();
+int population();
 void show_ptr(ptr ptr);
 void show_queue();
 void show_world();
-int population();
 
 /* state placing macros */
 #define NIL_SET(place, sub)              \

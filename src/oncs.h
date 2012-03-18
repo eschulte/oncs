@@ -42,6 +42,8 @@
     msg.coord.y = where.cdr;                                    \
     msg.mcar = AT(place).mcar;                                  \
     msg.mcdr = AT(place).mcdr;                                  \
+    t1.x = msg.mcdr.car; t1.y = msg.mcdr.cdr;                   \
+    update_ref_msg(t1, 1);                                      \
     enqueue(msg);                                               \
     break;                                                      \
   }
@@ -79,12 +81,8 @@ void duplicate(coord from, coord to);
 /* try to apply a message from the queue */
 void run_queue();
 
+/* send a message to PLACE to change its ref counter by DIFF */
+void update_ref_msg(coord place, int diff);
+
 /* run the onc at PLACE according to its contents and message */
 void run(coord place);
-
-/* which functions call which functions
- * ====================================
- *    open_space :
- *     duplicate :
- *           run : message
- */

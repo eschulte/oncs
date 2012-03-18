@@ -18,6 +18,17 @@ int debug(const char *format, ...){
     va_end(args);
 }
 
+int queue_population(){ return QWRAP(qend - qbeg); }
+
+int population(){
+  int i, j, count;
+  count = 0;
+  for(i=0;i<SIZE;i++)
+    for(j=0;j<SIZE;j++)
+      if (world[j][i].refs > 0)
+        count++;
+  return count;
+}
 
 void show_ptr(ptr ptr){
   switch(ptr.hdr){
@@ -34,7 +45,7 @@ void show_queue(){
   int i;
   msg msg;
   char c;
-  printf("Q:");
+  printf("Q[%d]:", queue_population());
   for(i=0;i<(qend-qbeg);i++){
     msg = queue[(qbeg+i)];
     switch(msg.mcar.hdr){
@@ -79,16 +90,6 @@ void show_world(){
     printf("\n");
     fflush(stdout);
   }
-}
-
-int population(){
-  int i, j, count;
-  count = 0;
-  for(i=0;i<SIZE;i++)
-    for(j=0;j<SIZE;j++)
-      if (world[j][i].refs > 0)
-        count++;
-  return count;
 }
 
 void simple_app(coord place){

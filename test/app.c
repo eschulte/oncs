@@ -9,20 +9,13 @@ int main(int argc, char *argv[]){
   simple_app(place);
 
   run(place);  show_world();
-  run_queue(); show_world();
 
-  place.x = 4; place.y = 3;
-  run(place);  show_world();
-  run_queue(); show_world();
-  
-  place.x = 4; place.y = 2;
-  run(place);  show_world();
-  run_queue(); show_world();
-  
-  place.x = 4; place.y = 1;
-  run(place);  show_world();
-  run_queue(); show_world();
-  
+  do{
+    place = queue[qbeg].coord;
+    run_queue(); show_world();
+    run(place);  show_world();
+  } while(queue_population() > 0);
+
   /* return indicates success or failure */
   return fail_p;
 }

@@ -79,6 +79,15 @@ void run_queue(){
   }
 }
 
+void update_ref_msg(coord place, int diff){
+  msg msg;
+  printf("(%d,%d)+=%d\n", place.x, place.y, diff);
+  msg.coord = place;
+  msg.mcar.hdr = INTEGER;
+  msg.mcar.car = diff;
+  enqueue(msg);
+}
+
 void run(coord place){
   coord t1, t2;
   msg msg;
@@ -92,6 +101,10 @@ void run(coord place){
         msg.mcar.hdr = LAMBDA;
         msg.mcar.car = 0;
         msg.mcdr = AT(place).cdr;
+        if(AT(place).cdr.hdr == LOCAL){
+          t1.x = AT(place).cdr.car; t1.y = AT(place).cdr.cdr;
+          update_ref_msg(t1, 1);
+        }
         enqueue(msg);
       }
     }
@@ -111,6 +124,8 @@ void run(coord place){
     enqueue(msg);
     break;
   case LAMBDA: /* perform lambda application */
+    t1.x = AT(place).mcdr.car; t1.y = AT(place).mcdr.cdr;
+    update_ref_msg(t1, -1);
     LAMBDA_APP(AT(place).car, msg, t1, t2);
     LAMBDA_APP(AT(place).cdr, msg, t1, t2);
     break;
