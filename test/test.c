@@ -67,7 +67,7 @@ void show_world(){
           tmp = world[j][i];
           if(tmp.refs > 0) {
             show_ptr(tmp.car);
-            if(tmp.mcar.hdr == NIL) printf("|");
+            if(tmp.mcar.hdr == NIL) printf("%d", tmp.refs);
             else printf("I");
             show_ptr(tmp.cdr);
           } else printf("   ");
