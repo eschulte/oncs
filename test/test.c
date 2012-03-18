@@ -34,15 +34,23 @@ void show_world(){
   int i, j;
   printf("\n");
   fflush(stdout);
-  for(i=0;i<SIZE;i++) {
-    for(j=0;j<SIZE;j++) {
-      tmp = world[j][i];
-      if(tmp.refs > 0) {
-        printf("["); show_ptr(tmp.mcar);
-        printf(","); show_ptr(tmp.car);
-        printf(","); show_ptr(tmp.cdr);
-        printf("]");
-      } else printf("       ");
+  for(i=-1;i<SIZE;i++) {
+    for(j=-1;j<SIZE;j++) {
+      /* index labels */
+      if(i<0){
+        if(j<0) printf("  ");
+        else    printf("  %d  ", j);
+      } else {
+        if(j<0) printf("%d ", i);
+        else{
+          tmp = world[j][i];
+          if(tmp.refs > 0) {
+            printf("["); show_ptr(tmp.car);
+            printf(","); show_ptr(tmp.cdr);
+            printf("]");
+          } else printf("     ");
+        }
+      }
       if(j<(SIZE-1)) printf(" ");
     }
     printf("\n");
