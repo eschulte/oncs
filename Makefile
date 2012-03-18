@@ -15,7 +15,8 @@ test/%.test: src/oncs.c src/oncs.h test/test.c test/test.h test/%.c
 check: $(TESTS:=.test)
 	for test in test/*.test;do \
 		./$$test; \
-		if [[ "$$?" -eq "0" ]];then result=PASS;else result=FAIL;fi; \
+		if [[ "$$?" -eq "0" ]];then result=PASS; \
+		else result=FAIL;fi; \
 		echo "$$result $$test"; \
 	done
 
