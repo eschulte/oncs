@@ -67,3 +67,42 @@ int population(){
         count++;
   return count;
 }
+
+void simple_app(coord place){
+  coord tmp1, tmp2;
+  /* setup world: ((lambda x (x x)) (1 2 3)) */
+  tmp1 = open_space(place);
+  debug("(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
+  LOCAL_SET(place, car, tmp1);
+  tmp2 = open_space(place);
+  debug("(%d,%d) -- (1 2 3)\n", tmp2.x, tmp2.y);
+  LOCAL_SET(place, cdr, tmp2);
+  /* (lambda x (x x)) */
+  place = tmp1;
+  LAMBDA_SET(place, 1);
+  tmp1 = open_space(place);
+  debug("(%d,%d) -- (x x)\n", tmp1.x, tmp1.y);
+  LOCAL_SET(place, cdr, tmp1);
+  /* (x x) */
+  place = tmp1;
+  SYMBOL_SET(place, car, 1);
+  tmp1 = open_space(place);
+  debug("(%d,%d) -- (_ x)\n", tmp1.x, tmp1.y);
+  LOCAL_SET(place, cdr, tmp1);
+  SYMBOL_SET(tmp1, car, 1);
+  NIL_SET(tmp1, cdr);
+  /* (1 2 3) */
+  place = tmp2;
+  tmp2 = open_space(place);
+  INTEGER_SET(place, car, 1);
+  LOCAL_SET(place, cdr, tmp2);
+  place = tmp2;
+  tmp2 = open_space(place);
+  debug("(%d,%d) -- (_ 2 _)\n", place.x, place.y);
+  INTEGER_SET(place, car, 2);
+  LOCAL_SET(place, cdr, tmp2);
+  place = tmp2;
+  debug("(%d,%d) -- (_ _ 3)\n", place.x, place.y);
+  INTEGER_SET(place, car, 3);
+  NIL_SET(place, cdr);
+}

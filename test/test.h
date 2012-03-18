@@ -24,6 +24,7 @@ int population();
   AT(place).sub.hdr = NIL;
 #define LOCAL_SET(palce, sub, coord)     \
   AT(place).refs++;                      \
+  AT(coord).refs++;                      \
   AT(place).sub.hdr = LOCAL;             \
   AT(place).sub.car = coord.x;           \
   AT(place).sub.cdr = coord.y;
@@ -39,3 +40,6 @@ int population();
   AT(place).refs++;                      \
   AT(place).car.hdr = LAMBDA;            \
   AT(place).car.car = variable;
+
+/* fixtures */
+void simple_app(coord);
