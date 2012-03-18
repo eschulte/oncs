@@ -2,7 +2,8 @@ CC=gcc
 TESTS = \
 	test/open_space	\
 	test/queue	\
-	test/duplicate
+	test/duplicate	\
+	test/app
 
 all: vm
 
