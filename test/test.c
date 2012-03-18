@@ -30,6 +30,18 @@ int population(){
   return count;
 }
 
+int count(int type){
+  int i, j, count;
+  count = 0;
+  for(i=0;i<SIZE;i++)
+    for(j=0;j<SIZE;j++)
+      if (world[j][i].refs > 0){
+        if(world[j][i].car.hdr == type) count++;
+        if(world[j][i].cdr.hdr == type) count++;
+      }
+  return count;
+}
+
 void show_ptr(ptr ptr){
   switch(ptr.hdr){
   case NIL:     printf("_"); break;
