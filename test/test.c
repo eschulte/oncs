@@ -9,6 +9,7 @@ void init(int argc, char *argv[]){
   for(i=1;i<argc;i++)
     if(strcmp(argv[i], "-v") == 0)
       verbose_p=1;
+  debug("");
 }
 
 int debug(const char *format, ...){
