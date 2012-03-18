@@ -20,15 +20,22 @@ void show_world();
 int population();
 
 /* state placing macros */
-#define LAMBDA_SET(place, variable)      \
-  AT(place).refs = 1;                    \
-  AT(place).car.hdr = LAMBDA;            \
-  AT(place).car.car = variable;
-#define SYMBOL_SET(place, sub, variable) \
-  AT(place).refs = 1;                    \
-  AT(place).sub.hdr = SYMBOL;            \
-  AT(place).sub.car = variable;
+#define NIL_SET(place, sub)              \
+  AT(place).sub.hdr = NIL;
 #define LOCAL_SET(palce, sub, coord)     \
+  AT(place).refs++;                      \
   AT(place).sub.hdr = LOCAL;             \
   AT(place).sub.car = coord.x;           \
   AT(place).sub.cdr = coord.y;
+#define INTEGER_SET(place, sub, int)     \
+  AT(place).refs++;                      \
+  AT(place).sub.hdr = INTEGER;           \
+  AT(place).sub.car = int;
+#define SYMBOL_SET(place, sub, variable) \
+  AT(place).refs++;                      \
+  AT(place).sub.hdr = SYMBOL;            \
+  AT(place).sub.car = variable;
+#define LAMBDA_SET(place, variable)      \
+  AT(place).refs++;                      \
+  AT(place).car.hdr = LAMBDA;            \
+  AT(place).car.car = variable;
