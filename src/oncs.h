@@ -1,3 +1,4 @@
+/* Copyright (C) 2012 Eric Schulte */
 #include <stdlib.h>
 #include <stdio.h>
 

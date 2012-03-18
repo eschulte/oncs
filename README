@@ -1,6 +1,7 @@
 # -*- mode:org -*-
 #+Title: Oncs -- A distributed lisp virtual machine
 #+Author: Eric Schulte
+#+Copyright: 2012 Eric Schulte
 #+License: GPLV3
 #+Options: ^:nil toc:nil num:nil
 #+Style: <style type="text/css">pre{display:table-cell;background:#232323; color:#e6e1dc;}</style>

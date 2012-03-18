@@ -1,3 +1,4 @@
+/* Copyright (C) 2012 Eric Schulte */
 #include "test.h"
 
 int verbose_p = 0;

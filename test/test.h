@@ -1,3 +1,4 @@
+/* Copyright (C) 2012 Eric Schulte */
 #include <string.h>
 #include <stdarg.h>
 #include <oncs.h>
