@@ -66,11 +66,35 @@ void duplicate(coord to, coord from){
   if(AT(to).cdr.hdr == LOCAL) DUPLICATE_LOCAL(AT(to).cdr, to, t1, t2);
 }
 
+void run_queue(){
+  if(queue[qbeg].mcar.hdr != NIL){
+    msg msg = dequeue();
+    if(AT(msg.coord).mcar.hdr == NIL){
+      AT(msg.coord).mcar = msg.mcar;
+      AT(msg.coord).mcdr = msg.mcdr;
+    } else {
+      enqueue(msg);
+    }
+  }
+}
+
 void run(coord place){
   coord t1, t2;
   msg msg;
   switch(AT(place).mcar.hdr){
-  case NIL: /* no nothing */ case LOCAL: case SYMBOL: /* undefined */ break;
+  case NIL: /* waiting loop */
+    if(AT(place).car.hdr == LOCAL){
+      t1.x = AT(place).car.car;
+      t1.y = AT(place).car.cdr;
+      if(AT(t1).car.hdr == LAMBDA){
+        msg.coord = t1;
+        msg.mcar.hdr = LAMBDA;
+        msg.mcar.car = 0;
+        msg.mcdr = AT(place).cdr;
+        enqueue(msg);
+      }
+    }
+  case LOCAL: case SYMBOL: /* undefined */ break;
   case INTEGER: /* update number of references */
     AT(place).refs += AT(place).mcar.car;
     msg.mcar = AT(place).mcar;

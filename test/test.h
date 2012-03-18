@@ -16,6 +16,7 @@ int debug(const char *format, ...);
 
 /* world queries */
 void show_ptr(ptr ptr);
+void show_queue();
 void show_world();
 int population();
 

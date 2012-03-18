@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
   SYMBOL_SET(new, car, 32);
 
   SHOULD(population() == 2);
-  if(verbose_p) show_world();
+  show_world();
 
   /* duplicate 16 times */
   int flip,counter;
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]){
     if(AT(new).refs == 0){
       counter++;
       duplicate(new, place);
-      if(verbose_p) show_world();
+      show_world();
       SHOULD(population() == 2 + (2 * counter));
     }
   } while (counter <= 16);

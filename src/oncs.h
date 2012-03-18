@@ -31,7 +31,10 @@
       where.cdr = t2.y;                                         \
     }                                                           \
     break;                                                      \
-  case LAMBDA: if(AT(place).mcar.car == where.car) return;      \
+  case LAMBDA:                                                  \
+    if(AT(place).mcar.car == 0) AT(place).mcar.car = where.car; \
+    else if(AT(place).mcar.car == where.car) return;            \
+    break;                                                      \
   case LOCAL:                                                   \
     msg.coord.x = where.car;                                    \
     msg.coord.y = where.cdr;                                    \
@@ -70,6 +73,9 @@ coord open_space(coord place);
 
 /* duplicate a linked structure */
 void duplicate(coord from, coord to);
+
+/* try to apply a message from the queue */
+void run_queue();
 
 /* run the onc at PLACE according to its contents and message */
 void run(coord place);

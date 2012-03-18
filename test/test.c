@@ -29,11 +29,32 @@ void show_ptr(ptr ptr){
   }
 }
 
+void show_queue(){
+  int i;
+  msg msg;
+  char c;
+  printf("Q:");
+  for(i=0;i<(qend-qbeg);i++){
+    msg = queue[(qbeg+i)];
+    switch(msg.mcar.hdr){
+    case NIL:     c='_'; break;
+    case LOCAL:   c='^'; break;
+    case INTEGER: c='i'; break;
+    case SYMBOL:  c='s'; break;
+    case LAMBDA:  c='l'; break;
+    }
+    printf("[(%d,%d),%c]", msg.coord.x, msg.coord.y, c);
+  }
+  printf("\n");
+}
+
 void show_world(){
+  if(!verbose_p) return;
   onc tmp;
   int i, j;
   printf("\n");
   fflush(stdout);
+  show_queue();
   for(i=-1;i<SIZE;i++) {
     for(j=-1;j<SIZE;j++) {
       /* index labels */
@@ -46,7 +67,8 @@ void show_world(){
           tmp = world[j][i];
           if(tmp.refs > 0) {
             show_ptr(tmp.car);
-            printf("|");
+            if(tmp.mcar.hdr == NIL) printf("|");
+            else printf("I");
             show_ptr(tmp.cdr);
           } else printf("   ");
         }
@@ -70,13 +92,17 @@ int population(){
 
 void simple_app(coord place){
   coord tmp1, tmp2;
+  int hold = verbose_p;
+  verbose_p = 0;
   /* setup world: ((lambda x (x x)) (1 2 3)) */
+  debug("(%d,%d) -- ((lambda x (x x)) (1 2 3))\n", place.x, place.y);
+  AT(place).refs++;
   tmp1 = open_space(place);
-  debug("(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
   LOCAL_SET(place, car, tmp1);
+  debug("(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
   tmp2 = open_space(place);
-  debug("(%d,%d) -- (1 2 3)\n", tmp2.x, tmp2.y);
   LOCAL_SET(place, cdr, tmp2);
+  debug("(%d,%d) -- (1 2 3)\n", tmp2.x, tmp2.y);
   /* (lambda x (x x)) */
   place = tmp1;
   LAMBDA_SET(place, 1);
@@ -105,4 +131,5 @@ void simple_app(coord place){
   debug("(%d,%d) -- (_ _ 3)\n", place.x, place.y);
   INTEGER_SET(place, car, 3);
   NIL_SET(place, cdr);
+  verbose_p = hold;
 }
