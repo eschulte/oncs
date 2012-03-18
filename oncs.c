@@ -70,9 +70,8 @@ void run(coord place){
   coord t1, t2;
   msg msg;
   switch(AT(place).mcar.hdr){
-  case NIL:                          /* run the holding loop */ break;
-  case LOCAL:                        /* undefined */ break;
-  case INTEGER:                      /* update number of references */
+  case NIL: /* no nothing */ case LOCAL: case SYMBOL: /* undefined */ break;
+  case INTEGER: /* update number of references */
     AT(place).refs += AT(place).mcar.car;
     msg.mcar = AT(place).mcar;
     msg.mcdr = AT(place).mcdr;
@@ -86,26 +85,9 @@ void run(coord place){
     }
     enqueue(msg);
     break;
-  case SYMBOL:                  /* undefined */ break;
-  case LAMBDA:                  /* perform lambda application */
-    switch(AT(place).car.hdr){
-    case NIL:
-    case INTEGER: break;
-    case SYMBOL:
-      if(AT(place).mcar == AT(place).car.car){
-        DUPLICATE_LOCAL(AT(place).mcdr, place, t1, t2);
-        AT(place).car.car = t2.x;
-        AT(place).car.cdr = t2.y;
-      }
-      break;
-    case LAMBDA: if(AT(place).mcar == AT(place.car.car)) return;
-    case LOCAL:
-      msg.coord.x = AT(place).car.car;
-      msg.coord.y = AT(place).car.cdr;
-      msg.mcar = AT(place).mcar;
-      msg.mcdr = AT(place).mcdr;
-      enqueue(msg);
-    }
+  case LAMBDA: /* perform lambda application */
+    LAMBDA_APP(AT(place).car);
+    LAMBDA_APP(AT(place).cdr);
     break;
   }
   AT(place).mcar.hdr = NIL;
