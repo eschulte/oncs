@@ -19,7 +19,16 @@ void show_ptr(ptr ptr);
 void show_world();
 int population();
 
-/* world building */
-void place_lambda(coord place, int variable);
-void place_symbol(coord place, int variable);
-void place_cdr_local(coord place, coord local);
+/* state placing macros */
+#define LAMBDA_SET(place, variable)      \
+  AT(place).refs = 1;                    \
+  AT(place).car.hdr = LAMBDA;            \
+  AT(place).car.car = variable;
+#define SYMBOL_SET(place, sub, variable) \
+  AT(place).refs = 1;                    \
+  AT(place).sub.hdr = SYMBOL;            \
+  AT(place).sub.car = variable;
+#define LOCAL_SET(palce, sub, coord)     \
+  AT(place).sub.hdr = LOCAL;             \
+  AT(place).sub.car = coord.x;           \
+  AT(place).sub.cdr = coord.y;

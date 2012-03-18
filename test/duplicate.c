@@ -8,9 +8,9 @@ int main(int argc, char *argv[]){
   /* setup world */
   new.x = 1;
   new.y = place.x = place.y = 0;
-  place_lambda(place, 32);
-  place_cdr_local(place, new);
-  place_symbol(new, 32);
+  LAMBDA_SET(place, 32);
+  LOCAL_SET(place, cdr, new);
+  SYMBOL_SET(new, car, 32);
 
   SHOULD(population() == 2);
   if(verbose_p) show_world();

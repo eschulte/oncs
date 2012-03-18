@@ -59,22 +59,3 @@ int population(){
         count++;
   return count;
 }
-
-void place_lambda(coord place, int variable){
-  AT(place).refs = 1;           /* mark space as full */
-  AT(place).car.hdr = LAMBDA;   /* LAMBDA */
-  AT(place).car.car = variable; /* variable value */
-}
-
-void place_cdr_local(coord place, coord local){
-  AT(place).refs = 1;           /* mark space as full */
-  AT(place).cdr.hdr = 1;        /* LOCAL */
-  AT(place).cdr.car = local.x;  /* x */
-  AT(place).cdr.cdr = local.y;  /* y */
-}
-
-void place_symbol(coord place, int variable){
-  AT(place).refs = 1;           /* mark space as full */
-  AT(place).car.hdr = 3;        /* SYMBOL */
-  AT(place).car.car = 32;       /* 32 */
-}
