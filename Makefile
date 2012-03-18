@@ -1,4 +1,5 @@
 CC=gcc
+LIB = src/oncs.c src/oncs.h
 TESTS = \
 	test/open_space	\
 	test/queue	\
@@ -7,10 +8,10 @@ TESTS = \
 
 all: vm
 
-vm: src/oncs.c src/oncs.h src/vm.c
+vm: $(LIB) src/vm.c
 	$(CC) -o vm -Isrc/ src/vm.c src/oncs.c
 
-test/%.test: src/oncs.c src/oncs.h test/test.c test/test.h test/%.c
+test/%.test: $(LIB) test/test.c test/test.h test/%.c
 	$(CC) -Itest/ -Isrc/ -o test/$*.test src/oncs.c test/test.c test/$*.c
 
 check: $(TESTS:=.test)
@@ -20,6 +21,9 @@ check: $(TESTS:=.test)
 		else result=FAIL;fi; \
 		echo "$$result $$test"; \
 	done
+
+etags: $(LIB) $(TESTS:=.c) test/test.c test/test.h
+	etags $^
 
 clean:
 	rm -f vm test/*.test
