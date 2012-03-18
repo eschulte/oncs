@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "oncs.h"
+#include <oncs.h>
 
 onc world[SIZE][SIZE];
 msg queue[QLENGTH];
@@ -66,20 +66,12 @@ void duplicate(coord to, coord from){
   if(AT(to).cdr.hdr == LOCAL) DUPLICATE_LOCAL(AT(to).cdr, to, t1, t2);
 }
 
-void replace_ptr(int var, ptr to, coord to_coord, ptr new, coord new_coord){
-  switch(to.hdr){
-  case NIL:
-  case INTEGER: break;
-  case SYMBOL: if(to.car != var) break;
-  case LAMBDA: if(to.hdr == var) break;
-  case LOCAL:  /* TODO: duplicate locally */ break;
-  }
-}
-
 void run(coord place){
+  coord t1, t2;
   msg msg;
   switch(AT(place).mcar.hdr){
-  case INTEGER:                 /* update number of references */
+  case NIL: /* no nothing */ case LOCAL: case SYMBOL: /* undefined */ break;
+  case INTEGER: /* update number of references */
     AT(place).refs += AT(place).mcar.car;
     msg.mcar = AT(place).mcar;
     msg.mcdr = AT(place).mcdr;
@@ -93,7 +85,10 @@ void run(coord place){
     }
     enqueue(msg);
     break;
-  default: /* LAMBDA application */ break;
+  case LAMBDA: /* perform lambda application */
+    LAMBDA_APP(AT(place).car, msg, t1, t2);
+    LAMBDA_APP(AT(place).cdr, msg, t1, t2);
+    break;
   }
   AT(place).mcar.hdr = NIL;
 }

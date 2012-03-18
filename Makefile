@@ -7,7 +7,7 @@ TESTS = \
 all: vm
 
 vm: src/oncs.c src/oncs.h src/vm.c
-	$(CC) -o vm src/vm.c src/oncs.c
+	$(CC) -o vm -Isrc/ src/vm.c src/oncs.c
 
 test/%.test: src/oncs.c src/oncs.h test/test.c test/test.h test/%.c
 	$(CC) -Itest/ -Isrc/ -o test/$*.test src/oncs.c test/test.c test/$*.c
