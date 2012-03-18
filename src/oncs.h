@@ -27,6 +27,7 @@
   case SYMBOL:                                                  \
     if(AT(place).mcar.car == where.car){                        \
       DUPLICATE_LOCAL(AT(place).mcdr, place, t1, t2);           \
+      where.hdr = LOCAL;                                        \
       where.car = t2.x;                                         \
       where.cdr = t2.y;                                         \
     }                                                           \
