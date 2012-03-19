@@ -1,5 +1,9 @@
 # -*- mode:org -*-
 
+* reading strings into ONCS
+For example.
+: ((#L#S1 #S1 #S1 ) 1 2 3 )
+
 * at some point replace all structs with binary data
   :PROPERTIES:
   :CUSTOM_ID: no-structs

@@ -26,7 +26,6 @@ void get_expr(coord place, char *buf, int index);
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
 int onc_to_string(coord place, char *buf, int index);
 int string_to_onc(coord place, char *buf, int index);
-ptr string_to_ptr(coord place, char *buf, int index);
 int close_paren(char *buf, int index);
 
 /* state placing macros */
@@ -45,6 +44,31 @@ int close_paren(char *buf, int index);
 #define LAMBDA_SET(place, variable)      \
   AT(place).car.hdr = LAMBDA;            \
   AT(place).car.car = variable;
+#define STR_TO_PTR(where, buf, index, t1)                       \
+  switch(buf[index]){                                           \
+  case '\0': /* NIL */                                          \
+  case ')': where.hdr = NIL; break;                             \
+  case 'L': /* LAMBDA */                                        \
+    where.hdr = LAMBDA;                                         \
+    where.car = read_int(buf, (index+3));                       \
+    break;                                                      \
+  case 'S': /* SYMBOL */                                        \
+    where.hdr = SYMBOL;                                         \
+    where.car = read_int(buf, (index+1));                       \
+    break;                                                      \
+  case '(': /* LOCAL */                                         \
+    t1 = open_space(place);                                     \
+    AT(t1).refs = 1;                                            \
+    where.hdr = LOCAL;                                          \
+    where.car = t1.x; where.cdr = t1.y;                         \
+    parend=close_paren(buf, index);                             \
+    index++;                                                    \
+    for(i=index;i<parend;i++) interum[(i-index)] = buf[i];      \
+    interum[parend-index] = '\0';                               \
+    string_to_onc(t1, interum, 0);                              \
+    break;                                                      \
+  default:  /* INTEGER */ break;                                \
+  }
 
 /* fixtures */
 void simple_app(coord);

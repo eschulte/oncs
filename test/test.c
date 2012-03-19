@@ -147,17 +147,13 @@ int onc_to_string(coord place, char *buf, int index){
 }
 
 int string_to_onc(coord place, char *buf, int index){
-  if(buf[index] == '#') index++;
-  switch(buf[index]){
-  case 'L': /* LAMBDA */ break;
-  case 'S': /* SYMBOL */ break;
-  case '(': /* LOCAL */ break;
-  default:  /* INTEGER */ break;
-  }
-}
-
-ptr string_to_ptr(coord place, char *buf, int index){
-  
+  debug("%d -- %s\n", index, buf);
+  coord t1, t2;
+  int i, parend;
+  char *interum = buf;
+  while((buf[index] == '#') || (buf[index] == ' ')) index++;
+  STR_TO_PTR(AT(place).car, buf, index, t1);
+  STR_TO_PTR(AT(place).cdr, buf, index, t1);
 }
 
 int close_paren(char *buf, int index){
@@ -169,11 +165,22 @@ int close_paren(char *buf, int index){
     switch(buf[index]){
     case '(': paren_counter++; break;
     case ')': paren_counter--; break;
-    case '\0': printf("ERROR: unmatched paren %d", index); exit(1);
+    case '\0': printf("ERROR: unmatched paren %d\n", index); exit(1);
     default: break;
     }
   } while (paren_counter > 0);
   return index;
+}
+
+int read_int(char *buf, int index){
+  int result, tmp;
+  result = 0;
+  while((0 <= (tmp = (buf[index] - '0'))) && tmp <= 9) {
+    result = (result * 10) + tmp;
+    index++;
+    tmp = (buf[index] - '0');
+  }
+  return result;
 }
 
 void simple_app(coord place){

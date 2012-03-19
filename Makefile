@@ -6,7 +6,8 @@ TESTS = \
 	test/duplicate	\
 	test/app	\
 	test/expr	\
-	test/paren
+	test/paren	\
+	test/parse
 
 all: vm
 
