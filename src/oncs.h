@@ -61,6 +61,9 @@ extern int qbeg, qend;
 void enqueue(msg msg);
 msg dequeue();
 
+/* set all ref counters to 0 clearing out the world */
+void clear_world();
+
 /* return the coord of the nearest open space
  * 
  * cycle around original place

@@ -147,13 +147,14 @@ int onc_to_string(coord place, char *buf, int index){
 }
 
 int string_to_onc(coord place, char *buf, int index){
-  debug("%d -- %s\n", index, buf);
   coord t1, t2;
   int i, parend;
   char *interum = buf;
-  while((buf[index] == '#') || (buf[index] == ' ')) index++;
-  STR_TO_PTR(AT(place).car, buf, index, t1);
-  STR_TO_PTR(AT(place).cdr, buf, index, t1);
+  AT(place).refs = 1;
+  while(buf[index] != '\0') {
+    STR_TO_PTR(AT(place).car, buf, index, t1);
+    STR_TO_PTR(AT(place).cdr, buf, index, t1);
+  }
 }
 
 int close_paren(char *buf, int index){
@@ -172,13 +173,13 @@ int close_paren(char *buf, int index){
   return index;
 }
 
-int read_int(char *buf, int index){
+int read_int(char *buf, int *index){
   int result, tmp;
   result = 0;
-  while((0 <= (tmp = (buf[index] - '0'))) && tmp <= 9) {
+  while(0 <= (tmp = (buf[(*index)] - '0')) && tmp <= 9) {
     result = (result * 10) + tmp;
-    index++;
-    tmp = (buf[index] - '0');
+    (*index)++;
+    tmp = (buf[(*index)] - '0');
   }
   return result;
 }

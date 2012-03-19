@@ -45,20 +45,22 @@ int close_paren(char *buf, int index);
   AT(place).car.hdr = LAMBDA;            \
   AT(place).car.car = variable;
 #define STR_TO_PTR(where, buf, index, t1)                       \
+  while((buf[index] == '#') || (buf[index] == ' ')) index++;    \
   switch(buf[index]){                                           \
-  case '\0': /* NIL */                                          \
-  case ')': where.hdr = NIL; break;                             \
+  case ')': index++; /* NIL */                                  \
+  case '\0': where.hdr = NIL; break;                            \
   case 'L': /* LAMBDA */                                        \
     where.hdr = LAMBDA;                                         \
-    where.car = read_int(buf, (index+3));                       \
+    index += 3;                                                 \
+    where.car = read_int(buf, &index);                          \
     break;                                                      \
   case 'S': /* SYMBOL */                                        \
     where.hdr = SYMBOL;                                         \
-    where.car = read_int(buf, (index+1));                       \
+    index++;                                                    \
+    where.car = read_int(buf, &index);                          \
     break;                                                      \
   case '(': /* LOCAL */                                         \
     t1 = open_space(place);                                     \
-    AT(t1).refs = 1;                                            \
     where.hdr = LOCAL;                                          \
     where.car = t1.x; where.cdr = t1.y;                         \
     parend=close_paren(buf, index);                             \
@@ -67,7 +69,12 @@ int close_paren(char *buf, int index);
     interum[parend-index] = '\0';                               \
     string_to_onc(t1, interum, 0);                              \
     break;                                                      \
-  default:  /* INTEGER */ break;                                \
+  default: /* INTEGER */                                        \
+    if(0 <= (buf[index] - '0') && (buf[index] - '0') <= 9) {    \
+    where.hdr = INTEGER;                                        \
+    where.car = read_int(buf, &index);                          \
+    } else { index++; }                                         \
+    break;                                                      \
   }
 
 /* fixtures */

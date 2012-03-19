@@ -31,6 +31,13 @@ msg dequeue(){
   }
 }
 
+void clear_world(){
+  int i,j;
+  for(i=0;i<SIZE;i++)
+    for(j=0;j<SIZE;j++)
+      world[i][j].refs = 0;
+}
+
 coord open_space(coord place){
   int index, cntrl, tried;
   index = cntrl = tried = 0;
