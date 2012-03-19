@@ -105,6 +105,47 @@ void show_world(){
   }
 }
 
+int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
+  int i, j;
+  char s[20];
+  coord coord;
+  switch(ptr.hdr){
+  case NIL: break;
+  case LOCAL:
+    coord.x = ptr.car; coord.y = ptr.cdr;
+    if(car_p) { buf[index] = '('; index++; }
+    index = ptr_to_string(AT(coord).car, buf, index, 1);
+    buf[index] = ' '; index++;
+    index = ptr_to_string(AT(coord).cdr, buf, index, 0);
+    if(car_p) { buf[index] = ')'; index++; }
+    return index;
+  case LAMBDA:
+    buf[index] = '#'; index++;
+    buf[index] = 'L'; index++;
+  case SYMBOL:
+    buf[index] = '#'; index++;
+    buf[index] = 'S'; index++;
+  case INTEGER:
+    i = sprintf(s, "%d", ptr.car);
+    for(j=0;j<i;j++){
+      buf[index] = s[j];
+      index++;
+    }
+    break;
+  }
+  return index;
+}
+
+int onc_to_string(coord place, char *buf, int index){
+  buf[index] = '('; index++;
+  index = ptr_to_string(AT(place).car, buf, index, 1);
+  buf[index] = ' '; index++;
+  index = ptr_to_string(AT(place).cdr, buf, index, 0);
+  buf[index] = ')'; index++;
+  buf[index] = '\0';
+  return index;
+}
+
 void simple_app(coord place){
   coord tmp1, tmp2;
   int hold = verbose_p;

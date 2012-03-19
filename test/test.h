@@ -22,6 +22,7 @@ int count(int type);
 void show_ptr(ptr ptr);
 void show_queue();
 void show_world();
+void get_expr(coord place, char *buf, int index);
 
 /* state placing macros */
 #define NIL_SET(place, sub)              \

@@ -4,7 +4,8 @@ TESTS = \
 	test/open_space	\
 	test/queue	\
 	test/duplicate	\
-	test/app
+	test/app	\
+	test/expr
 
 all: vm
 
