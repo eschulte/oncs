@@ -87,9 +87,19 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                  :base-extension "h\\|c\\|txt\\|lisp"
                  :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
                  :publishing-function org-publish-attachment))
+  (add-to-list 'org-publish-project-alist
+               `("oncs-src"
+                 :base-directory ,(expand-file-name "src" oncs-dir)
+                 :base-extension "h\\|c\\|txt\\|lisp"
+                 :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/src/"
+                 :publishing-function org-publish-attachment))
+  (add-to-list 'org-publish-project-alist
+               `("oncs-test"
+                 :base-directory ,(expand-file-name "test" oncs-dir)
+                 :base-extension "h\\|c\\|txt\\|lisp"
+                 :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/test/"
+                 :publishing-function org-publish-attachment))
   ;; a single combined project to publish both html and supporting materials
   (add-to-list 'org-publish-project-alist
-               '("oncs" :components
-                 ("oncs-html"
-                  "oncs-data")))
+               '("oncs" :components ("oncs-html" "oncs-data" "oncs-src" "oncs-test")))
 #+end_src
