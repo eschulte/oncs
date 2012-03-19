@@ -5,7 +5,8 @@ TESTS = \
 	test/queue	\
 	test/duplicate	\
 	test/app	\
-	test/expr
+	test/expr	\
+	test/paren
 
 all: vm
 

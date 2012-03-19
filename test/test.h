@@ -25,6 +25,9 @@ void show_world();
 void get_expr(coord place, char *buf, int index);
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
 int onc_to_string(coord place, char *buf, int index);
+int string_to_onc(coord place, char *buf, int index);
+ptr string_to_ptr(coord place, char *buf, int index);
+int close_paren(char *buf, int index);
 
 /* state placing macros */
 #define NIL_SET(place, sub)              \

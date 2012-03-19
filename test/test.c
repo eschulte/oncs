@@ -146,6 +146,36 @@ int onc_to_string(coord place, char *buf, int index){
   return index;
 }
 
+int string_to_onc(coord place, char *buf, int index){
+  if(buf[index] == '#') index++;
+  switch(buf[index]){
+  case 'L': /* LAMBDA */ break;
+  case 'S': /* SYMBOL */ break;
+  case '(': /* LOCAL */ break;
+  default:  /* INTEGER */ break;
+  }
+}
+
+ptr string_to_ptr(coord place, char *buf, int index){
+  
+}
+
+int close_paren(char *buf, int index){
+  int paren_counter;
+  if(buf[index] = '(') paren_counter = 1;
+  else                 paren_counter = 0;
+  do {
+    index++;
+    switch(buf[index]){
+    case '(': paren_counter++; break;
+    case ')': paren_counter--; break;
+    case '\0': printf("ERROR: unmatched paren %d", index); exit(1);
+    default: break;
+    }
+  } while (paren_counter > 0);
+  return index;
+}
+
 void simple_app(coord place){
   coord tmp1, tmp2;
   int hold = verbose_p;
