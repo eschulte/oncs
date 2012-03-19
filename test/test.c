@@ -147,13 +147,17 @@ int onc_to_string(coord place, char *buf, int index){
 }
 
 int string_to_onc(coord place, char *buf, int index){
+  debug("(%d,%d) %s:%d\n", place.x, place.y, buf, index);
   coord t1, t2;
   int i, parend;
   char *interum = buf;
-  AT(place).refs = 1;
   while(buf[index] != '\0') {
+    AT(place).refs = 1;
+    debug("\tcar\n");
     STR_TO_PTR(AT(place).car, buf, index, t1);
+    debug("\tcdr\n");
     STR_TO_PTR(AT(place).cdr, buf, index, t1);
+    place = open_space(place);
   }
 }
 

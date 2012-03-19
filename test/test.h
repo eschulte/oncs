@@ -46,21 +46,27 @@ int close_paren(char *buf, int index);
   AT(place).car.car = variable;
 #define STR_TO_PTR(where, buf, index, t1)                       \
   while((buf[index] == '#') || (buf[index] == ' ')) index++;    \
+  debug("\t%d:%c:%s\n", index, buf[index], buf);                \
   switch(buf[index]){                                           \
   case ')': index++; /* NIL */                                  \
-  case '\0': where.hdr = NIL; break;                            \
+  case '\0':                                                    \
+    debug("\tNIL:(%d,%d)\n", place.x, place.y);                 \
+    where.hdr = NIL; break;                                     \
   case 'L': /* LAMBDA */                                        \
+    debug("\tLAMBDA:(%d,%d)\n", place.x, place.y);              \
     where.hdr = LAMBDA;                                         \
     index += 3;                                                 \
     where.car = read_int(buf, &index);                          \
     break;                                                      \
   case 'S': /* SYMBOL */                                        \
+    debug("\tSYMBOL:(%d,%d)\n", place.x, place.y);              \
     where.hdr = SYMBOL;                                         \
     index++;                                                    \
     where.car = read_int(buf, &index);                          \
     break;                                                      \
   case '(': /* LOCAL */                                         \
     t1 = open_space(place);                                     \
+    debug("\tLOCAL:(%d,%d)\n", place.x, place.y);               \
     where.hdr = LOCAL;                                          \
     where.car = t1.x; where.cdr = t1.y;                         \
     parend=close_paren(buf, index);                             \
@@ -71,6 +77,7 @@ int close_paren(char *buf, int index);
     break;                                                      \
   default: /* INTEGER */                                        \
     if(0 <= (buf[index] - '0') && (buf[index] - '0') <= 9) {    \
+      debug("\tINTEGER:(%d,%d)\n", place.x, place.y);           \
     where.hdr = INTEGER;                                        \
     where.car = read_int(buf, &index);                          \
     } else { index++; }                                         \

@@ -19,18 +19,27 @@ int main(int argc, char *argv[]){
   SHOULD(index == 8);
 
   char buf2[] = "#S1";
+  clear_world();
   place.x = place.y = 3;
   string_to_onc(place, buf2, 0);
   show_world();
-  clear_world();
+  debug("exp:%s\n", buf2);
 
   char buf3[] = "#S1 678";
+  clear_world();
   place.x = place.y = 3;
   string_to_onc(place, buf3, 0);
   show_world();
-  clear_world();
+  debug("exp:%s\n", buf3);
 
-  char buf5[] = "((#L#S1 #S1 #S1 ) 1 2 3 )";
+  char buf4[] = "#S1 (#S2 678)";
+  clear_world();
+  place.x = place.y = 3;
+  string_to_onc(place, buf4, 0);
+  show_world();
+  debug("exp:%s\n", buf4);
+
+  /* char buf5[] = "((#L#S1 #S1 #S1 ) 1 2 3 )"; */
 
   /* return indicates success or failure */
   return fail_p;
