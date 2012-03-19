@@ -21,7 +21,7 @@ used.  See file:oncs.lisp for a simulation of the world in lisp.
 
 - ONC :: are linked structures composed of
      #+begin_src C
-       typedef struct { ptr car, cdr, msg; int refs; } onc;
+       typedef struct { ptr car, cdr, mcar, mcdr; int refs; } onc;
      #+end_src
      which perform the following actions
   - replace self with the value at a pointer uniquifying variables
@@ -31,6 +31,9 @@ used.  See file:oncs.lisp for a simulation of the world in lisp.
     free space
 
 - Pointer :: header indicating type of contents, then car and cdr
+     #+begin_src C
+       typedef struct { int hdr, car, cdr; } ptr;
+     #+end_src
      | header | interpretation                       |
      |--------+--------------------------------------|
      |      0 | nil                                  |
@@ -39,8 +42,13 @@ used.  See file:oncs.lisp for a simulation of the world in lisp.
      |      3 | symbol car (cdr for disambiguation?) |
      |      4 | \lambda same as symbol                     |
 
-- Messages :: passed between oncs, indicate next action for an onc to
-     take, broken out by header type below
+- Messages :: passed between oncs
+     #+begin_src C
+       typedef struct { int x, y; } coord;
+       typedef struct { ptr mcar,mcdr; coord coord; } msg;
+     #+end_src
+     indicate next action for an onc to take, broken out by header
+     type below
   - =NIL= runs the holding loop
   - =LOCAL= undefined
   - =INTEGER= increments or decrements the ref counter by the given
