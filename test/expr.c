@@ -4,7 +4,7 @@
 int main(int argc, char *argv[]){
   init(argc, argv);
 
-  char* buf[BUF_SIZE];
+  char buf[BUF_SIZE];
   coord place;
   place.x = place.y = 4;
 
