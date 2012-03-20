@@ -133,8 +133,14 @@ void run(coord place){
         /* remove lambda expression */
         AT(t1).refs = 0;
         AT(t2).refs = 0;
-      }
+      } else { run(t1); }
     }
+    if(AT(place).cdr.hdr == LOCAL){
+      t1.x = AT(place).cdr.car;
+      t1.y = AT(place).cdr.cdr;
+      run(t1);
+    }
+    break;
   case LOCAL: case SYMBOL: /* undefined */ break;
   case INTEGER: /* update number of references */
     AT(place).refs += AT(place).mcar.car;

@@ -3,6 +3,7 @@
 
 void full_run(char *expr){
   debug(2, "1\n");
+  debug(1, "\nrunning: %s\n", expr);
   coord place;
   place.x = place.y = 4;
   clear_world();
@@ -18,7 +19,7 @@ void full_run(char *expr){
       run_queue(); debug(2, "4\n"); show_world(); debug(2, "5\n");
       run(place);  debug(2, "6\n"); show_world(); debug(2, "7\n");
     }
-    printf("8\n");
+    debug(2, "8\n");
   } while(queue_population() > 0);
   place.x = place.y = 4;
   debug(1, "(%d,%d):%s\n", place.x, place.y, expr);
@@ -27,11 +28,18 @@ void full_run(char *expr){
 int main(int argc, char *argv[]){
   init(argc, argv);
 
-  char expr1[] = "(#L1 (#L2 #S1)) 8";
+  char expr1[] = "(#L1 (#L2 (#S1))) (8)";
   full_run(expr1);
+  SHOULD(count(LAMBDA) == 1);
+  SHOULD(count(SYMBOL) == 0);
+  SHOULD(count(INTEGER) == 1);
 
-  /* char expr2[] = "(#L1 (#L2 #S1)) ((#L1 (#L2 #S1)) (3 4))"; */
-  /* full_run(expr2); */
+  char expr2[] =
+    "((#L1 (#L2 #S2)) (1 (2 3))) ((#L1 (#L2 #S1)) (3 4))";
+  full_run(expr2);
+  SHOULD(count(INTEGER) == 2);
+  SHOULD(count(LAMBDA) == 0);
+  SHOULD(count(SYMBOL) == 0);
 
   /* return indicates success or failure */
   return fail_p;
