@@ -64,6 +64,9 @@ msg dequeue();
 /* set all ref counters to 0 clearing out the world */
 void clear_world();
 
+/* forcefully empty the queue */
+void clear_queue();
+
 /* return the coord of the nearest open space
  * 
  * cycle around original place

@@ -38,6 +38,13 @@ void clear_world(){
       world[i][j].refs = 0;
 }
 
+void clear_queue(){
+  int i;
+  for(i=0;i<QLENGTH;i++)
+    queue[i].mcar.hdr = NIL;
+  qbeg = qend = 0;
+}
+
 coord open_space(coord place){
   int index, cntrl, tried;
   index = cntrl = tried = 0;
