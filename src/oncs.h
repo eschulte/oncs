@@ -21,6 +21,8 @@
     tmp_to = open_space(near);                                  \
     duplicate(tmp_to, tmp_from);                                \
   }
+#define COORD_OF_PTR(coord, ptr) \
+  { coord.x=ptr.car; coord.y=ptr.cdr; }
 #define LAMBDA_APP(where, msg, t1, t2)                          \
   switch(where.hdr){                                            \
   case NIL:                                                     \
@@ -45,6 +47,13 @@
     enqueue(msg);                                               \
     break;                                                      \
   }
+
+/* utility macros */
+#define DEBUG_P 0
+#define DEBUG(fmt) if(DEBUG_P) printf(fmt);
+#define DEBUG1(fmt, x) if(DEBUG_P) printf(fmt, x);
+#define DEBUG2(fmt, x, y) if(DEBUG_P) printf(fmt, x, y);
+#define ERROR(message) { printf(message); exit(1); }
 
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;

@@ -28,11 +28,14 @@ void full_run(char *expr){
 int main(int argc, char *argv[]){
   init(argc, argv);
 
-  char expr1[] = "(#L1 (#L2 (#S1))) (8)";
-  full_run(expr1);
-  SHOULD(count(LAMBDA) == 1);
-  SHOULD(count(SYMBOL) == 0);
-  SHOULD(count(INTEGER) == 1);
+  /* char expr0[] = "(#L1) 24"; */
+  /* full_run(expr0); */
+
+  /* char expr1[] = "(#L1 (#L2 (#S1))) (8)"; */
+  /* full_run(expr1); */
+  /* SHOULD(count(LAMBDA) == 1); */
+  /* SHOULD(count(SYMBOL) == 0); */
+  /* SHOULD(count(INTEGER) == 1); */
 
   char expr2[] =
     "((#L1 (#L2 #S2)) (1 (2 3))) ((#L1 (#L2 #S1)) (3 4))";

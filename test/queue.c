@@ -4,6 +4,7 @@ int queue_size(){ return (qend-qbeg) % QLENGTH; }
 
 int main(int argc, char *argv[]){
   init(argc, argv);
+  debug(2, "starting queue test\n");
 
   msg msg;
   msg.coord.x = msg.coord.y = 0;
@@ -11,6 +12,7 @@ int main(int argc, char *argv[]){
   msg.mcar.car = 1;
 
   /* enqueue a message */
+  debug(2, "calling enqueue\n");
   enqueue(msg);
 
   /* should be in the queue */

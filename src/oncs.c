@@ -8,14 +8,13 @@ msg queue[QLENGTH];
 int qbeg, qend = 0;
 
 void enqueue(msg msg){
+  DEBUG2("enqueue(%d,%d)\n", msg.coord.x, msg.coord.y);
   int i;
   for(i=0;i<QLENGTH;i++)
     if(queue[QWRAP(qend + i)].mcar.hdr == NIL)
       break;
-  if(i == (QLENGTH - 1)){
-    printf("ERROR: queue overflow\n");
-    exit(1);
-  }
+  if(i == (QLENGTH - 1))
+    ERROR("queue overflow\n");
   queue[QWRAP(qend + i)] = msg;
   qend = QWRAP(qend+1);
 }
@@ -25,10 +24,7 @@ msg dequeue(){
   if(queue[tmp].mcar.hdr != NIL){
     qbeg = QWRAP(qbeg+1);
     return queue[tmp];
-  } else {
-    printf("ERROR: queue underflow\n");
-    exit(1);
-  }
+  } else ERROR("queue underflow\n");
 }
 
 void clear_world(){
@@ -64,12 +60,8 @@ coord open_space(coord place){
     }
     if (AT(place).refs == 0) break;
   } while (tried <= SIZE*SIZE);
-  if (tried >= SIZE*SIZE) {
-    printf("ERROR: exhausted world\n");
-    exit(1);
-  } else {
-    return place;
-  }
+  if (tried >= SIZE*SIZE) { ERROR("exhausted world\n"); }
+  else { return place; }
 }
 
 void duplicate(coord to, coord from){
@@ -84,8 +76,6 @@ void duplicate(coord to, coord from){
 void run_queue(){
   if(queue[qbeg].mcar.hdr != NIL){
     msg msg = dequeue();
-    /* printf("msg.coord.x=%d msg.coord.x=%d\n", */
-    /*        msg.coord.x, msg.coord.y); */
     if(AT(msg.coord).mcar.hdr == NIL){
       AT(msg.coord).mcar = msg.mcar;
       AT(msg.coord).mcdr = msg.mcdr;
@@ -100,18 +90,19 @@ void update_ref_msg(coord place, int diff){
   msg.coord = place;
   msg.mcar.hdr = INTEGER;
   msg.mcar.car = diff;
+  DEBUG("update ref\n");
   enqueue(msg);
 }
 
 void run(coord place){
   coord t1, t2;
   msg msg;
+  DEBUG2("running(%d,%d)\n", place.x, place.y);
   switch(AT(place).mcar.hdr){
   case NIL: /* waiting loop */
     if(AT(place).car.hdr == LOCAL){
       /* point t1 at abstraction */
-      t1.x = AT(place).car.car;
-      t1.y = AT(place).car.cdr;
+      COORD_OF_PTR(t1, AT(place).car);
       /* apply car to cdr and replace self with result */
       if(AT(t1).car.hdr == LAMBDA){
         /* build lambda message from car and send to myself */
@@ -121,12 +112,16 @@ void run(coord place){
         msg.mcdr = AT(place).cdr;
         if(AT(place).cdr.hdr == LOCAL){
           /* point t2 at second half of application */
-          t2.x = AT(place).cdr.car; t2.y = AT(place).cdr.cdr;
+          COORD_OF_PTR(t2, AT(place).cdr);
           update_ref_msg(t2, 1);
         }
         enqueue(msg);
+        /* self no longer points to cdr */
+        if(AT(place).cdr.hdr == LOCAL){
+          DEBUG2("NIL update ref to (%d,%d)\n", t2.x, t2.y);
+          update_ref_msg(t2, -1);
+        }
         /* replace self with body of lambda expression (cadr) */
-        update_ref_msg(t2, -1); /* self no longer points to cdr */
         t2.x = AT(t1).cdr.car; t2.y = AT(t1).cdr.cdr;
         AT(place).car = AT(t2).car;
         AT(place).cdr = AT(t2).cdr;
@@ -136,8 +131,7 @@ void run(coord place){
       } else { run(t1); }
     }
     if(AT(place).cdr.hdr == LOCAL){
-      t1.x = AT(place).cdr.car;
-      t1.y = AT(place).cdr.cdr;
+      COORD_OF_PTR(t1, AT(place).cdr);
       run(t1);
     }
     break;
@@ -146,13 +140,12 @@ void run(coord place){
     AT(place).refs += AT(place).mcar.car;
     msg.mcar = AT(place).mcar;
     if(AT(place).car.hdr == LOCAL){
-      msg.coord.x = AT(place).car.car;
-      msg.coord.y = AT(place).car.cdr;
+      COORD_OF_PTR(msg.coord, AT(place).car);
       enqueue(msg);
     }
     if(AT(place).cdr.hdr == LOCAL){
-      msg.coord.x = AT(place).cdr.car;
-      msg.coord.y = AT(place).cdr.cdr;
+      COORD_OF_PTR(msg.coord, AT(place).cdr);
+      DEBUG("INTEGER2\n");
       enqueue(msg);
     }
     break;
@@ -160,6 +153,7 @@ void run(coord place){
     t1.x = AT(place).mcdr.car; t1.y = AT(place).mcdr.cdr;
     LAMBDA_APP(AT(place).car, msg, t1, t2);
     LAMBDA_APP(AT(place).cdr, msg, t1, t2);
+    DEBUG2("LAMBDA update ref to (%d,%d)\n", t1.x, t1.y);
     update_ref_msg(t1, -1);
     break;
   }
