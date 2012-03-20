@@ -129,8 +129,10 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
     buf[index] = '#'; index++;
     buf[index] = 'L'; index++;
   case SYMBOL:
-    buf[index] = '#'; index++;
-    buf[index] = 'S'; index++;
+    if(ptr.hdr != LAMBDA){
+      buf[index] = '#'; index++;
+      buf[index] = 'S'; index++;
+    }
   case INTEGER:
     i = sprintf(s, "%d", ptr.car);
     for(j=0;j<i;j++){

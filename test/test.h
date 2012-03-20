@@ -55,7 +55,7 @@ int close_paren(char *buf, int index);
   case 'L': /* LAMBDA */                                        \
     debug(2, "\tLAMBDA:(%d,%d)\n", place.x, place.y);           \
     where.hdr = LAMBDA;                                         \
-    index += 3;                                                 \
+    index++;                                                    \
     where.car = read_int(buf, &index);                          \
     break;                                                      \
   case 'S': /* SYMBOL */                                        \

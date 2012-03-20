@@ -48,13 +48,13 @@ int main(int argc, char *argv[]){
   SHOULD(count(INTEGER) == 2);
   SHOULD(population() == 2);
 
-  char buf6[] = "(#L#S1 (#S1 #S1)) (1 (2 3))";
+  char buf6[] = "(#L1 (#S1 #S1)) (1 (2 3))";
   insert_into_world(place, buf6);
   SHOULD(count(LAMBDA) == 1);
   SHOULD(count(SYMBOL) == 2);
   SHOULD(count(INTEGER) == 3);
 
-  char buf7[] = "((#L#S1 (#S1 #S1)) (1 (2 3)))";
+  char buf7[] = "((#L1 (#S1 #S1)) (1 (2 3)))";
   insert_into_world(place, buf7);
   SHOULD(count(LAMBDA) == 1);
   SHOULD(count(SYMBOL) == 2);
@@ -63,6 +63,11 @@ int main(int argc, char *argv[]){
   char buf8[] = "(#L1 (#L2 #S1)) ((#L1 (#L2 #S1)) (3 4))";
   insert_into_world(place, buf8);
   SHOULD(count(LAMBDA) == 4);
+
+  char buf9[] = "#L1 (#L2 #S1)";
+  insert_into_world(place, buf9);
+  SHOULD(count(LAMBDA) == 2);
+  SHOULD(count(SYMBOL) == 1);
 
   /* return indicates success or failure */
   return fail_p;

@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
 
   debug(1, "buf=%s\n", buf);
 
-  SHOULD(strcmp(buf, "((#L#S1 #S1 #S1 ) 1 2 3 )") == 0);
+  SHOULD(strcmp(buf, "((#L1 #S1 #S1 ) 1 2 3 )") == 0);
 
   /* return indicates success or failure */
   return fail_p;
