@@ -4,7 +4,7 @@
 void insert_into_world(coord place, char *buf){
   clear_world();
   place.x = place.y = 3;
-  debug("exp:%s\n", buf);
+  debug(1, "exp:%s\n", buf);
   string_to_onc(place, buf, 0);
   show_world();
 }
@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
   coord place;
   int index;
 
-  debug("simple parsing of an integer\n");
+  debug(1, "simple parsing of an integer\n");
   char buf1[] = "one 3241z ";
   index = 4;
   SHOULD(read_int(buf1, &index) == 3241);
@@ -59,6 +59,10 @@ int main(int argc, char *argv[]){
   SHOULD(count(LAMBDA) == 1);
   SHOULD(count(SYMBOL) == 2);
   SHOULD(count(INTEGER) == 3);
+
+  char buf8[] = "(#L1 (#L2 #S1)) ((#L1 (#L2 #S1)) (3 4))";
+  insert_into_world(place, buf8);
+  SHOULD(count(LAMBDA) == 4);
 
   /* return indicates success or failure */
   return fail_p;

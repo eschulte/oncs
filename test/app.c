@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
 
   place.x = place.y = 4;
   onc_to_string(place, buf, 0);
-  debug("(%d,%d):%s\n", place.x, place.y, buf);
+  debug(1, "(%d,%d):%s\n", place.x, place.y, buf);
   
   /* return indicates success or failure */
   return fail_p;

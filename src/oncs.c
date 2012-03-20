@@ -77,6 +77,8 @@ void duplicate(coord to, coord from){
 void run_queue(){
   if(queue[qbeg].mcar.hdr != NIL){
     msg msg = dequeue();
+    /* printf("msg.coord.x=%d msg.coord.x=%d\n", */
+    /*        msg.coord.x, msg.coord.y); */
     if(AT(msg.coord).mcar.hdr == NIL){
       AT(msg.coord).mcar = msg.mcar;
       AT(msg.coord).mcdr = msg.mcdr;

@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
   simple_app(place); show_world();
   onc_to_string(place, buf, 0);
 
-  debug("buf=%s\n", buf);
+  debug(1, "buf=%s\n", buf);
 
   SHOULD(strcmp(buf, "((#L#S1 #S1 #S1 ) 1 2 3 )") == 0);
 

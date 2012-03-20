@@ -1,22 +1,28 @@
 /* Copyright (C) 2012 Eric Schulte */
 #include "test.h"
 
-int verbose_p = 0;
+int verbose = 0;
 int fail_p = 0;
 
 void init(int argc, char *argv[]){
   int i;
   for(i=1;i<argc;i++)
-    if(strcmp(argv[i], "-v") == 0)
-      verbose_p=1;
-  debug("");
+    if(argv[i][0] == '-'){
+      switch(argv[i][1]){
+      case 'v': verbose = 1; break;
+      case 'V': verbose = 2; break;
+      }
+    }
+  debug(1, "");
 }
 
-int debug(const char *format, ...){
+int debug(int level, const char *format, ...){
+  if(verbose >= level){
     va_list args;
     va_start(args, format);
-    if(verbose_p) vprintf(format, args);
+    vprintf(format, args);
     va_end(args);
+  }
 }
 
 int queue_population(){ return QWRAP(qend - qbeg); }
@@ -74,7 +80,7 @@ void show_queue(){
 }
 
 void show_world(){
-  if(!verbose_p) return;
+  if(!verbose) return;
   onc tmp;
   int i, j;
   printf("\n");
@@ -147,15 +153,15 @@ int onc_to_string(coord place, char *buf, int index){
 }
 
 int string_to_onc(coord place, char *buf, int index){
-  /* debug("(%d,%d) %s:%d\n", place.x, place.y, buf, index); */
+  debug(2, "(%d,%d) %s:%d\n", place.x, place.y, buf, index);
   coord t1, t2;
   int i, parend;
   char *interum = buf;
   while(buf[index] != '\0') {
     AT(place).refs = 1;
-    /* debug("\tcar\n"); */
+    debug(2, "\tcar\n");
     STR_TO_PTR(AT(place).car, buf, index, t1);
-    /* debug("\tcdr\n"); */
+    debug(2, "\tcdr\n");
     STR_TO_PTR(AT(place).cdr, buf, index, t1);
     place = open_space(place);
   }
@@ -190,32 +196,30 @@ int read_int(char *buf, int *index){
 
 void simple_app(coord place){
   coord tmp1, tmp2;
-  int hold = verbose_p;
-  verbose_p = 0;
   /* setup world: ((lambda x (x x)) (1 2 3)) */
   AT(place).refs++;
-  debug("(%d,%d) -- ((lambda x (x x)) (1 2 3))\n", place.x, place.y);
+  debug(2, "(%d,%d) -- ((lambda x (x x)) (1 2 3))\n", place.x, place.y);
   tmp1 = open_space(place);
   AT(tmp1).refs++;
   LOCAL_SET(place, car, tmp1);
-  debug("(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
+  debug(2, "(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
   LOCAL_SET(place, cdr, tmp2);
-  debug("(%d,%d) -- (1 2 3)\n", tmp2.x, tmp2.y);
+  debug(2, "(%d,%d) -- (1 2 3)\n", tmp2.x, tmp2.y);
   /* (lambda x (x x)) */
   place = tmp1;
   LAMBDA_SET(place, 1);
   tmp1 = open_space(place);
   AT(tmp1).refs++;
-  debug("(%d,%d) -- (x x)\n", tmp1.x, tmp1.y);
+  debug(2, "(%d,%d) -- (x x)\n", tmp1.x, tmp1.y);
   LOCAL_SET(place, cdr, tmp1);
   /* (x x) */
   place = tmp1;
   SYMBOL_SET(place, car, 1);
   tmp1 = open_space(place);
   AT(tmp1).refs++;
-  debug("(%d,%d) -- (_ x)\n", tmp1.x, tmp1.y);
+  debug(2, "(%d,%d) -- (_ x)\n", tmp1.x, tmp1.y);
   LOCAL_SET(place, cdr, tmp1);
   SYMBOL_SET(tmp1, car, 1);
   NIL_SET(tmp1, cdr);
@@ -228,12 +232,11 @@ void simple_app(coord place){
   place = tmp2;
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  debug("(%d,%d) -- (_ 2 _)\n", place.x, place.y);
+  debug(2, "(%d,%d) -- (_ 2 _)\n", place.x, place.y);
   INTEGER_SET(place, car, 2);
   LOCAL_SET(place, cdr, tmp2);
   place = tmp2;
-  debug("(%d,%d) -- (_ _ 3)\n", place.x, place.y);
+  debug(2, "(%d,%d) -- (_ _ 3)\n", place.x, place.y);
   INTEGER_SET(place, car, 3);
   NIL_SET(place, cdr);
-  verbose_p = hold;
 }

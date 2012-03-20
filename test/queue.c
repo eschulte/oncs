@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
 
   /* should be in the queue */
   SHOULD(queue_size() == 1);
-  debug("qbeg=%d qend=%d queue_size=%d fail_p=%d\n",
+  debug(1, "qbeg=%d qend=%d queue_size=%d fail_p=%d\n",
         qbeg, qend, queue_size(), fail_p);
 
   /* change the value of the instance not in the queue */
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
 
   /* should be empty */
   SHOULD(queue_size() == 0);
-  debug("qbeg=%d qend=%d queue_size=%d fail_p=%d\n",
+  debug(1, "qbeg=%d qend=%d queue_size=%d fail_p=%d\n",
         qbeg, qend, queue_size(), fail_p);
 
   /* should have the initial value (stored in the queue) */
