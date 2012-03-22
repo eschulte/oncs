@@ -8,7 +8,8 @@ TESTS = \
 	test/expr	\
 	test/paren	\
 	test/parse	\
-	test/cond
+	test/cond	\
+	test/prim-opt
 
 all: vm
 
