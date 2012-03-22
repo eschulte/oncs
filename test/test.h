@@ -29,6 +29,7 @@ int string_to_onc(coord place, char *buf, int index);
 int close_paren(char *buf, int index);
 void show_all(coord place);
 void run_down(coord place);
+void run_expr(char *expr, coord place);
 
 /* state placing macros */
 #define NIL_SET(place, sub)              \

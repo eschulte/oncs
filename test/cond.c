@@ -1,22 +1,12 @@
 #include "test.h"
 
-void full_run(char *expr){
-  coord place;
-  place.x = place.y = 4;
-  clear_world();
-  string_to_onc(place, expr, 0);
-  show_all(place);
-  run_down(place);
-  place.x = place.y = 4;
-  run_down(place);
-  debug(2, "leaving full_run\n");
-}
-
 int main(int argc, char *argv[]){
   init(argc, argv);
+  coord place;
+  place.x = 4; place.y = 4;
 
   char expr0[] = "(#L1) (24)";
-  full_run(expr0);
+  run_expr(expr0, place);
   SHOULD(count(LAMBDA) == 0);
   SHOULD(count(SYMBOL) == 0);
   SHOULD(count(INTEGER) == 0);
@@ -24,7 +14,7 @@ int main(int argc, char *argv[]){
   if(fail_p) ERROR("failed expr0");
 
   char expr1[] = "(#L1 (#L2 (#S1))) (8)";
-  full_run(expr1);
+  run_expr(expr1, place);
   SHOULD(count(LAMBDA) == 1);
   SHOULD(count(SYMBOL) == 0);
   SHOULD(count(INTEGER) == 1);
@@ -33,7 +23,7 @@ int main(int argc, char *argv[]){
 
   char expr2[] =
     "((#L1 (#L2 (#S2))) (1 (2 3))) ((#L1 (#L2 (#S1))) (3 4))";
-  full_run(expr2);
+  run_expr(expr2, place);
   debug(2, "counting integers\n");
   SHOULD(count(INTEGER) == 2);
   debug(2, "%d integers\n", count(INTEGER));

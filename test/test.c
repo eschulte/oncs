@@ -207,6 +207,16 @@ void run_down(coord place){
   debug(2, "leaving run_down\n");
 }
 
+void run_expr(char *expr, coord place){
+  clear_world();
+  string_to_onc(place, expr, 0);
+  show_all(place);
+  run_down(place);
+  place.x = place.y = 4;
+  run_down(place);
+  debug(2, "leaving full_run\n");
+}
+
 int read_int(char *buf, int *index){
   int result, tmp;
   result = 0;
