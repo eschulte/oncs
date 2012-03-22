@@ -41,6 +41,8 @@ used.  See file:oncs.lisp for a simulation of the world in lisp.
      |      2 | integer car+cdr                      |
      |      3 | symbol car (cdr for disambiguation?) |
      |      4 | \lambda same as symbol                     |
+     |      5 | primitive integer operation          |
+     |      6 | curried primitive integer operation  |
 
 - Messages :: passed between oncs
      #+begin_src C

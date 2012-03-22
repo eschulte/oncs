@@ -1,5 +1,6 @@
 /* Copyright (C) 2012 Eric Schulte */
 #include "test.h"
+#define EXPR_BUF_SIZE 1024
 
 int verbose = 0;
 int fail_p = 0;
@@ -183,6 +184,27 @@ int close_paren(char *buf, int index){
     }
   } while (paren_counter > 0);
   return index;
+}
+
+void show_all(coord place){
+  char buf[EXPR_BUF_SIZE];
+  show_world();
+  onc_to_string(place, buf, 0);
+  debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
+}
+
+void run_down(coord place){
+  coord tmp;
+  run(place); show_all(place);
+  while(queue_population() > 0){
+    tmp = queue[qbeg].coord;
+    debug(2, "run queue to (%d,%d)\n", tmp.x, tmp.y);
+    run_queue(); show_all(place);
+    debug(2, "run (%d,%d)\n", tmp.x, tmp.y);
+    run(tmp);  show_all(place);
+    debug(2, "checking queue\n");
+  };
+  debug(2, "leaving run_down\n");
 }
 
 int read_int(char *buf, int *index){

@@ -15,7 +15,7 @@ void init(int argc, char *argv[]);
 /* logging */
 int debug(int level, const char *format, ...);
 
-/* world queries */
+/* world queries and actions */
 int queue_population();
 int population();
 int count(int type);
@@ -27,6 +27,8 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
 int onc_to_string(coord place, char *buf, int index);
 int string_to_onc(coord place, char *buf, int index);
 int close_paren(char *buf, int index);
+void show_all(coord place);
+void run_down(coord place);
 
 /* state placing macros */
 #define NIL_SET(place, sub)              \
