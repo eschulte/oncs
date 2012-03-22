@@ -14,7 +14,7 @@ void enqueue(msg msg){
     if(queue[QWRAP(qend + i)].mcar.hdr == NIL)
       break;
   if(i == (QLENGTH - 1))
-    ERROR("queue overflow\n");
+    ERROR("queue overflow");
   queue[QWRAP(qend + i)] = msg;
   qend = QWRAP(qend+1);
 }
@@ -24,7 +24,7 @@ msg dequeue(){
   if(queue[tmp].mcar.hdr != NIL){
     qbeg = QWRAP(qbeg+1);
     return queue[tmp];
-  } else ERROR("queue underflow\n");
+  } else ERROR("queue underflow");
 }
 
 void clear_world(){
@@ -60,7 +60,7 @@ coord open_space(coord place){
     }
     if (AT(place).refs == 0) break;
   } while (tried <= SIZE*SIZE);
-  if (tried >= SIZE*SIZE) { ERROR("exhausted world\n"); }
+  if (tried >= SIZE*SIZE) { ERROR("exhausted world"); }
   else { return place; }
 }
 
@@ -107,6 +107,8 @@ void run(coord place){
       COORD_OF_PTR(t1, AT(place).car);
       /* apply car to cdr and replace self with result */
       if(AT(t1).car.hdr == LAMBDA){
+        if((AT(t1).cdr.hdr != LOCAL) && (AT(t1).cdr.hdr != NIL))
+          ERROR("cdr of LAMBDA must be LOCAL or NIL");
         /* build lambda message from car and send to myself */
         msg.coord = place;
         msg.mcar.hdr = LAMBDA;

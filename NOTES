@@ -1,6 +1,6 @@
 # -*- mode:org -*-
 
-* leftover lambda and (0,0) messages
+* DONE leftover lambda and (0,0) messages
 For some reason after running some applications there are leftover
 lambdas and messages sent to (0,0).
 

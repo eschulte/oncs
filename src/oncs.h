@@ -54,7 +54,7 @@
 #define DEBUG(fmt) if(DEBUG_P) printf(fmt);
 #define DEBUG1(fmt, x) if(DEBUG_P) printf(fmt, x);
 #define DEBUG2(fmt, x, y) if(DEBUG_P) printf(fmt, x, y);
-#define ERROR(message) { printf(message); exit(1); }
+#define ERROR(message) { printf("ERROR: %s\n", message); exit(1); }
 
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
