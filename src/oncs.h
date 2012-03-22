@@ -37,6 +37,7 @@
     break;                                                      \
   case LAMBDA:                                                  \
     if(AT(place).mcar.car == where.car) return;                 \
+    break;                                                      \
   case LOCAL:                                                   \
     msg.coord.x = where.car;                                    \
     msg.coord.y = where.cdr;                                    \

@@ -1,28 +1,44 @@
 #include "test.h"
 #define BUF_SIZE 1024
 
+void show_all(){
+  coord place;
+  place.x = place.y = 4;
+  char buf[BUF_SIZE];
+  show_world();
+  onc_to_string(place, buf, 0);
+  debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
+}
+
 void full_run(char *expr){
   debug(2, "1\n");
   debug(1, "\nrunning: %s\n", expr);
   coord place;
   place.x = place.y = 4;
   clear_world();
+  run_queue(); debug(2, "4\n"); show_all(); debug(2, "5\n");
   string_to_onc(place, expr, 0);
-  show_world();
+  show_all();
+  run_queue(); debug(2, "4\n"); show_all(); debug(2, "5\n");
   run(place);
-  show_world();
+  show_all();
+  run_queue(); debug(2, "4\n"); show_all(); debug(2, "5\n");
   debug(2, "2\n");
+  run_down();
+  place.x = place.y = 4;
+  run_down();
+  show_all();
+}
+
+void run_down(){
+  coord place;
   do{
     place = queue[qbeg].coord; debug(2, "3\n");
     if(queue_population() > 0){
-      debug(2, "queue.length%d\n", queue_population());
-      run_queue(); debug(2, "4\n"); show_world(); debug(2, "5\n");
-      run(place);  debug(2, "6\n"); show_world(); debug(2, "7\n");
+      run_queue(); show_all();
+      run(place);  show_all();
     }
-    debug(2, "8\n");
   } while(queue_population() > 0);
-  place.x = place.y = 4;
-  debug(1, "(%d,%d):%s\n", place.x, place.y, expr);
 }
 
 int main(int argc, char *argv[]){
@@ -39,6 +55,7 @@ int main(int argc, char *argv[]){
 
   char expr2[] =
     "((#L1 (#L2 #S2)) (1 (2 3))) ((#L1 (#L2 #S1)) (3 4))";
+  full_run(expr2);
   full_run(expr2);
   SHOULD(count(INTEGER) == 2);
   SHOULD(count(LAMBDA) == 0);

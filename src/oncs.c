@@ -80,6 +80,7 @@ void run_queue(){
       AT(msg.coord).mcar = msg.mcar;
       AT(msg.coord).mcdr = msg.mcdr;
     } else {
+      DEBUG2("message requeue: (%d,%d)\n", msg.coord.x, msg.coord.y);
       enqueue(msg);
     }
   }
@@ -90,7 +91,7 @@ void update_ref_msg(coord place, int diff){
   msg.coord = place;
   msg.mcar.hdr = INTEGER;
   msg.mcar.car = diff;
-  DEBUG("update ref\n");
+  DEBUG2("update ref (%d,%d)\n", place.x, place.y);
   enqueue(msg);
 }
 
@@ -100,8 +101,9 @@ void run(coord place){
   DEBUG2("running(%d,%d)\n", place.x, place.y);
   switch(AT(place).mcar.hdr){
   case NIL: /* waiting loop */
+    if(AT(place).cdr.hdr == LOCAL) COORD_OF_PTR(t2, AT(place).cdr);
     if(AT(place).car.hdr == LOCAL){
-      /* point t1 at abstraction */
+      /* point (t1,t2) at (car,cdr) */
       COORD_OF_PTR(t1, AT(place).car);
       /* apply car to cdr and replace self with result */
       if(AT(t1).car.hdr == LAMBDA){
@@ -110,15 +112,12 @@ void run(coord place){
         msg.mcar.hdr = LAMBDA;
         msg.mcar.car = AT(t1).car.car;
         msg.mcdr = AT(place).cdr;
-        if(AT(place).cdr.hdr == LOCAL){
-          /* point t2 at second half of application */
-          COORD_OF_PTR(t2, AT(place).cdr);
-          update_ref_msg(t2, 1);
-        }
+        if(AT(place).cdr.hdr == LOCAL) update_ref_msg(t2, 1);
+        DEBUG2("    NIL: lambda to me at (%d,%d)\n", msg.coord.x, msg.coord.y);
         enqueue(msg);
         /* self no longer points to cdr */
         if(AT(place).cdr.hdr == LOCAL){
-          DEBUG2("NIL update ref to (%d,%d)\n", t2.x, t2.y);
+          DEBUG2("    NIL: removing cdr local at (%d,%d)\n", t2.x, t2.y);
           update_ref_msg(t2, -1);
         }
         /* replace self with body of lambda expression (cadr) */
@@ -126,14 +125,16 @@ void run(coord place){
         AT(place).car = AT(t2).car;
         AT(place).cdr = AT(t2).cdr;
         /* remove lambda expression */
+        DEBUG2("    NIL: removing car lambda at (%d,%d)\n", t1.x, t1.y);
         AT(t1).refs = 0;
         AT(t2).refs = 0;
-      } else { run(t1); }
+      } else {
+        /* if not lambda then let it run */
+        DEBUG2("    NIL: running car at (%d,%d)\n", t1.x, t1.y);
+        run(t1);
+      }
     }
-    if(AT(place).cdr.hdr == LOCAL){
-      COORD_OF_PTR(t1, AT(place).cdr);
-      run(t1);
-    }
+    if(AT(place).cdr.hdr == LOCAL) run(t2);
     break;
   case LOCAL: case SYMBOL: /* undefined */ break;
   case INTEGER: /* update number of references */
@@ -141,11 +142,12 @@ void run(coord place){
     msg.mcar = AT(place).mcar;
     if(AT(place).car.hdr == LOCAL){
       COORD_OF_PTR(msg.coord, AT(place).car);
+      DEBUG2("INTEGER: update car ref at (%d,%d)\n", msg.coord.x, msg.coord.y);
       enqueue(msg);
     }
     if(AT(place).cdr.hdr == LOCAL){
       COORD_OF_PTR(msg.coord, AT(place).cdr);
-      DEBUG("INTEGER2\n");
+      DEBUG2("INTEGER: update cdr ref at (%d,%d)\n", msg.coord.x, msg.coord.y);
       enqueue(msg);
     }
     break;
@@ -153,7 +155,7 @@ void run(coord place){
     t1.x = AT(place).mcdr.car; t1.y = AT(place).mcdr.cdr;
     LAMBDA_APP(AT(place).car, msg, t1, t2);
     LAMBDA_APP(AT(place).cdr, msg, t1, t2);
-    DEBUG2("LAMBDA update ref to (%d,%d)\n", t1.x, t1.y);
+    DEBUG2(" LAMBDA: update ref to (%d,%d)\n", t1.x, t1.y);
     update_ref_msg(t1, -1);
     break;
   }
