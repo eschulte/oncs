@@ -96,13 +96,15 @@ void update_ref_msg(coord place, int diff){
 }
 
 void run(coord place){
-  coord t1, t2;
   msg msg;
+  coord t1, t2;
+  int i1;
   DEBUG2("running(%d,%d)\n", place.x, place.y);
   switch(AT(place).mcar.hdr){
   case NIL: /* waiting loop */
     if(AT(place).cdr.hdr == LOCAL) COORD_OF_PTR(t2, AT(place).cdr);
-    if(AT(place).car.hdr == LOCAL){
+    switch(AT(place).car.hdr){
+    case LOCAL:
       /* point (t1,t2) at (car,cdr) */
       COORD_OF_PTR(t1, AT(place).car);
       /* apply car to cdr and replace self with result */
@@ -115,11 +117,13 @@ void run(coord place){
         msg.mcar.car = AT(t1).car.car;
         msg.mcdr = AT(place).cdr;
         if(AT(place).cdr.hdr == LOCAL) update_ref_msg(t2, 1);
-        DEBUG2("    NIL: lambda to me at (%d,%d)\n", msg.coord.x, msg.coord.y);
+        DEBUG2("    NIL: lambda to me at (%d,%d)\n",
+               msg.coord.x, msg.coord.y);
         enqueue(msg);
         /* self no longer points to cdr */
         if(AT(place).cdr.hdr == LOCAL){
-          DEBUG2("    NIL: removing cdr local at (%d,%d)\n", t2.x, t2.y);
+          DEBUG2("    NIL: removing cdr local at (%d,%d)\n",
+                 t2.x, t2.y);
           update_ref_msg(t2, -1);
         }
         /* replace self with body of lambda expression (cadr) */
@@ -127,7 +131,8 @@ void run(coord place){
         AT(place).car = AT(t2).car;
         AT(place).cdr = AT(t2).cdr;
         /* remove lambda expression */
-        DEBUG2("    NIL: removing car lambda at (%d,%d)\n", t1.x, t1.y);
+        DEBUG2("    NIL: removing car lambda at (%d,%d)\n",
+               t1.x, t1.y);
         AT(t1).refs = 0;
         AT(t2).refs = 0;
       } else {
@@ -135,6 +140,26 @@ void run(coord place){
         DEBUG2("    NIL: running car at (%d,%d)\n", t1.x, t1.y);
         run(t1);
       }
+      break;
+    case PRIMOPT: /* curry up primitive operation */
+      if(AT(place).cdr.hdr == INTEGER){
+        AT(place).car.cdr = AT(place).cdr.car;
+        AT(place).car.hdr = CURRIED;
+      }
+      break;
+    case CURRIED: /* apply curried primitive operation */
+      if(AT(place).cdr.hdr == INTEGER){
+        switch(AT(place).car.car){
+        case PLUS:   i1 = AT(place).car.cdr + AT(place).cdr.car; break;
+        case MINUS:  i1 = AT(place).car.cdr - AT(place).cdr.car; break;
+        case TIMES:  i1 = AT(place).car.cdr * AT(place).cdr.car; break;
+        case DIVIDE: i1 = AT(place).car.cdr / AT(place).cdr.car; break;
+        default: ERROR("unsupported CURRIED operation"); break;
+        }
+        AT(place).car.hdr = INTEGER;
+        AT(place).car.car = i1;
+      }
+      break;
     }
     if(AT(place).cdr.hdr == LOCAL) run(t2);
     break;
@@ -153,7 +178,7 @@ void run(coord place){
       enqueue(msg);
     }
     break;
-  case LAMBDA: /* perform lambda application */
+  case LAMBDA:  /* perform lambda application */
     t1.x = AT(place).mcdr.car; t1.y = AT(place).mcdr.cdr;
     LAMBDA_APP(AT(place).car, msg, t1, t2);
     LAMBDA_APP(AT(place).cdr, msg, t1, t2);

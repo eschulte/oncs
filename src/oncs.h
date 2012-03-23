@@ -8,6 +8,14 @@
 #define INTEGER 2
 #define SYMBOL  3
 #define LAMBDA  4
+#define PRIMOPT 5
+#define CURRIED 6
+
+/* types of primitive operations */
+#define PLUS   0
+#define MINUS  1
+#define TIMES  2
+#define DIVIDE 3
 
 /* world size and access */
 #define SIZE 10
