@@ -59,6 +59,7 @@ void show_ptr(ptr ptr){
   case LAMBDA:  printf("l"); break;
   case PRIMOPT: printf("#"); break;
   case CURRIED: printf("@"); break;
+  case UNPACK:  printf(">"); break;
   default:      printf("?"); break;
   }
 }
@@ -120,6 +121,7 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   char s[20];
   coord coord;
   switch(ptr.hdr){
+  case UNPACK: buf[index] = '>'; index++; break;
   case NIL: break;
   case LOCAL:
     coord.x = ptr.car; coord.y = ptr.cdr;
@@ -219,6 +221,7 @@ void show_all(coord place){
 }
 
 void run_down(coord place){
+  debug(2, "run_down (%d, %d)\n", place.x, place.y);
   coord tmp;
   run(place); show_all(place);
   while(queue_population() > 0){

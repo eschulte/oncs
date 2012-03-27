@@ -105,10 +105,11 @@ void run(coord place){
     if(AT(place).cdr.hdr == LOCAL) COORD_OF_PTR(t2, AT(place).cdr);
     switch(AT(place).car.hdr){
     case LOCAL:
-      /* point (t1,t2) at (car,cdr) */
+      /* point t1 at car */
       COORD_OF_PTR(t1, AT(place).car);
       /* apply car to cdr and replace self with result */
-      if(AT(t1).car.hdr == LAMBDA){
+      switch(AT(t1).car.hdr){
+      case LAMBDA:
         if((AT(t1).cdr.hdr != LOCAL) && (AT(t1).cdr.hdr != NIL))
           ERROR("cdr of LAMBDA must be LOCAL or NIL");
         /* build lambda message from car and send to myself */
@@ -135,8 +136,10 @@ void run(coord place){
                t1.x, t1.y);
         AT(t1).refs = 0;
         AT(t2).refs = 0;
-      } else {
-        /* if not lambda then let it run */
+        break;
+      case UNPACK: UNPACK_APP(AT(place).cdr, t1); break;
+      default:
+        /* if not lambda or unpack then let it run */
         DEBUG2("    NIL: running car at (%d,%d)\n", t1.x, t1.y);
         run(t1);
       }
@@ -145,7 +148,6 @@ void run(coord place){
       if(AT(place).cdr.hdr == INTEGER){
         PRIMOPT_APP(AT(place).car, AT(place).cdr.car);
       } else if (AT(place).cdr.hdr == LOCAL) {
-        COORD_OF_PTR(t2, AT(place).cdr);
         if(AT(t2).car.hdr == INTEGER) {
           AT(place).cdr = AT(t2).cdr;
           if(AT(t2).cdr.hdr == LOCAL){
@@ -155,14 +157,15 @@ void run(coord place){
           PRIMOPT_APP(AT(place).car, AT(t2).car.car);
           update_ref_msg(t2, -1);
         } else {
-          DEBUG2("PRIMOPT: running cdr at (%d,%d)\n", t2.x, t2.y);
+          DEBUG2("    NIL:PRIMOPT running cdr at (%d,%d)\n",
+                 t2.x, t2.y);
           run(t2);
         }
       }
       break;
     case CURRIED: /* apply curried primitive operation */
       if(AT(place).cdr.hdr == INTEGER){
-        CURRIED_APP(AT(place).car, AT(place).cdr, i1);
+        CURRIED_APP(AT(place), AT(place).cdr);
       } else if (AT(place).cdr.hdr == LOCAL) {
         COORD_OF_PTR(t2, AT(place).cdr);
         if(AT(t2).car.hdr == INTEGER) {
@@ -171,17 +174,21 @@ void run(coord place){
             COORD_OF_PTR(t1, AT(t2).cdr);
             update_ref_msg(t1, 1);
           }
-          CURRIED_APP(AT(place).car, AT(t2).car, i1);
+          CURRIED_APP(AT(place), AT(t2).car);
           update_ref_msg(t2, -1);
         } else {
           COORD_OF_PTR(t2, AT(place).cdr);
-          DEBUG2("CURRIED: running cdr at (%d,%d)\n", t2.x, t2.y);
+          DEBUG2("    NIL:CURRIED running cdr at (%d,%d)\n",
+                 t2.x, t2.y);
           run(t2);
         }
       }
       break;
     }
-    if(AT(place).cdr.hdr == LOCAL) run(t2);
+    if(AT(place).cdr.hdr == LOCAL) {
+      if(AT(t2).car.hdr == UNPACK) { UNPACK_APP(AT(place).cdr, t1); }
+      else                         { run(t2); }
+    }
     break;
   case LOCAL: case SYMBOL: /* undefined */ break;
   case INTEGER: /* update number of references */

@@ -10,6 +10,7 @@
 #define LAMBDA  4
 #define PRIMOPT 5
 #define CURRIED 6
+#define UNPACK  7
 
 /* types of primitive operations */
 #define PLUS   0
@@ -57,17 +58,25 @@
     break;                                                      \
   }
 #define PRIMOPT_APP(op, arg) { op.cdr = arg; op.hdr = CURRIED; }
-#define CURRIED_APP(op, arg, tmp) {                                \
-    switch(op.car){                                                \
-    case PLUS:   tmp = op.cdr + arg.car; break;                    \
-    case MINUS:  tmp = op.cdr - arg.car; break;                    \
-    case TIMES:  tmp = op.cdr * arg.car; break;                    \
-    case DIVIDE: tmp = op.cdr / arg.car; break;                    \
-    default: ERROR("unsupported CURRIED operation"); break;        \
+#define CURRIED_APP(op, arg) {                                     \
+    switch(op.car.car){                                            \
+    case PLUS:   op.cdr.car = op.car.cdr + arg.car; break;         \
+    case MINUS:  op.cdr.car = op.car.cdr - arg.car; break;         \
+    case TIMES:  op.cdr.car = op.car.cdr * arg.car; break;         \
+    case DIVIDE: op.cdr.car = op.car.cdr / arg.car; break;         \
+    default: ERROR("unsupported CURRIED op.careration"); break;    \
     }                                                              \
-    op.hdr = INTEGER;                                              \
-    op.car = tmp;                                                  \
+    op.cdr.hdr = INTEGER;                                          \
+    op.car.hdr  = UNPACK;                                          \
   }
+#define UNPACK_APP(op, arg) {                                     \
+  DEBUG2("    NIL: unpacking from (%d,%d)\n", arg.x, arg.y);      \
+  op = AT(arg).cdr;                                               \
+  if(AT(arg).cdr.hdr == LOCAL){                                   \
+    COORD_OF_PTR(arg, AT(arg).cdr);                               \
+    update_ref_msg(arg, 1);                                       \
+  }                                                               \
+  update_ref_msg(arg, -1); }
 
 /* utility macros */
 #define DEBUG_P 0
