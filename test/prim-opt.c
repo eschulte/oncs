@@ -10,14 +10,18 @@ int main(int argc, char *argv[]){
   run_down(place);
   SHOULD(AT(place).car.hdr == INTEGER);
   SHOULD(AT(place).car.car == 6);
+  SHOULD(count(INTEGER) == 1);
+  SHOULD(count(LAMBDA) == 0);
+  SHOULD(count(LOCAL) == 0);
 
-  /* if(fail_p) ERROR("failed expr0"); */
+  if(fail_p) ERROR("failed expr0");
 
-  /* char expr1[] = ""; */
-  /* run_expr(expr1, place); */
-  /* SHOULD(count(LAMBDA) == 1); */
-  /* SHOULD(count(SYMBOL) == 0); */
-  /* SHOULD(count(INTEGER) == 1); */
+  char expr1[] = "* ((+ (1 (2))) ((- (32 (8)))))";
+  run_expr(expr1, place);
+  run_down(place);
+  run_down(place);
+  SHOULD(AT(place).car.hdr == INTEGER);
+  SHOULD(AT(place).car.car == 72);
 
   /* if(fail_p) ERROR("failed expr0"); */
 

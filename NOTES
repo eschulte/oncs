@@ -1,5 +1,10 @@
 # -*- mode:org -*-
 
+* TODO better reading/writing between strings and ONCS
+specifically currently it is necessary to include far too many
+parenthesis specifying the linking order for lists, e.g., what should
+be written as =(1 2 3 4 5)= must be written as =(1 (2 (3 (4 (5)))))=.
+
 * TODO direct debug output to STDERR
 * DONE leftover lambda and (0,0) messages
 For some reason after running some applications there are leftover
