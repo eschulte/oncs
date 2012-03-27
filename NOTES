@@ -1,5 +1,11 @@
 # -*- mode:org -*-
 
+* dealing with "global" variables and environments
+need to address this eventually, points to keep in mind
+- build-ins which should be provided by the medium itself
+- software transactional memory for widely referenced values
+- the environment pointers from previous iterations
+
 * DONE need to figure out how to un-shell results
 When a function is applied to arguments, it must then /emerge/ from
 the list enclosing the function and arguments.

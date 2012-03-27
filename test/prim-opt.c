@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr0");
 
-  char expr1[] = "+ ((> 2) (> 3))";
+  char expr1[] = "+ ((~ 2) (~ 3))";
   run_expr(expr1, place);
   run_down(place);
   place.x = 4; place.y = 3;

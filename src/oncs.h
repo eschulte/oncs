@@ -17,6 +17,8 @@
 #define MINUS  1
 #define TIMES  2
 #define DIVIDE 3
+#define EQUAL  4
+#define LESS   5
 
 /* world size and access */
 #define SIZE 10
@@ -64,10 +66,14 @@
     case MINUS:  op.cdr.car = op.car.cdr - arg.car; break;         \
     case TIMES:  op.cdr.car = op.car.cdr * arg.car; break;         \
     case DIVIDE: op.cdr.car = op.car.cdr / arg.car; break;         \
+    case EQUAL:  /* TODO */ break;                                 \
+    case DIVIDE: /* TODO */ break;                                 \
     default: ERROR("unsupported CURRIED op.careration"); break;    \
     }                                                              \
-    op.cdr.hdr = INTEGER;                                          \
-    op.car.hdr  = UNPACK;                                          \
+    if(op.car.car <= DIVIDE){                                      \
+      op.cdr.hdr = INTEGER;                                        \
+      op.car.hdr  = UNPACK;                                        \
+    }                                                              \
   }
 #define UNPACK_APP(op, arg) {                                     \
   DEBUG2("    NIL: unpacking from (%d,%d)\n", arg.x, arg.y);      \
@@ -77,6 +83,23 @@
     update_ref_msg(arg, 1);                                       \
   }                                                               \
   update_ref_msg(arg, -1); }
+#define PUT_BOOL(t1, t2, bool) {             \
+  t2 = new_place(t1);                        \
+  AT(t1).car.hdr = LAMBDA;                   \
+  AT(t1).car.car = 1;                        \
+  AT(t1).cdr.hdr = LOCAL;                    \
+  AT(t1).cdr.car = t2.x;                     \
+  AT(t1).cdr.cdr = t2.y;                     \
+  t1 = new_place(t2);                        \
+  AT(t2).car.hdr = LAMBDA;                   \
+  AT(t2).car.car = 0;                        \
+  AT(t2).cdr.hdr = LOCAL;                    \
+  AT(t2).cdr.car = t1.x;                     \
+  AT(t2).cdr.cdr = t1.y;                     \
+  t2 = new_place(t1);                        \
+  AT(t1).car.hdr = SYMBOL;                   \
+  AT(t1).car.car = bool;                     \
+  AT(t1).cdr.hdr = NIL;
 
 /* utility macros */
 #define DEBUG_P 0

@@ -59,7 +59,7 @@ void show_ptr(ptr ptr){
   case LAMBDA:  printf("l"); break;
   case PRIMOPT: printf("#"); break;
   case CURRIED: printf("@"); break;
-  case UNPACK:  printf(">"); break;
+  case UNPACK:  printf("~"); break;
   default:      printf("?"); break;
   }
 }
@@ -121,7 +121,7 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   char s[20];
   coord coord;
   switch(ptr.hdr){
-  case UNPACK: buf[index] = '>'; index++; break;
+  case UNPACK: buf[index] = '~'; index++; break;
   case NIL: break;
   case LOCAL:
     coord.x = ptr.car; coord.y = ptr.cdr;
@@ -152,6 +152,8 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
     case MINUS:  buf[index] = '-'; break;
     case TIMES:  buf[index] = '*'; break;
     case DIVIDE: buf[index] = '/'; break;
+    case EQUAL:  buf[index] = '='; break;
+    case LESS:   buf[index] = '<'; break;
     }
     index++;
     break;
