@@ -43,6 +43,7 @@ used.  See file:oncs.lisp for a simulation of the world in lisp.
      |      4 | \lambda same as symbol                     |
      |      5 | primitive integer operation          |
      |      6 | curried primitive integer operation  |
+     |      7 | unpack "(foo)" into "foo"            |
 
 - Messages :: passed between oncs
      #+begin_src C
