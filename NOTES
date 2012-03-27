@@ -1,6 +1,6 @@
 # -*- mode:org -*-
 
-* need to figure out how to un-shell results
+* DONE need to figure out how to un-shell results
 When a function is applied to arguments, it must then /emerge/ from
 the list enclosing the function and arguments.
 : (+ 1 1) => 2
