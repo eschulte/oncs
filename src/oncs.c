@@ -137,7 +137,7 @@ void run(coord place){
         AT(t1).refs = 0;
         AT(t2).refs = 0;
         break;
-      case UNPACK: UNPACK_APP(AT(place).cdr, t1); break;
+      case UNPACK: UNPACK_APP(AT(place).car, t1); break;
       default:
         /* if not lambda or unpack then let it run */
         DEBUG2("    NIL: running car at (%d,%d)\n", t1.x, t1.y);
@@ -186,7 +186,7 @@ void run(coord place){
       break;
     }
     if(AT(place).cdr.hdr == LOCAL) {
-      if(AT(t2).car.hdr == UNPACK) { UNPACK_APP(AT(place).cdr, t1); }
+      if(AT(t2).car.hdr == UNPACK) { UNPACK_APP(AT(place).cdr, t2); }
       else                         { run(t2); }
     }
     break;

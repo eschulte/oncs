@@ -55,6 +55,11 @@ void run_expr(char *expr, coord place);
   case '\0':                                                    \
     debug(2, "\tNIL:(%d,%d)\n", place.x, place.y);              \
     where.hdr = NIL; break;                                     \
+  case '>': /* UNPACK */                                        \
+    debug(2, "\tSYMBOL:(%d,%d)\n", place.x, place.y);           \
+    where.hdr = UNPACK;                                         \
+    index++;                                                    \
+    break;                                                      \
   case 'L': /* LAMBDA */                                        \
     debug(2, "\tLAMBDA:(%d,%d)\n", place.x, place.y);           \
     where.hdr = LAMBDA;                                         \
