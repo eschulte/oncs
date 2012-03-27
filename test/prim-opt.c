@@ -5,10 +5,11 @@ int main(int argc, char *argv[]){
   coord place;
   place.x = 4; place.y = 4;
 
-  char expr0[] = "(+ 1 1)";
+  char expr0[] = "+ (2 (4))";
   run_expr(expr0, place);
+  run_down(place);
   SHOULD(AT(place).car.hdr == INTEGER);
-  SHOULD(AT(place).car.car == 2);
+  SHOULD(AT(place).car.car == 6);
 
   /* if(fail_p) ERROR("failed expr0"); */
 

@@ -21,7 +21,7 @@ test/%.test: $(LIB) test/test.c test/test.h test/%.c
 
 check: $(TESTS:=.test)
 	for test in $(TESTS:=.test);do \
-		./$$test; \
+		./$$test 2>/dev/null; \
 		if [[ "$$?" -eq "0" ]];then result=PASS; \
 		else result=FAIL;fi; \
 		echo "$$result $$test"; \

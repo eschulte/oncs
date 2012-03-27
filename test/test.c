@@ -57,6 +57,8 @@ void show_ptr(ptr ptr){
   case INTEGER: printf("i"); break;
   case SYMBOL:  printf("s"); break;
   case LAMBDA:  printf("l"); break;
+  case PRIMOPT: printf("#"); break;
+  case CURRIED: printf("@"); break;
   default:      printf("?"); break;
   }
 }
@@ -114,6 +116,7 @@ void show_world(){
 
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   int i, j;
+  char c;
   char s[20];
   coord coord;
   switch(ptr.hdr){
@@ -136,6 +139,28 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
     }
   case INTEGER:
     i = sprintf(s, "%d", ptr.car);
+    for(j=0;j<i;j++){
+      buf[index] = s[j];
+      index++;
+    }
+    break;
+  case PRIMOPT:
+    switch(ptr.car){
+    case PLUS:   buf[index] = '+'; break;
+    case MINUS:  buf[index] = '-'; break;
+    case TIMES:  buf[index] = '*'; break;
+    case DIVIDE: buf[index] = '/'; break;
+    }
+    index++;
+    break;
+  case CURRIED:
+    switch(ptr.car){
+    case PLUS:   c = '+'; break;
+    case MINUS:  c = '-'; break;
+    case TIMES:  c = '*'; break;
+    case DIVIDE: c = '/'; break;
+    }
+    i = sprintf(s, "%c%d", c, ptr.cdr);
     for(j=0;j<i;j++){
       buf[index] = s[j];
       index++;

@@ -143,21 +143,41 @@ void run(coord place){
       break;
     case PRIMOPT: /* curry up primitive operation */
       if(AT(place).cdr.hdr == INTEGER){
-        AT(place).car.cdr = AT(place).cdr.car;
-        AT(place).car.hdr = CURRIED;
+        PRIMOPT_APP(AT(place).car, AT(place).cdr.car);
+      } else if (AT(place).cdr.hdr == LOCAL) {
+        COORD_OF_PTR(t2, AT(place).cdr);
+        if(AT(t2).car.hdr == INTEGER) {
+          AT(place).cdr = AT(t2).cdr;
+          if(AT(t2).cdr.hdr == LOCAL){
+            COORD_OF_PTR(t1, AT(t2).cdr);
+            update_ref_msg(t1, 1);
+          }
+          PRIMOPT_APP(AT(place).car, AT(t2).car.car);
+          update_ref_msg(t2, -1);
+        } else {
+          DEBUG2("PRIMOPT: running cdr at (%d,%d)\n", t2.x, t2.y);
+          run(t2);
+        }
       }
       break;
     case CURRIED: /* apply curried primitive operation */
       if(AT(place).cdr.hdr == INTEGER){
-        switch(AT(place).car.car){
-        case PLUS:   i1 = AT(place).car.cdr + AT(place).cdr.car; break;
-        case MINUS:  i1 = AT(place).car.cdr - AT(place).cdr.car; break;
-        case TIMES:  i1 = AT(place).car.cdr * AT(place).cdr.car; break;
-        case DIVIDE: i1 = AT(place).car.cdr / AT(place).cdr.car; break;
-        default: ERROR("unsupported CURRIED operation"); break;
+        CURRIED_APP(AT(place).car, AT(place).cdr, i1);
+      } else if (AT(place).cdr.hdr == LOCAL) {
+        COORD_OF_PTR(t2, AT(place).cdr);
+        if(AT(t2).car.hdr == INTEGER) {
+          AT(place).cdr = AT(t2).cdr;
+          if(AT(t2).cdr.hdr == LOCAL){
+            COORD_OF_PTR(t1, AT(t2).cdr);
+            update_ref_msg(t1, 1);
+          }
+          CURRIED_APP(AT(place).car, AT(t2).car, i1);
+          update_ref_msg(t2, -1);
+        } else {
+          COORD_OF_PTR(t2, AT(place).cdr);
+          DEBUG2("CURRIED: running cdr at (%d,%d)\n", t2.x, t2.y);
+          run(t2);
         }
-        AT(place).car.hdr = INTEGER;
-        AT(place).car.car = i1;
       }
       break;
     }
@@ -169,12 +189,14 @@ void run(coord place){
     msg.mcar = AT(place).mcar;
     if(AT(place).car.hdr == LOCAL){
       COORD_OF_PTR(msg.coord, AT(place).car);
-      DEBUG2("INTEGER: update car ref at (%d,%d)\n", msg.coord.x, msg.coord.y);
+      DEBUG2("INTEGER: update car ref at (%d,%d)\n",
+             msg.coord.x, msg.coord.y);
       enqueue(msg);
     }
     if(AT(place).cdr.hdr == LOCAL){
       COORD_OF_PTR(msg.coord, AT(place).cdr);
-      DEBUG2("INTEGER: update cdr ref at (%d,%d)\n", msg.coord.x, msg.coord.y);
+      DEBUG2("INTEGER: update cdr ref at (%d,%d)\n",
+             msg.coord.x, msg.coord.y);
       enqueue(msg);
     }
     break;

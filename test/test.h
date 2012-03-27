@@ -67,6 +67,30 @@ void run_expr(char *expr, coord place);
     index++;                                                    \
     where.car = read_int(buf, &index);                          \
     break;                                                      \
+  case '+':                                                     \
+    debug(2, "\tPLUS:(%d,%d)\n", place.x, place.y);             \
+    where.hdr = PRIMOPT;                                        \
+    where.car = PLUS;                                           \
+    index++;                                                    \
+    break;                                                      \
+  case '-':                                                     \
+    debug(2, "\tMINUS:(%d,%d)\n", place.x, place.y);            \
+    where.hdr = PRIMOPT;                                        \
+    where.car = MINUS;                                          \
+    index++;                                                    \
+    break;                                                      \
+  case '*':                                                     \
+    debug(2, "\tTIMES:(%d,%d)\n", place.x, place.y);            \
+    where.hdr = PRIMOPT;                                        \
+    where.car = TIMES;                                          \
+    index++;                                                    \
+    break;                                                      \
+  case '/':                                                     \
+    debug(2, "\tDIVIDE:(%d,%d)\n", place.x, place.y);           \
+    where.hdr = PRIMOPT;                                        \
+    where.car = DIVIDE;                                         \
+    index++;                                                    \
+    break;                                                      \
   case '(': /* LOCAL */                                         \
     t1 = open_space(place);                                     \
     debug(2, "\tLOCAL:(%d,%d)\n", place.x, place.y);            \

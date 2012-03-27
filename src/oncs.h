@@ -56,6 +56,18 @@
     enqueue(msg);                                               \
     break;                                                      \
   }
+#define PRIMOPT_APP(op, arg) { op.cdr = arg; op.hdr = CURRIED; }
+#define CURRIED_APP(op, arg, tmp) {                                \
+    switch(op.car){                                                \
+    case PLUS:   tmp = op.cdr + arg.car; break;                    \
+    case MINUS:  tmp = op.cdr - arg.car; break;                    \
+    case TIMES:  tmp = op.cdr * arg.car; break;                    \
+    case DIVIDE: tmp = op.cdr / arg.car; break;                    \
+    default: ERROR("unsupported CURRIED operation"); break;        \
+    }                                                              \
+    op.hdr = INTEGER;                                              \
+    op.car = tmp;                                                  \
+  }
 
 /* utility macros */
 #define DEBUG_P 0
