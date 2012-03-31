@@ -4,9 +4,6 @@
 #+Copyright: 2012 Eric Schulte
 #+License: GPLV3
 #+Options: ^:nil toc:nil num:nil
-#+Style: <style type="text/css">pre{display:table-cell;background:#232323; color:#e6e1dc;}</style>
-#+Style: <style type="text/css">#content{max-width:1000px;margin:auto;} body{ font-size:small; } table{ font-size:small; }</style>
-#+Style: <style type="text/css">.outline-text-2{margin-left:2em;}.outline-text-3{margin-left:3em;}</style>
 
 There is a large grid /world/ of ONC structures linked by local
 relative pointers.  These structures perform calculations through

@@ -96,6 +96,9 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                   :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
                   :publishing-function org-publish-org-to-html
                   :style "<style type=\"text/css\">\n <!--/*--><![CDATA[/*><!--*/
+    pre{display:table-cell;background:#232323; color:#e6e1dc;}
+    #content{max-width:1000px;margin:auto;} body{ font-size:small; } table{ font-size:small; }
+    .outline-text-2{margin-left:2em;}.outline-text-3{margin-left:3em;}
     .title  { text-align: center; }
     p.verse { margin-left: 3% }
     p { text-align: justify }
