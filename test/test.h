@@ -96,6 +96,18 @@ void run_expr(char *expr, coord place);
     where.car = DIVIDE;                                         \
     index++;                                                    \
     break;                                                      \
+  case '=':                                                     \
+    debug(2, "\tEQUAL:(%d,%d)\n", place.x, place.y);            \
+    where.hdr = PRIMOPT;                                        \
+    where.car = EQUAL;                                          \
+    index++;                                                    \
+    break;                                                      \
+  case '<':                                                     \
+    debug(2, "\tLESS:(%d,%d)\n", place.x, place.y);             \
+    where.hdr = PRIMOPT;                                        \
+    where.car = LESS;                                           \
+    index++;                                                    \
+    break;                                                      \
   case '(': /* LOCAL */                                         \
     t1 = open_space(place);                                     \
     debug(2, "\tLOCAL:(%d,%d)\n", place.x, place.y);            \

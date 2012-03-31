@@ -60,6 +60,7 @@ void show_ptr(ptr ptr){
   case PRIMOPT: printf("#"); break;
   case CURRIED: printf("@"); break;
   case UNPACK:  printf("~"); break;
+  case BOOLEAN: printf("b"); break;
   default:      printf("?"); break;
   }
 }
@@ -169,6 +170,13 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
       buf[index] = s[j];
       index++;
     }
+    break;
+  case BOOLEAN:
+    switch(ptr.car){
+    case TRUE:  buf[index] = 't'; break;
+    case FALSE: buf[index] = 'f'; break;
+    }
+    index++;
     break;
   }
   return index;

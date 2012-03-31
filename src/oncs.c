@@ -190,7 +190,7 @@ void run(coord place){
       else                         { run(t2); }
     }
     break;
-  case LOCAL: case SYMBOL: /* undefined */ break;
+  case LOCAL: case SYMBOL: case BOOLEAN: /* undefined */ break;
   case INTEGER: /* update number of references */
     AT(place).refs += AT(place).mcar.car;
     msg.mcar = AT(place).mcar;

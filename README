@@ -44,6 +44,7 @@ used.  See file:oncs.lisp for a simulation of the world in lisp.
      |      5 | primitive integer operation          |
      |      6 | curried primitive integer operation  |
      |      7 | unpack "(foo)" into "foo"            |
+     |      8 | Boolean true or false                |
 
 - Messages :: passed between oncs
      #+begin_src C

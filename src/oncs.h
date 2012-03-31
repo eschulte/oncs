@@ -11,6 +11,7 @@
 #define PRIMOPT 5
 #define CURRIED 6
 #define UNPACK  7
+#define BOOLEAN 8
 
 /* types of primitive operations */
 #define PLUS   0
@@ -19,6 +20,8 @@
 #define DIVIDE 3
 #define EQUAL  4
 #define LESS   5
+#define TRUE   1
+#define FALSE  0
 
 /* world size and access */
 #define SIZE 10
@@ -38,6 +41,7 @@
   switch(where.hdr){                                            \
   case NIL:                                                     \
   case INTEGER: break;                                          \
+  case BOOLEAN: break;                                          \
   case SYMBOL:                                                  \
     if(AT(place).mcar.car == where.car){                        \
       DUPLICATE_LOCAL(AT(place).mcdr, place, t1, t2);           \
@@ -66,14 +70,19 @@
     case MINUS:  op.cdr.car = op.car.cdr - arg.car; break;         \
     case TIMES:  op.cdr.car = op.car.cdr * arg.car; break;         \
     case DIVIDE: op.cdr.car = op.car.cdr / arg.car; break;         \
-    case EQUAL:  /* TODO */ break;                                 \
-    case DIVIDE: /* TODO */ break;                                 \
+    case EQUAL:                                                    \
+      if(op.car.cdr == arg.car) op.cdr.car = TRUE;                 \
+      else op.cdr.car = FALSE;                                     \
+      break;                                                       \
+    case LESS:                                                     \
+      if(op.car.cdr < arg.car) op.cdr.car = TRUE;                  \
+      else op.cdr.car = FALSE;                                     \
+      break;                                                       \
     default: ERROR("unsupported CURRIED op.careration"); break;    \
     }                                                              \
-    if(op.car.car <= DIVIDE){                                      \
-      op.cdr.hdr = INTEGER;                                        \
-      op.car.hdr  = UNPACK;                                        \
-    }                                                              \
+    if(op.car.car <= DIVIDE) op.cdr.hdr = INTEGER;                 \
+    else                     op.cdr.hdr = BOOLEAN;                 \
+    op.car.hdr  = UNPACK;                                          \
   }
 #define UNPACK_APP(op, arg) {                                     \
   DEBUG2("    NIL: unpacking from (%d,%d)\n", arg.x, arg.y);      \
