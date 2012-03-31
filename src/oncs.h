@@ -93,22 +93,23 @@
   }                                                               \
   update_ref_msg(arg, -1); }
 #define PUT_BOOL(t1, t2, bool) {             \
-  t2 = new_place(t1);                        \
+  t2 = open_space(t1);                       \
   AT(t1).car.hdr = LAMBDA;                   \
-  AT(t1).car.car = 1;                        \
+  AT(t1).car.car = TRUE;                     \
   AT(t1).cdr.hdr = LOCAL;                    \
   AT(t1).cdr.car = t2.x;                     \
   AT(t1).cdr.cdr = t2.y;                     \
-  t1 = new_place(t2);                        \
+  t1 = open_space(t2);                       \
   AT(t2).car.hdr = LAMBDA;                   \
-  AT(t2).car.car = 0;                        \
+  AT(t2).car.car = FALSE;                    \
   AT(t2).cdr.hdr = LOCAL;                    \
   AT(t2).cdr.car = t1.x;                     \
   AT(t2).cdr.cdr = t1.y;                     \
-  t2 = new_place(t1);                        \
+  t2 = open_space(t1);                       \
   AT(t1).car.hdr = SYMBOL;                   \
   AT(t1).car.car = bool;                     \
-  AT(t1).cdr.hdr = NIL;
+  AT(t1).cdr.hdr = NIL;                      \
+  }
 
 /* utility macros */
 #define DEBUG_P 0
