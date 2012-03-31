@@ -164,6 +164,8 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
     case MINUS:  c = '-'; break;
     case TIMES:  c = '*'; break;
     case DIVIDE: c = '/'; break;
+    case EQUAL:  c = '='; break;
+    case LESS:   c = '<'; break;
     }
     i = sprintf(s, "%c%d", c, ptr.cdr);
     for(j=0;j<i;j++){
