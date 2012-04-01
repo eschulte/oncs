@@ -184,19 +184,15 @@ void run(coord place){
         }
       }
       break;
-    case BOOLEAN: /* replace with church booleans */
-      t1 = open_space(place);
-      i1 = AT(place).car.car;
-      AT(place).car.hdr = LOCAL;
-      AT(place).car.car = t1.x;
-      AT(place).car.cdr = t1.y;
-      PUT_BOOL(t1, t2, i1);
-      break;
     }
     if(AT(place).cdr.hdr == LOCAL) {
       if(AT(t2).car.hdr == UNPACK) { UNPACK_APP(AT(place).cdr, t2); }
       else                         { run(t2); }
     }
+    if(AT(place).car.hdr == BOOLEAN)
+      BOOLEAN_APP(place, AT(place).car, t1, t2, i1);
+    if(AT(place).cdr.hdr == BOOLEAN)
+      BOOLEAN_APP(place, AT(place).cdr, t1, t2, i1);
     break;
   case LOCAL: case SYMBOL: case BOOLEAN: /* undefined */ break;
   case INTEGER: /* update number of references */

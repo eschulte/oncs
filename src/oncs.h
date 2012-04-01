@@ -92,23 +92,32 @@
     update_ref_msg(arg, 1);                                       \
   }                                                               \
   update_ref_msg(arg, -1); }
-#define PUT_BOOL(t1, t2, bool) {             \
-  t2 = open_space(t1);                       \
-  AT(t1).car.hdr = LAMBDA;                   \
-  AT(t1).car.car = TRUE;                     \
-  AT(t1).cdr.hdr = LOCAL;                    \
-  AT(t1).cdr.car = t2.x;                     \
-  AT(t1).cdr.cdr = t2.y;                     \
-  t1 = open_space(t2);                       \
-  AT(t2).car.hdr = LAMBDA;                   \
-  AT(t2).car.car = FALSE;                    \
-  AT(t2).cdr.hdr = LOCAL;                    \
-  AT(t2).cdr.car = t1.x;                     \
-  AT(t2).cdr.cdr = t1.y;                     \
-  t2 = open_space(t1);                       \
-  AT(t1).car.hdr = SYMBOL;                   \
-  AT(t1).car.car = bool;                     \
-  AT(t1).cdr.hdr = NIL;                      \
+#define BOOLEAN_APP(place, ptr, t1, t2, i1) {                   \
+    DEBUG2("    NIL: bool replacement at (%d,%d)\n",            \
+           place.x, place.y);                                   \
+    t1 = open_space(place);                                     \
+    AT(t1).refs = 1;                                            \
+    i1 = ptr.car;                                               \
+    ptr.hdr = LOCAL;                                            \
+    ptr.car = t1.x;                                             \
+    ptr.cdr = t1.y;                                             \
+    t2 = open_space(t1);                                        \
+    AT(t2).refs = 1;                                            \
+    AT(t1).car.hdr = LAMBDA;                                    \
+    AT(t1).car.car = TRUE;                                      \
+    AT(t1).cdr.hdr = LOCAL;                                     \
+    AT(t1).cdr.car = t2.x;                                      \
+    AT(t1).cdr.cdr = t2.y;                                      \
+    t1 = open_space(t2);                                        \
+    AT(t1).refs = 1;                                            \
+    AT(t2).car.hdr = LAMBDA;                                    \
+    AT(t2).car.car = FALSE;                                     \
+    AT(t2).cdr.hdr = LOCAL;                                     \
+    AT(t2).cdr.car = t1.x;                                      \
+    AT(t2).cdr.cdr = t1.y;                                      \
+    AT(t1).car.hdr = SYMBOL;                                    \
+    AT(t1).car.car = i1;                                        \
+    AT(t1).cdr.hdr = NIL;                                       \
   }
 
 /* utility macros */
