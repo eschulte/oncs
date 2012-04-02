@@ -25,7 +25,7 @@ void show_world();
 void get_expr(coord place, char *buf, int index);
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
 int onc_to_string(coord place, char *buf, int index);
-int string_to_onc(coord place, char *buf, int index);
+int string_to_onc(coord place, char *buf);
 int close_paren(char *buf, int index);
 void show_all(coord place);
 void run_down(coord place);
@@ -47,11 +47,10 @@ void run_expr(char *expr, coord place);
 #define LAMBDA_SET(place, variable)      \
   AT(place).car.hdr = LAMBDA;            \
   AT(place).car.car = variable;
-#define STR_TO_PTR(where, buf, index, t1)                       \
-  while((buf[index] == '#') || (buf[index] == ' ')) index++;    \
-  debug(2, "\t%d:%c:%s\n", index, buf[index], buf);             \
-  switch(buf[index]){                                           \
-  case ')': index++; /* NIL */                                  \
+#define CHAR_TO_PTR(place, where, char)                         \
+  debug(2, "char_to_ptr((%d,%d), %c)\n",                        \
+        place.x, place.y, char);                                \
+  switch(char){                                                 \
   case '\0':                                                    \
     debug(2, "\tNIL:(%d,%d)\n", place.x, place.y);              \
     where.hdr = NIL; break;                                     \
@@ -107,18 +106,6 @@ void run_expr(char *expr, coord place);
     where.hdr = PRIMOPT;                                        \
     where.car = LESS;                                           \
     index++;                                                    \
-    break;                                                      \
-  case '(': /* LOCAL */                                         \
-    t1 = open_space(place);                                     \
-    debug(2, "\tLOCAL:(%d,%d)\n", place.x, place.y);            \
-    where.hdr = LOCAL;                                          \
-    where.car = t1.x; where.cdr = t1.y;                         \
-    parend=close_paren(buf, index);                             \
-    index++;                                                    \
-    for(i=index;i<parend;i++) interum[(i-index)] = buf[i];      \
-    interum[parend-index] = '\0';                               \
-    string_to_onc(t1, interum, 0);                              \
-    index = parend+1;                                           \
     break;                                                      \
   default: /* INTEGER */                                        \
     if(0 <= (buf[index] - '0') && (buf[index] - '0') <= 9) {    \

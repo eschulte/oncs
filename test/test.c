@@ -194,25 +194,56 @@ int onc_to_string(coord place, char *buf, int index){
   return index;
 }
 
-int string_to_onc(coord place, char *buf, int index){
-  debug(2, "(%d,%d) %s:%d\n", place.x, place.y, buf, index);
-  coord t1, t2;
-  int i, parend;
+int string_to_onc(coord place, char *buf){
+  debug(2, "string_to_onc((%d,%d), %s)\n",
+        place.x, place.y, buf);
+  int i, car_p, parend, index;
+  index = 0;
+  car_p = TRUE;
+  coord t1;
   char *interum = buf;
   while(buf[index] != '\0') {
+    while((buf[index] == '#') || (buf[index] == ' ')) index++;
     AT(place).refs = 1;
-    debug(2, "\tcar\n");
-    STR_TO_PTR(AT(place).car, buf, index, t1);
-    debug(2, "\tcdr\n");
-    STR_TO_PTR(AT(place).cdr, buf, index, t1);
-    place = open_space(place);
+    if(car_p){
+      if(buf[index] == '(') {
+        /* push the sub-list to another call */
+        t1 = open_space(place);
+        AT(place).car.hdr = LOCAL;
+        AT(place).car.car = t1.x;
+        AT(place).car.cdr = t1.y;
+        parend=close_paren(buf, index);
+        index++;
+        for(i=index;i<parend;i++) interum[(i-index)] = buf[i];
+        interum[parend-index] = '\0';
+        debug(2, "substring %s\n", interum);
+        string_to_onc(t1, interum);
+        index = parend+1;
+      } else {
+        CHAR_TO_PTR(place, AT(place).car, buf[index]);
+      }
+      car_p = FALSE;
+    } else {
+      if(buf[index] == '.'){
+        index++;
+        while((buf[index] == '#') || (buf[index] == ' ')) index++;
+        CHAR_TO_PTR(place, AT(place).cdr, buf[index]);
+      } else {
+        t1 = open_space(place);
+        AT(place).cdr.hdr = LOCAL;
+        AT(place).cdr.car = t1.x;
+        AT(place).cdr.cdr = t1.y;
+        place = t1;
+      }
+      car_p = TRUE;
+    }
   }
 }
 
 int close_paren(char *buf, int index){
   int paren_counter;
-  if(buf[index] = '(') paren_counter = 1;
-  else                 paren_counter = 0;
+  if(buf[index] == '(') paren_counter = 1;
+  else                  paren_counter = 0;
   do {
     index++;
     switch(buf[index]){
@@ -249,7 +280,7 @@ void run_down(coord place){
 
 void run_expr(char *expr, coord place){
   clear_world();
-  string_to_onc(place, expr, 0);
+  string_to_onc(place, expr);
   show_all(place);
   run_down(place);
   place.x = place.y = 4;
