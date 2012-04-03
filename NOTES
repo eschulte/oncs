@@ -1,5 +1,6 @@
 # -*- mode:org -*-
 
+* unpack lambdas not just applications of curried functions
 * dealing with "global" variables and environments
 need to address this eventually, points to keep in mind
 - build-ins which should be provided by the medium itself
