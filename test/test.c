@@ -328,20 +328,26 @@ void simple_app(coord place){
   LOCAL_SET(place, cdr, tmp1);
   SYMBOL_SET(tmp1, car, 1);
   NIL_SET(tmp1, cdr);
-  /* (1 2 3) */
+  /* ((1 2 3)) */
   place = tmp2;
   tmp2 = open_space(place);
   AT(tmp2).refs++;
+  LOCAL_SET(place, car, tmp2);
+  NIL_SET(place, cdr);
+  /* (1 _ _) */
+  place = tmp2;
   INTEGER_SET(place, car, 1);
-  LOCAL_SET(place, cdr, tmp2);
-  place = tmp2;
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  debug(2, "(%d,%d) -- (_ 2 _)\n", place.x, place.y);
-  INTEGER_SET(place, car, 2);
   LOCAL_SET(place, cdr, tmp2);
+  /* (_ 2 _) */
   place = tmp2;
-  debug(2, "(%d,%d) -- (_ _ 3)\n", place.x, place.y);
+  INTEGER_SET(place, car, 2);
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, cdr, tmp2);
+  /* (_ _ 3) */
+  place = tmp2;
   INTEGER_SET(place, car, 3);
   NIL_SET(place, cdr);
 }

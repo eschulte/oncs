@@ -97,12 +97,16 @@ void update_ref_msg(coord place, int diff){
 
 void run(coord place){
   msg msg;
-  coord t1, t2;
+  coord t1, t2, t3;
   int i1;
   DEBUG2("running(%d,%d)\n", place.x, place.y);
   switch(AT(place).mcar.hdr){
   case NIL: /* waiting loop */
-    if(AT(place).cdr.hdr == LOCAL) COORD_OF_PTR(t2, AT(place).cdr);
+    if(AT(place).cdr.hdr == LOCAL){
+      COORD_OF_PTR(t2, AT(place).cdr);
+      if(AT(t2).car.hdr == LOCAL)
+        COORD_OF_PTR(t3, AT(t2).car);
+    }
     switch(AT(place).car.hdr){
     case LOCAL:
       /* point t1 at car */
@@ -111,36 +115,32 @@ void run(coord place){
       switch(AT(t1).car.hdr){
       case LAMBDA:
         if((AT(t1).cdr.hdr != LOCAL) && (AT(t1).cdr.hdr != NIL))
-          ERROR("cdr of LAMBDA must be LOCAL or NIL");
+          ERROR("cdr (body) of LAMBDA must be LOCAL or NIL");
         /* build lambda message from car and send to myself */
         msg.coord = place;
         msg.mcar.hdr = LAMBDA;
         msg.mcar.car = AT(t1).car.car;
-        msg.mcdr = AT(place).cdr;
-        if(AT(place).cdr.hdr == LOCAL) update_ref_msg(t2, 1);
-        DEBUG2("    NIL: lambda to me at (%d,%d)\n",
-               msg.coord.x, msg.coord.y);
+        msg.mcdr = AT(t2).car;
+        if(AT(place).cdr.hdr == LOCAL && AT(t2).car.hdr == LOCAL)
+          update_ref_msg(t3, 1);
+        DEBUG2("NIL: l->me (%d,%d)\n", msg.coord.x, msg.coord.y);
         enqueue(msg);
-        /* self no longer points to cdr */
         if(AT(place).cdr.hdr == LOCAL){
-          DEBUG2("    NIL: removing cdr local at (%d,%d)\n",
-                 t2.x, t2.y);
-          update_ref_msg(t2, -1);
+          AT(place).cdr = AT(t2).cdr;
+          if(AT(t2).car.hdr == LOCAL) update_ref_msg(t3, -1);
         }
         /* replace self with body of lambda expression (cadr) */
-        t2.x = AT(t1).cdr.car; t2.y = AT(t1).cdr.cdr;
-        AT(place).car = AT(t2).car;
-        AT(place).cdr = AT(t2).cdr;
+        AT(place).car = AT(t1).cdr;
         /* remove lambda expression */
-        DEBUG2("    NIL: removing car lambda at (%d,%d)\n",
-               t1.x, t1.y);
+        DEBUG2("NIL: removing car of l at (%d,%d)\n", t1.x, t1.y);
         AT(t1).refs = 0;
+        DEBUG2("NIL: removing cdr of l at (%d,%d)\n", t2.x, t2.y);
         AT(t2).refs = 0;
         break;
       case UNPACK: UNPACK_APP(AT(place).car, t1); break;
       default:
         /* if not lambda or unpack then let it run */
-        DEBUG2("    NIL: running car at (%d,%d)\n", t1.x, t1.y);
+        DEBUG2("NIL: running car at (%d,%d)\n", t1.x, t1.y);
         run(t1);
       }
       break;
@@ -157,8 +157,7 @@ void run(coord place){
           PRIMOPT_APP(AT(place).car, AT(t2).car.car);
           update_ref_msg(t2, -1);
         } else {
-          DEBUG2("    NIL:PRIMOPT running cdr at (%d,%d)\n",
-                 t2.x, t2.y);
+          DEBUG2("NIL:PRIMOPT running cdr at (%d,%d)\n", t2.x, t2.y);
           run(t2);
         }
       }
@@ -178,8 +177,7 @@ void run(coord place){
           update_ref_msg(t2, -1);
         } else {
           COORD_OF_PTR(t2, AT(place).cdr);
-          DEBUG2("    NIL:CURRIED running cdr at (%d,%d)\n",
-                 t2.x, t2.y);
+          DEBUG2("NIL:CURRIED running cdr at (%d,%d)\n", t2.x, t2.y);
           run(t2);
         }
       }

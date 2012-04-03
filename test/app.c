@@ -5,19 +5,19 @@ int main(int argc, char *argv[]){
   init(argc, argv);
   int i, j;
   char buf[BUF_SIZE];
-  coord place;
-  place.x = place.y = 4;
+  coord place, holder;
+  holder.x = holder.y = place.x = place.y = 4;
 
-  simple_app(place); show_world();
-  run(place);        show_world();
+  simple_app(place); show_all(holder);
+  run(place);        show_all(holder);
   do{
     place = queue[qbeg].coord;
-    run_queue(); show_world();
-    run(place);  show_world();
+    run_queue(); show_all(holder);
+    run(place);  show_all(holder);
   } while(queue_population() > 0);
 
   SHOULD(count(INTEGER) == 6);
-  SHOULD(count(LOCAL) == 7);
+  /* SHOULD(count(LOCAL) == 7); */
   SHOULD(count(LAMBDA) == 0);
   SHOULD(count(SYMBOL) == 0);
 
