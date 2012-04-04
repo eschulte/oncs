@@ -210,11 +210,12 @@ void run(coord place){
     }
     break;
   case LAMBDA:  /* perform lambda application */
-    t1.x = AT(place).mcdr.car; t1.y = AT(place).mcdr.cdr;
-    LAMBDA_APP(AT(place).car, msg, t1, t2);
-    LAMBDA_APP(AT(place).cdr, msg, t1, t2);
-    DEBUG2(" LAMBDA: update ref to (%d,%d)\n", t1.x, t1.y);
-    update_ref_msg(t1, -1);
+    /* TODO: what happens here if the replacer is not a pointer but
+       is a literal value  */
+    if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(t2, AT(place).mcdr);
+    LAMBDA_APP(place, AT(place).car, msg, t1);
+    LAMBDA_APP(place, AT(place).cdr, msg, t1);
+    if(AT(place).mcdr.hdr == LOCAL) update_ref_msg(t2, -1);
     break;
   }
   AT(place).mcar.hdr = NIL;

@@ -37,31 +37,34 @@
   }
 #define COORD_OF_PTR(coord, ptr) \
   { coord.x=ptr.car; coord.y=ptr.cdr; }
-#define LAMBDA_APP(where, msg, t1, t2)                          \
-  switch(where.hdr){                                            \
-  case NIL:                                                     \
-  case INTEGER: break;                                          \
-  case BOOLEAN: break;                                          \
-  case SYMBOL:                                                  \
-    if(AT(place).mcar.car == where.car){                        \
-      DUPLICATE_LOCAL(AT(place).mcdr, place, t1, t2);           \
-      where.hdr = LOCAL;                                        \
-      where.car = t2.x;                                         \
-      where.cdr = t2.y;                                         \
-    }                                                           \
-    break;                                                      \
-  case LAMBDA:                                                  \
-    if(AT(place).mcar.car == where.car) return;                 \
-    break;                                                      \
-  case LOCAL:                                                   \
-    msg.coord.x = where.car;                                    \
-    msg.coord.y = where.cdr;                                    \
-    msg.mcar = AT(place).mcar;                                  \
-    msg.mcdr = AT(place).mcdr;                                  \
-    t1.x = msg.mcdr.car; t1.y = msg.mcdr.cdr;                   \
-    update_ref_msg(t1, 1);                                      \
-    enqueue(msg);                                               \
-    break;                                                      \
+#define LAMBDA_APP(place, where, msg, t1)               \
+  switch(where.hdr){                                    \
+  case NIL:                                             \
+  case INTEGER: break;                                  \
+  case BOOLEAN: break;                                  \
+  case SYMBOL:                                          \
+    if(AT(place).mcar.car == where.car) {               \
+      where = AT(place).mcdr;                           \
+      if(AT(place).mcdr.hdr == LOCAL) {                 \
+        t1.x = msg.mcdr.car; t1.y = msg.mcdr.cdr;       \
+        update_ref_msg(t1, 1);                          \
+      }                                                 \
+    }                                                   \
+    break;                                              \
+  case LAMBDA:                                          \
+    if(AT(place).mcar.car == where.car) return;         \
+    break;                                              \
+  case LOCAL:                                           \
+    msg.coord.x = where.car;                            \
+    msg.coord.y = where.cdr;                            \
+    msg.mcar = AT(place).mcar;                          \
+    msg.mcdr = AT(place).mcdr;                          \
+    if(AT(place).mcdr.hdr == LOCAL) {                   \
+      t1.x = msg.mcdr.car; t1.y = msg.mcdr.cdr;         \
+      update_ref_msg(t1, 1);                            \
+    }                                                   \
+    enqueue(msg);                                       \
+    break;                                              \
   }
 #define PRIMOPT_APP(op, arg) { op.cdr = arg; op.hdr = CURRIED; }
 #define CURRIED_APP(op, arg) {                                     \

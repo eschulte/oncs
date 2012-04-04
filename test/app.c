@@ -16,14 +16,16 @@ int main(int argc, char *argv[]){
     run(place);  show_all(holder);
   } while(queue_population() > 0);
 
-  SHOULD(count(INTEGER) == 6);
-  /* SHOULD(count(LOCAL) == 7); */
-  SHOULD(count(LAMBDA) == 0);
-  SHOULD(count(SYMBOL) == 0);
+  SHOULD(count(INTEGER) == 3);
+  SHOULD(count(LOCAL)   == 6);
+  SHOULD(count(LAMBDA)  == 0);
+  SHOULD(count(SYMBOL)  == 0);
 
   place.x = place.y = 4;
   onc_to_string(place, buf, 0);
   debug(1, "(%d,%d):%s\n", place.x, place.y, buf);
+  debug(1, "integer:%d local:%d lambda:%d symbol:%d\n",
+        count(INTEGER), count(LOCAL), count(LAMBDA), count(SYMBOL));
   
   /* return indicates success or failure */
   return fail_p;
