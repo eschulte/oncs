@@ -210,8 +210,7 @@ void run(coord place){
     }
     break;
   case LAMBDA:  /* perform lambda application */
-    /* TODO: what happens here if the replacer is not a pointer but
-       is a literal value  */
+    /* TODO: what happens here if the replacer is not a pointer */
     if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(t2, AT(place).mcdr);
     LAMBDA_APP(place, AT(place).car, msg, t1);
     LAMBDA_APP(place, AT(place).cdr, msg, t1);
