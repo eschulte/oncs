@@ -45,21 +45,17 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr3");
 
-  /* char expr4[] = "(#L1 #L2 #S2) (1 2 3) ((#L1 #L2 #S1) (3 4) 8)"; */
-  /* run_expr(expr4, place); */
-  /* place.x = place.y = 4; */
-  /* run_down(place); */
-  /* debug(2, "counting integers\n"); */
-  /* SHOULD(count(INTEGER) == 2); */
-  /* debug(2, "%d integers\n", count(INTEGER)); */
-  /* debug(2, "counting lambdas\n"); */
-  /* SHOULD(count(LAMBDA) == 0); */
-  /* debug(2, "%d lambdas\n", count(LAMBDA)); */
-  /* debug(2, "counting symbols\n"); */
-  /* SHOULD(count(SYMBOL) == 0); */
-  /* debug(2, "%d symbols\n", count(SYMBOL)); */
+  char expr4[] = "(#L1 #L2 #S2) (1 2 3) ((#L1 #L2 #S1) (3 4) 8)";
+  run_expr(expr4, place);
+  place.x = place.y = 4;
+  run_down(place);
+  debug(2, "lambda:%d symbol:%d integer:%d\n",
+        count(LAMBDA), count(SYMBOL), count(INTEGER));
+  SHOULD(count(INTEGER) == 2);
+  SHOULD(count(LAMBDA) == 0);
+  SHOULD(count(SYMBOL) == 0);
 
-  /* if(fail_p) ERROR("failed expr4"); */
+  if(fail_p) ERROR("failed expr4");
 
   /* return indicates success or failure */
   return fail_p;
