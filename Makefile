@@ -1,4 +1,4 @@
-CC=gcc
+CC=gcc -g
 LIB = src/oncs.c src/oncs.h
 TESTS = \
 	test/open_space	\

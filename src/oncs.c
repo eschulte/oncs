@@ -97,8 +97,8 @@ void update_ref_msg(coord place, int diff){
 void run(coord place){
   msg msg;
   coord t1, t2, t3;
-  int i1, t2_p, t3_p;
-  t2_p = t3_p = 0;
+  int i1, t1_p, t2_p, t3_p;
+  t1_p = t2_p = t3_p = 0;
   DEBUG2("running(%d,%d)\n", place.x, place.y);
   switch(AT(place).mcar.hdr){
   case NIL: /* waiting loop */
@@ -113,6 +113,7 @@ void run(coord place){
     switch(AT(place).car.hdr){
     case LOCAL:
       /* point t1 at car */
+      t1_p = 1;
       COORD_OF_PTR(t1, AT(place).car);
       /* apply car to cdr and replace self with result */
       switch(AT(t1).car.hdr){
@@ -120,22 +121,26 @@ void run(coord place){
         if((AT(t1).cdr.hdr != LOCAL) && (AT(t1).cdr.hdr != NIL))
           ERROR("cdr (body) of LAMBDA must be LOCAL or NIL");
         /* build lambda message from car and send to myself */
-        msg.coord = place;
+        msg.coord = AT(t1).cdr;
         msg.mcar.hdr = LAMBDA;
         msg.mcar.car = AT(t1).car.car;
         if(t2_p) msg.mcdr = AT(t2).car;
         else msg.mcdr.hdr = NIL; /* if not local then NIL */
         if(t3_p) update_ref_msg(t3, 1);
-        DEBUG2("NIL: l->me (%d,%d)\n", msg.coord.x, msg.coord.y);
+        DEBUG2("NIL: l->me.car (%d,%d)\n", msg.coord.x, msg.coord.y);
         enqueue(msg);
-        if(t2_p) AT(place).cdr = AT(t2).cdr;
         if(t3_p) update_ref_msg(t3, -1);
+        if(t2_p) AT(place).cdr = AT(t2).cdr;
         /* replace self with body of lambda expression (cadr) */
         AT(place).car = AT(t1).cdr;
         /* remove lambda expression */
         DEBUG2("NIL: removing car of l at (%d,%d)\n", t1.x, t1.y);
         AT(t1).refs = 0;
-        if(t2_p) AT(t2).refs = 0;
+        t1_p = 0;
+        if(t2_p){
+          AT(t2).refs = 0;
+          t2_p = 0;
+        }
         break;
       case UNPACK: UNPACK_APP(AT(place).car, t1); break;
       default:
@@ -183,7 +188,7 @@ void run(coord place){
       }
       break;
     }
-    if(AT(place).cdr.hdr == LOCAL) {
+    if(t2_p) {
       if(AT(t2).car.hdr == UNPACK) { UNPACK_APP(AT(place).cdr, t2); }
       else                         { run(t2); }
     }
@@ -210,7 +215,6 @@ void run(coord place){
     }
     break;
   case LAMBDA:  /* perform lambda application */
-    /* TODO: what happens here if the replacer is not a pointer */
     if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(t2, AT(place).mcdr);
     LAMBDA_APP(place, AT(place).car, msg, t1);
     LAMBDA_APP(place, AT(place).cdr, msg, t1);

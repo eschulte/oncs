@@ -1,6 +1,20 @@
 # -*- mode:org -*-
 
 * unpack lambdas not just applications of curried functions
+* variables in the =run= function
+:                  ((l1 l2 s2) 1 2)
+:
+:      place                        t2
+:     +--+--+                      +--+--+    +--+--+
+:     |  | -+--------------------> |i1| -+--->|i2|()|
+:     +-++--+                      +-++--+    +--+--+
+:       |                            |
+:       v                            +------> t3
+:     +--+--+    +--+--+    +--+--+
+:     |l1| -+--->|l2| -+--->|s2|()|
+:     +--+--+    +--+--+    +--+--+
+:      t1
+
 * dealing with "global" variables and environments
 need to address this eventually, points to keep in mind
 - build-ins which should be provided by the medium itself
