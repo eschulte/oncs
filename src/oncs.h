@@ -133,7 +133,7 @@
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
 typedef struct { int hdr, car, cdr; } ptr;
-typedef struct { ptr mcar,mcdr; coord coord; } msg;
+typedef struct { ptr mcar, mcdr; coord coord; } msg;
 typedef struct { ptr car, cdr, mcar, mcdr; int refs; } onc;
 
 /* global state */

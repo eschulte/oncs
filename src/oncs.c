@@ -94,132 +94,40 @@ void update_ref_msg(coord place, int diff){
   enqueue(msg);
 }
 
-void run(coord place){
-  msg msg;
-  coord t1, t2, t3;
-  int i1, t1_p, t2_p, t3_p;
-  t1_p = t2_p = t3_p = 0;
-  DEBUG2("running(%d,%d)\n", place.x, place.y);
-  switch(AT(place).mcar.hdr){
-  case NIL: /* waiting loop */
-    DEBUG1("AT(place).cdr.hdr == %d\n", AT(place).cdr.hdr);
-    if(AT(place).cdr.hdr == LOCAL){
-      t2_p = 1;
-      COORD_OF_PTR(t2, AT(place).cdr);
-      if(AT(t2).car.hdr == LOCAL)
-        t3_p = 1;
-        COORD_OF_PTR(t3, AT(t2).car);
-    }
-    switch(AT(place).car.hdr){
-    case LOCAL:
-      /* point t1 at car */
-      t1_p = 1;
-      COORD_OF_PTR(t1, AT(place).car);
-      /* apply car to cdr and replace self with result */
-      switch(AT(t1).car.hdr){
-      case LAMBDA:
-        if((AT(t1).cdr.hdr != LOCAL) && (AT(t1).cdr.hdr != NIL))
-          ERROR("cdr (body) of LAMBDA must be LOCAL or NIL");
-        /* build lambda message from car and send to myself */
-        msg.coord = AT(t1).cdr;
-        msg.mcar.hdr = LAMBDA;
-        msg.mcar.car = AT(t1).car.car;
-        if(t2_p) msg.mcdr = AT(t2).car;
-        else msg.mcdr.hdr = NIL; /* if not local then NIL */
-        if(t3_p) update_ref_msg(t3, 1);
-        DEBUG2("NIL: l->me.car (%d,%d)\n", msg.coord.x, msg.coord.y);
-        enqueue(msg);
-        if(t3_p) update_ref_msg(t3, -1);
-        if(t2_p) AT(place).cdr = AT(t2).cdr;
-        /* replace self with body of lambda expression (cadr) */
-        AT(place).car = AT(t1).cdr;
-        /* remove lambda expression */
-        DEBUG2("NIL: removing car of l at (%d,%d)\n", t1.x, t1.y);
-        AT(t1).refs = 0;
-        t1_p = 0;
-        if(t2_p){
-          AT(t2).refs = 0;
-          t2_p = 0;
-        }
-        break;
-      case UNPACK: UNPACK_APP(AT(place).car, t1); break;
-      default:
-        /* if not lambda or unpack then let it run */
-        DEBUG2("NIL: running car at (%d,%d)\n", t1.x, t1.y);
-        run(t1);
-      }
-      break;
-    case PRIMOPT: /* curry up primitive operation */
-      if(AT(place).cdr.hdr == INTEGER){
-        PRIMOPT_APP(AT(place).car, AT(place).cdr.car);
-      } else if (AT(place).cdr.hdr == LOCAL) {
-        if(AT(t2).car.hdr == INTEGER) {
-          AT(place).cdr = AT(t2).cdr;
-          if(AT(t2).cdr.hdr == LOCAL){
-            COORD_OF_PTR(t1, AT(t2).cdr);
-            update_ref_msg(t1, 1);
-          }
-          PRIMOPT_APP(AT(place).car, AT(t2).car.car);
-          update_ref_msg(t2, -1);
-        } else {
-          DEBUG2("NIL:PRIMOPT running cdr at (%d,%d)\n", t2.x, t2.y);
-          run(t2);
-        }
-      }
-      break;
-    case CURRIED: /* apply curried primitive operation */
-      if(AT(place).cdr.hdr == INTEGER){
-        CURRIED_APP(AT(place), AT(place).cdr);
-      } else if (AT(place).cdr.hdr == LOCAL) {
-        COORD_OF_PTR(t2, AT(place).cdr);
-        if(AT(t2).car.hdr == INTEGER) {
-          AT(place).cdr = AT(t2).cdr;
-          if(AT(t2).cdr.hdr == LOCAL){
-            COORD_OF_PTR(t1, AT(t2).cdr);
-            update_ref_msg(t1, 1);
-          }
-          CURRIED_APP(AT(place), AT(t2).car);
-          update_ref_msg(t2, -1);
-        } else {
-          COORD_OF_PTR(t2, AT(place).cdr);
-          DEBUG2("NIL:CURRIED running cdr at (%d,%d)\n", t2.x, t2.y);
-          run(t2);
-        }
-      }
-      break;
-    }
-    if(t2_p) {
-      if(AT(t2).car.hdr == UNPACK) { UNPACK_APP(AT(place).cdr, t2); }
-      else                         { run(t2); }
-    }
-    if(AT(place).car.hdr == BOOLEAN)
-      BOOLEAN_APP(place, AT(place).car, t1, t2, i1);
-    if(AT(place).cdr.hdr == BOOLEAN)
-      BOOLEAN_APP(place, AT(place).cdr, t1, t2, i1);
-    break;
-  case LOCAL: case SYMBOL: case BOOLEAN: /* undefined */ break;
-  case INTEGER: /* update number of references */
-    AT(place).refs += AT(place).mcar.car;
-    msg.mcar = AT(place).mcar;
-    if(AT(place).car.hdr == LOCAL){
-      COORD_OF_PTR(msg.coord, AT(place).car);
-      DEBUG2("INTEGER: update car ref at (%d,%d)\n",
-             msg.coord.x, msg.coord.y);
-      enqueue(msg);
-    }
-    if(AT(place).cdr.hdr == LOCAL){
-      COORD_OF_PTR(msg.coord, AT(place).cdr);
-      DEBUG2("INTEGER: update cdr ref at (%d,%d)\n",
-             msg.coord.x, msg.coord.y);
-      enqueue(msg);
-    }
-    break;
-  case LAMBDA:  /* perform lambda application */
-    if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(t2, AT(place).mcdr);
-    LAMBDA_APP(place, AT(place).car, msg, t1);
-    LAMBDA_APP(place, AT(place).cdr, msg, t1);
-    if(AT(place).mcdr.hdr == LOCAL) update_ref_msg(t2, -1);
-    break;
+ptr copy_ptr(ptr ptr){
+  coord temp;
+  if(ptr.hdr == LOCAL){
+    COORD_OF_PTR(temp, ptr);
+    update_ref_msg(temp, 1);
   }
-  AT(place).mcar.hdr = NIL;
+  return ptr;
+}
+
+ptr delete_ptr(ptr ptr){
+  coord temp;
+  if(ptr.hdr == LOCAL){
+    COORD_OF_PTR(temp, ptr);
+    update_ref_msg(temp, -1);
+  }
+  return ptr;
+}
+
+void app_abs(coord place){
+  if(AT(place).car.hdr != LOCAL)
+    ERROR("malformed app_abs");
+  coord l;
+  COORD_OF_PTR(l, AT(place).car);
+  if(AT(l).car.hdr != LAMBDA ||
+     (AT(l).car.hdr != LOCAL &&
+      AT(l).car.hdr != NIL))
+    ERROR("malformed app_abs.car");
+  msg msg;
+  msg.mcar = copy_ptr(AT(l).car);
+  msg.mcdr = copy_ptr(AT(place).cdr);
+  /* TODO: where does this point */
+  msg.coord;
+}
+
+void run(coord place){
+  
 }
