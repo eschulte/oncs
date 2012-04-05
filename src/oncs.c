@@ -1,6 +1,5 @@
 /* Copyright (C) 2012 Eric Schulte */
 #include <stdlib.h>
-#include <stdio.h>
 #include <oncs.h>
 
 onc world[SIZE][SIZE];
@@ -98,13 +97,17 @@ void update_ref_msg(coord place, int diff){
 void run(coord place){
   msg msg;
   coord t1, t2, t3;
-  int i1;
+  int i1, t2_p, t3_p;
+  t2_p = t3_p = 0;
   DEBUG2("running(%d,%d)\n", place.x, place.y);
   switch(AT(place).mcar.hdr){
   case NIL: /* waiting loop */
+    DEBUG1("AT(place).cdr.hdr == %d\n", AT(place).cdr.hdr);
     if(AT(place).cdr.hdr == LOCAL){
+      t2_p = 1;
       COORD_OF_PTR(t2, AT(place).cdr);
       if(AT(t2).car.hdr == LOCAL)
+        t3_p = 1;
         COORD_OF_PTR(t3, AT(t2).car);
     }
     switch(AT(place).car.hdr){
@@ -120,22 +123,19 @@ void run(coord place){
         msg.coord = place;
         msg.mcar.hdr = LAMBDA;
         msg.mcar.car = AT(t1).car.car;
-        msg.mcdr = AT(t2).car;
-        if(AT(place).cdr.hdr == LOCAL && AT(t2).car.hdr == LOCAL)
-          update_ref_msg(t3, 1);
+        if(t2_p) msg.mcdr = AT(t2).car;
+        else msg.mcdr.hdr = NIL; /* if not local then NIL */
+        if(t3_p) update_ref_msg(t3, 1);
         DEBUG2("NIL: l->me (%d,%d)\n", msg.coord.x, msg.coord.y);
         enqueue(msg);
-        if(AT(place).cdr.hdr == LOCAL){
-          AT(place).cdr = AT(t2).cdr;
-          if(AT(t2).car.hdr == LOCAL) update_ref_msg(t3, -1);
-        }
+        if(t2_p) AT(place).cdr = AT(t2).cdr;
+        if(t3_p) update_ref_msg(t3, -1);
         /* replace self with body of lambda expression (cadr) */
         AT(place).car = AT(t1).cdr;
         /* remove lambda expression */
         DEBUG2("NIL: removing car of l at (%d,%d)\n", t1.x, t1.y);
         AT(t1).refs = 0;
-        DEBUG2("NIL: removing cdr of l at (%d,%d)\n", t2.x, t2.y);
-        AT(t2).refs = 0;
+        if(t2_p) AT(t2).refs = 0;
         break;
       case UNPACK: UNPACK_APP(AT(place).car, t1); break;
       default:
