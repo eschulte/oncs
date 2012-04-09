@@ -37,32 +37,31 @@
   }
 #define COORD_OF_PTR(coord, ptr) \
   { coord.x=ptr.car; coord.y=ptr.cdr; }
-#define LAMBDA_APP(place, where, msg, t1)               \
+#define INTEGER_APP(where, msg)                 \
+  if(where.hdr == LOCAL){                       \
+    COORD_OF_PTR(msg.coord, AT(place).car);     \
+    DEBUG("enqueue from INTEGER_APP\n");        \
+    enqueue(msg);                               \
+  }
+#define LAMBDA_APP(l_msg, where, c1)                    \
   switch(where.hdr){                                    \
   case NIL:                                             \
   case INTEGER: break;                                  \
   case BOOLEAN: break;                                  \
   case SYMBOL:                                          \
-    if(AT(place).mcar.car == where.car) {               \
-      where = AT(place).mcdr;                           \
-      if(AT(place).mcdr.hdr == LOCAL) {                 \
-        t1.x = msg.mcdr.car; t1.y = msg.mcdr.cdr;       \
-        update_ref_msg(t1, 1);                          \
-      }                                                 \
-    }                                                   \
+    if(l_msg.mcar.car == where.car)                     \
+      where = copy_ptr(l_msg.mcdr);                     \
     break;                                              \
   case LAMBDA:                                          \
-    if(AT(place).mcar.car == where.car) return;         \
+    if(l_msg.mcar.car == where.car) return;             \
     break;                                              \
   case LOCAL:                                           \
-    msg.coord.x = where.car;                            \
-    msg.coord.y = where.cdr;                            \
-    msg.mcar = AT(place).mcar;                          \
-    msg.mcdr = AT(place).mcdr;                          \
-    if(AT(place).mcdr.hdr == LOCAL) {                   \
-      t1.x = msg.mcdr.car; t1.y = msg.mcdr.cdr;         \
-      update_ref_msg(t1, 1);                            \
+    COORD_OF_PTR(l_msg.coord, where);                   \
+    if(l_msg.mcdr.hdr == LOCAL) {                       \
+      c1.x = l_msg.mcdr.car; c1.y = l_msg.mcdr.cdr;     \
+      update_ref_msg(c1, 1);                            \
     }                                                   \
+    DEBUG("enqueue from LAMBDA_APP\n");                 \
     enqueue(msg);                                       \
     break;                                              \
   }
@@ -128,6 +127,7 @@
 #define DEBUG(fmt) if(DEBUG_P) printf(fmt);
 #define DEBUG1(fmt, x) if(DEBUG_P) printf(fmt, x);
 #define DEBUG2(fmt, x, y) if(DEBUG_P) printf(fmt, x, y);
+#define DEBUG3(fmt, x, y, z) if(DEBUG_P) printf(fmt, x, y, z);
 #define ERROR(message) { printf("ERROR: %s\n", message); exit(1); }
 
 /* structures inhabiting the world */

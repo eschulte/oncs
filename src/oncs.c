@@ -8,6 +8,8 @@ int qbeg, qend = 0;
 
 void enqueue(msg msg){
   DEBUG2("enqueue(%d,%d)\n", msg.coord.x, msg.coord.y);
+  DEBUG3("enqueue msg.ptr=(%d,%d,%d)\n",
+         msg.mcar.hdr, msg.mcar.car, msg.mcar.cdr);
   int i;
   for(i=0;i<QLENGTH;i++)
     if(queue[QWRAP(qend + i)].mcar.hdr == NIL)
@@ -90,7 +92,7 @@ void update_ref_msg(coord place, int diff){
   msg.coord = place;
   msg.mcar.hdr = INTEGER;
   msg.mcar.car = diff;
-  DEBUG2("update ref (%d,%d)\n", place.x, place.y);
+  DEBUG2("enqueue from update ref (%d,%d)\n", place.x, place.y);
   enqueue(msg);
 }
 
@@ -112,22 +114,84 @@ ptr delete_ptr(ptr ptr){
   return ptr;
 }
 
+ptr lambda_app(msg l_msg, ptr ptr){
+  switch(ptr.hdr){
+  case NIL:
+  case INTEGER:
+  case BOOLEAN:
+  case LAMBDA: break;
+  case SYMBOL:
+    if(l_msg.mcar.car == ptr.car)
+      ptr = copy_ptr(l_msg.mcdr);
+    break;
+  case LOCAL:
+    COORD_OF_PTR(l_msg.coord, ptr);
+    l_msg.mcdr = copy_ptr(l_msg.mcdr);
+    DEBUG("enqueue from LAMBDA_APP\n");
+    enqueue(l_msg);
+    break;
+  }
+  return ptr;
+}
+
 void app_abs(coord place){
+  msg msg;
+  coord c_car, c_cdr;
   if(AT(place).car.hdr != LOCAL)
     ERROR("malformed app_abs");
-  coord l;
-  COORD_OF_PTR(l, AT(place).car);
-  if(AT(l).car.hdr != LAMBDA ||
-     (AT(l).car.hdr != LOCAL &&
-      AT(l).car.hdr != NIL))
+  COORD_OF_PTR(c_car, AT(place).car);
+  if(AT(c_car).car.hdr != LAMBDA ||
+     (AT(c_car).cdr.hdr != LOCAL &&
+      AT(c_car).cdr.hdr != NIL))
     ERROR("malformed app_abs.car");
-  msg msg;
-  msg.mcar = copy_ptr(AT(l).car);
-  msg.mcdr = copy_ptr(AT(place).cdr);
-  /* TODO: where does this point */
-  msg.coord;
+  /* update AT(place).car */
+  AT(place).car = copy_ptr(AT(c_car).cdr);
+  /* update AT(place).cdr */
+  if(AT(place).cdr.hdr == LOCAL){
+    COORD_OF_PTR(c_cdr, AT(place).cdr);
+    msg.mcdr = copy_ptr(AT(c_cdr).car);
+    AT(place).cdr = copy_ptr(AT(c_cdr).cdr);
+  } else {
+    msg.mcdr = AT(place).cdr;
+    AT(place).cdr.hdr = NIL;
+  }
+  AT(place).cdr = copy_ptr(AT(c_car).cdr);
+  /* apply to AT(place).car */
+  msg.mcar.hdr = LAMBDA;
+  msg.mcar = copy_ptr(AT(c_car).car);
+  AT(place).car = lambda_app(msg, AT(place).car);
 }
 
 void run(coord place){
-  
+  msg msg;
+  coord c1, c2;
+  switch(AT(place).mcar.hdr){
+  case NIL:                     /* waiting loop */
+    switch(AT(place).car.hdr){
+    case LOCAL:
+      COORD_OF_PTR(c1, AT(place).car);
+      switch(AT(c1).car.hdr){
+      case LAMBDA: app_abs(place); break;
+      case PRIMOPT: break;
+      }
+      break;
+    case PRIMOPT: break;
+    case CURRIED: break;
+    }
+    break;
+  case INTEGER:                 /* update number of references */
+    AT(place).refs += AT(place).mcar.car;
+    msg.mcar = AT(place).mcar;
+    INTEGER_APP(AT(place).car, msg);
+    INTEGER_APP(AT(place).cdr, msg);
+    break;
+  case LAMBDA:                  /* perform lambda application */
+    msg.mcar = AT(place).mcar; msg.mcdr = AT(place).mcdr;
+    if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(c2, AT(place).mcdr);
+    LAMBDA_APP(msg, AT(place).car, c1);
+    LAMBDA_APP(msg, AT(place).cdr, c1);
+    if(AT(place).mcdr.hdr == LOCAL) update_ref_msg(c2, -1);
+    break;
+  }
+  AT(place).mcar.hdr = NIL;
 }

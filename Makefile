@@ -4,8 +4,9 @@ TESTS = \
 	test/open_space	\
 	test/queue	\
 	test/duplicate	\
-	test/app	\
-	test/expr	\
+	test/int-msg	\
+	test/app
+#	test/expr	\
 	test/paren	\
 	test/parse	\
 	test/cond	\
