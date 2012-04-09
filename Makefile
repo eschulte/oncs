@@ -3,7 +3,6 @@ LIB = src/oncs.c src/oncs.h
 TESTS = \
 	test/open_space	\
 	test/queue	\
-	test/duplicate	\
 	test/int-msg	\
 	test/app
 #	test/expr	\

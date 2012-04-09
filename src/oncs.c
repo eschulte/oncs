@@ -7,9 +7,22 @@ msg queue[QLENGTH];
 int qbeg, qend = 0;
 
 void enqueue(msg msg){
-  DEBUG2("enqueue(%d,%d)\n", msg.coord.x, msg.coord.y);
-  DEBUG3("enqueue msg.ptr=(%d,%d,%d)\n",
-         msg.mcar.hdr, msg.mcar.car, msg.mcar.cdr);
+  DEBUG2("enqueue(%d,%d) ", msg.coord.x, msg.coord.y);
+  switch(msg.mcar.hdr){
+  case LOCAL:
+    DEBUG2("LOCAL:(%d,%d)", msg.mcar.car, msg.mcar.cdr);
+    break;
+  case INTEGER:
+    DEBUG1("INTEGER:(%d)", msg.mcar.car);
+    break;
+  case LAMBDA:
+    DEBUG1("LAMBDA:(%d)", msg.mcar.car);
+    break;
+  default:
+    DEBUG("OTHER");
+    break;
+  }
+  DEBUG("\n");
   int i;
   for(i=0;i<QLENGTH;i++)
     if(queue[QWRAP(qend + i)].mcar.hdr == NIL)
@@ -65,15 +78,6 @@ coord open_space(coord place){
   else { return place; }
 }
 
-void duplicate(coord to, coord from){
-  coord t1, t2;
-  AT(to) = AT(from);
-  AT(to).refs = 1;
-  AT(to).mcar.hdr = AT(to).mcdr.hdr = NIL;
-  if(AT(to).car.hdr == LOCAL) DUPLICATE_LOCAL(AT(to).car, to, t1, t2);
-  if(AT(to).cdr.hdr == LOCAL) DUPLICATE_LOCAL(AT(to).cdr, to, t1, t2);
-}
-
 void run_queue(){
   if(queue[qbeg].mcar.hdr != NIL){
     msg msg = dequeue();
@@ -114,6 +118,26 @@ ptr delete_ptr(ptr ptr){
   return ptr;
 }
 
+ptr replace_ptr(ptr old, ptr new){
+  new = copy_ptr(new);
+  delete_ptr(old);
+  return new;
+}
+
+ptr duplicate_ptr(ptr ptr){
+  coord orig, new;
+  if(ptr.hdr == LOCAL){
+    COORD_OF_PTR(orig, ptr);
+    update_ref_msg(orig, 1);
+    new = open_space(orig);
+    ptr.car = new.x; ptr.cdr = new.y;
+    AT(new).refs = 1;
+    AT(new).car = duplicate_ptr(AT(orig).car);
+    AT(new).cdr = duplicate_ptr(AT(orig).cdr);
+  }
+  return ptr;
+}
+
 ptr lambda_app(msg l_msg, ptr ptr){
   switch(ptr.hdr){
   case NIL:
@@ -122,7 +146,7 @@ ptr lambda_app(msg l_msg, ptr ptr){
   case LAMBDA: break;
   case SYMBOL:
     if(l_msg.mcar.car == ptr.car)
-      ptr = copy_ptr(l_msg.mcdr);
+      ptr = duplicate_ptr(l_msg.mcdr);
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.coord, ptr);
@@ -131,12 +155,14 @@ ptr lambda_app(msg l_msg, ptr ptr){
     enqueue(l_msg);
     break;
   }
+  delete_ptr(l_msg.mcdr);
   return ptr;
 }
 
 void app_abs(coord place){
   msg msg;
   coord c_car, c_cdr;
+  /* setup */
   if(AT(place).car.hdr != LOCAL)
     ERROR("malformed app_abs");
   COORD_OF_PTR(c_car, AT(place).car);
@@ -144,21 +170,19 @@ void app_abs(coord place){
      (AT(c_car).cdr.hdr != LOCAL &&
       AT(c_car).cdr.hdr != NIL))
     ERROR("malformed app_abs.car");
-  /* update AT(place).car */
-  AT(place).car = copy_ptr(AT(c_car).cdr);
-  /* update AT(place).cdr */
-  if(AT(place).cdr.hdr == LOCAL){
+  if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
-    msg.mcdr = copy_ptr(AT(c_cdr).car);
-    AT(place).cdr = copy_ptr(AT(c_cdr).cdr);
-  } else {
-    msg.mcdr = AT(place).cdr;
-    AT(place).cdr.hdr = NIL;
-  }
-  AT(place).cdr = copy_ptr(AT(c_car).cdr);
-  /* apply to AT(place).car */
+  /* 1. make new message */
   msg.mcar.hdr = LAMBDA;
+  /* 2. copy λ1 to msg.car */
   msg.mcar = copy_ptr(AT(c_car).car);
+  /* 3. copy a to msg.cdr */
+  msg.mcdr = copy_ptr(AT(c_cdr).car);
+  /* 4. replace 2 with 4 */
+  AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
+  /* 5. replace 1 with 8 */
+  AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
+  /* 6. msg goes to 1 */
   AT(place).car = lambda_app(msg, AT(place).car);
 }
 
@@ -188,8 +212,10 @@ void run(coord place){
   case LAMBDA:                  /* perform lambda application */
     msg.mcar = AT(place).mcar; msg.mcdr = AT(place).mcdr;
     if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(c2, AT(place).mcdr);
-    LAMBDA_APP(msg, AT(place).car, c1);
-    LAMBDA_APP(msg, AT(place).cdr, c1);
+    AT(place).car = lambda_app(msg, AT(place).car);
+    if(! (AT(place).car.hdr == LAMBDA &&
+          AT(place).car.car == msg.mcar.car))
+      AT(place).cdr = lambda_app(msg, AT(place).cdr);
     if(AT(place).mcdr.hdr == LOCAL) update_ref_msg(c2, -1);
     break;
   }
