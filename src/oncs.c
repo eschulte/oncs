@@ -89,6 +89,7 @@ int run_queue(){
       AT(msg.coord).mcdr = msg.mcdr;
       return 1;
     } else {
+      run(msg.coord);
       DEBUG2("message requeue: (%d,%d)\n", msg.coord.x, msg.coord.y);
       enqueue(msg);
       return 0;

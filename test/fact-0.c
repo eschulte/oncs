@@ -5,7 +5,7 @@ int main(int argc, char *argv[]){
   coord place, left, right;
   left.x = 4; left.y = 4;
 
-  char f[] = "(#L2 (#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))))";
+  char f[] = "#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))";
 
   /* Factorial */
   string_to_onc(left, f);
@@ -17,15 +17,6 @@ int main(int argc, char *argv[]){
   INTEGER_SET(place, cdr, 0);
 
   show_all(place);
-  fix(place);
-
-  place.x = 3; place.y = 6;
-  run_down(place);
-  place.x = 3; place.y = 1;
-  run_down(place);
-  place.x = 4; place.y = 8;
-  run_down(place);
-
   fix(place);
 
   SHOULD(count(INTEGER) == 1);
