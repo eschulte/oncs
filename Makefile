@@ -4,6 +4,7 @@ TESTS = \
 	test/open_space	\
 	test/queue	\
 	test/int-msg	\
+	test/app-1	\
 	test/app
 #	test/expr	\
 	test/paren	\

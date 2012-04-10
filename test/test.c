@@ -299,6 +299,36 @@ int read_int(char *buf, int *index){
   return result;
 }
 
+void app_1(coord place){
+  coord tmp1, tmp2;
+  /* setup world: ((lambda x (x)) 1) */
+  AT(place).refs++;
+  debug(2, "(%d,%d) -- ((lambda x (x)) 1)\n", place.x, place.y);
+  tmp1 = open_space(place);
+  AT(tmp1).refs++;
+  LOCAL_SET(place, car, tmp1);
+  debug(2, "(%d,%d) -- (lambda x (x))\n", tmp1.x, tmp1.y);
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, cdr, tmp2);
+  debug(2, "(%d,%d) -- 1\n", tmp2.x, tmp2.y);
+  /* (lambda x (x)) */
+  place = tmp1;
+  LAMBDA_SET(place, 1);
+  tmp1 = open_space(place);
+  AT(tmp1).refs++;
+  debug(2, "(%d,%d) -- (x)\n", tmp1.x, tmp1.y);
+  LOCAL_SET(place, cdr, tmp1);
+  /* (x) */
+  place = tmp1;
+  SYMBOL_SET(place, car, 1);
+  NIL_SET(place, cdr);
+  /* (1) */
+  place = tmp2;
+  INTEGER_SET(place, car, 1);
+  NIL_SET(place, cdr);
+}
+
 void simple_app(coord place){
   coord tmp1, tmp2;
   /* setup world: ((lambda x (x x)) (1 2 3)) */
