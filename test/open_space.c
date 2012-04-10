@@ -18,6 +18,7 @@ int main(int argc, char *argv[]){
   for(i=0;i<97;i++){
     new = open_space(place);
     AT(new).refs = 1;
+    debug(1, "\n");
     show_world();
   }
   /* should be one empty space */
@@ -29,6 +30,7 @@ int main(int argc, char *argv[]){
     exit(1);
   new = open_space(place);
   AT(new).refs = 1;
+  debug(1, "\n");
   show_world();
   /* should be no more empty spaces */
   for(i=0;i<SIZE;i++)

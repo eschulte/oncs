@@ -33,6 +33,11 @@ void run_expr(char *expr, coord place);
 int read_int(char *buf, int *index);
 void simple_app(coord place);
 
+/* hashing functions from http://www.cse.yorku.ca/~oz/hash.html */
+unsigned long coord_hash();
+unsigned long world_hash();
+void fix();
+
 /* state placing macros */
 #define NIL_SET(place, sub)              \
   AT(place).sub.hdr = NIL;

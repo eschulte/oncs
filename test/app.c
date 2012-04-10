@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
   holder.x = holder.y = place.x = place.y = 4;
 
   app(place); show_all(holder);
-  run(place);        show_all(holder);
+  run(place); show_all(holder);
   do{
     place = queue[qbeg].coord;
     run_queue(); show_all(holder);

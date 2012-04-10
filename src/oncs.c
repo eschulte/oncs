@@ -81,15 +81,17 @@ coord open_space(coord place){
   else { return place; }
 }
 
-void run_queue(){
+int run_queue(){
   if(queue[qbeg].mcar.hdr != NIL){
     msg msg = dequeue();
     if(AT(msg.coord).mcar.hdr == NIL){
       AT(msg.coord).mcar = msg.mcar;
       AT(msg.coord).mcdr = msg.mcdr;
+      return 1;
     } else {
       DEBUG2("message requeue: (%d,%d)\n", msg.coord.x, msg.coord.y);
       enqueue(msg);
+      return 0;
     }
   }
 }

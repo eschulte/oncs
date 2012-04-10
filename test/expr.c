@@ -8,7 +8,10 @@ int main(int argc, char *argv[]){
   coord place;
   place.x = place.y = 4;
 
-  simple_app(place); show_world();
+  simple_app(place);
+  debug(1, "\n");
+  fflush(stdout);
+  show_world();
   onc_to_string(place, buf, 0);
 
   debug(1, "buf=%s\n", buf);

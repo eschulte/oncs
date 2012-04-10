@@ -125,7 +125,7 @@ void clear_queue();
 coord open_space(coord place);
 
 /* try to apply a message from the queue */
-void run_queue();
+int run_queue();
 
 /* send a message to PLACE to change its ref counter by DIFF */
 void update_ref_msg(coord place, int diff);

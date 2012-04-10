@@ -66,6 +66,7 @@ void show_ptr(ptr ptr){
 }
 
 void show_queue(){
+  if(!verbose) return;
   int i;
   msg msg;
   char c;
@@ -88,9 +89,6 @@ void show_world(){
   if(!verbose) return;
   onc tmp;
   int i, j;
-  printf("\n");
-  fflush(stdout);
-  show_queue();
   for(i=-1;i<SIZE;i++) {
     for(j=-1;j<SIZE;j++) {
       /* index labels */
@@ -258,10 +256,22 @@ int close_paren(char *buf, int index){
 }
 
 void show_all(coord place){
+  if(!verbose) return;
   char buf[EXPR_BUF_SIZE];
+  printf("\n");
+  fflush(stdout);
+  show_queue();
   show_world();
   onc_to_string(place, buf, 0);
   debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
+}
+
+void show_both(){
+  if(!verbose) return;
+  printf("\n");
+  fflush(stdout);
+  show_world();
+  show_queue();
 }
 
 void run_down(coord place){
@@ -277,6 +287,83 @@ void run_down(coord place){
     debug(2, "checking queue\n");
   };
   debug(2, "leaving run_down\n");
+}
+
+unsigned long coord_hash(int x, int y){
+  int i;
+  unsigned long hash = 5381;
+  int ints[12];
+  ints[0]  = world[x][y].car.hdr;
+  ints[1]  = world[x][y].car.car;
+  ints[2]  = world[x][y].car.cdr;
+  ints[3]  = world[x][y].cdr.hdr;
+  ints[4]  = world[x][y].cdr.car;
+  ints[5]  = world[x][y].cdr.cdr;
+  ints[6]  = world[x][y].mcar.hdr;
+  ints[7]  = world[x][y].mcar.car;
+  ints[8]  = world[x][y].mcar.cdr;
+  ints[9]  = world[x][y].mcdr.hdr;
+  ints[10] = world[x][y].mcdr.car;
+  ints[11] = world[x][y].mcdr.cdr;
+  for(i=0;i<12;i++) hash = ((hash << 5) + hash) + ints[i];
+  return hash;
+}
+
+unsigned long queue_hash(){
+  int i, j;
+  int msg_ints[8];
+  unsigned long hash = 5381;
+  i = qbeg;
+  while(i != qend){
+    msg_ints[0] = queue[i].coord.x;
+    msg_ints[1] = queue[i].coord.y;
+    msg_ints[2] = queue[i].mcar.hdr;
+    msg_ints[3] = queue[i].mcar.car;
+    msg_ints[4] = queue[i].mcar.cdr;
+    msg_ints[5] = queue[i].mcdr.hdr;
+    msg_ints[6] = queue[i].mcdr.car;
+    msg_ints[7] = queue[i].mcdr.cdr;
+    for(j=0;j<8;j++)
+      hash = ((hash << 5) + hash) + msg_ints[j];
+    i = QWRAP(i + 1);
+  }
+  return hash;
+}
+
+unsigned long world_hash(){
+  int i, j;
+  unsigned long hash = 0;
+  for(i=0;i<SIZE;i++)
+    for(j=0;j<SIZE;j++)
+      hash = coord_hash(i, j) + (hash << 6) + (hash << 16) - hash;
+  return hash;
+}
+
+void run_at(int x, int y){
+  coord coord;
+  coord.x = x; coord.y = y;
+  run(coord);
+}
+
+void fix(coord place){
+  char buf[EXPR_BUF_SIZE];
+  int i, j;
+  unsigned long hash_old, hash_new;
+  hash_old = hash_new = 0;
+  debug(2, "running to a fixed point\n");
+  do{
+    if(! (queue_population() > 0 && run_queue()))
+      for(i=0;i<SIZE;i++)
+        for(j=0;j<SIZE;j++)
+          if(world[i][j].refs > 0)
+            run_at(i, j);
+    show_both();
+    onc_to_string(place, buf, 0);
+    debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
+    hash_old = hash_new;
+    hash_new = world_hash() ^ queue_hash();
+    debug(1, "hash:%x\n", hash_new);
+  } while( hash_old != hash_new );
 }
 
 void run_expr(char *expr, coord place){
