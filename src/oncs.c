@@ -44,8 +44,11 @@ msg dequeue(){
 void clear_world(){
   int i,j;
   for(i=0;i<SIZE;i++)
-    for(j=0;j<SIZE;j++)
+    for(j=0;j<SIZE;j++) {
       world[i][j].refs = 0;
+      /* world[i][j].car.hdr = 0; */
+      /* world[i][j].cdr.hdr = 0; */
+    }  
 }
 
 void clear_queue(){
@@ -178,10 +181,15 @@ void app_abs(coord place){
   msg.mcar.hdr = LAMBDA;
   /* 2. copy λ1 to msg.car */
   msg.mcar = copy_ptr(AT(c_car).car);
-  /* 3. copy a to msg.cdr */
-  msg.mcdr = copy_ptr(AT(c_cdr).car);
-  /* 4. replace 2 with 4 */
-  AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
+  if(AT(place).cdr.hdr == LOCAL){
+    /* 3. copy a to msg.cdr */
+    msg.mcdr = copy_ptr(AT(c_cdr).car);
+    /* 4. replace 2 with 4 */
+    AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
+  } else {
+    msg.mcdr = copy_ptr(AT(place).cdr);
+    AT(place).cdr.hdr = NIL;
+  }
   /* 5. replace 1 with 8 */
   AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
   /* 6. msg goes to 1 */

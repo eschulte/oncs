@@ -8,12 +8,12 @@ TESTS = \
 	test/app-1	\
 	test/app-2	\
 	test/app-3	\
-	test/app
-#	test/expr	\
+	test/app	\
+	test/expr	\
 	test/paren	\
 	test/parse	\
-	test/cond	\
-	test/prim-opt	\
+	test/cond
+#	test/prim-opt	\
 	test/prim-cond	\
 	test/y-comb
 
