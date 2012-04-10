@@ -238,6 +238,7 @@ int string_to_onc(coord place, char *buf){
       car_p = TRUE;
     }
   }
+  if(! car_p) AT(place).cdr.hdr = NIL;
 }
 
 int close_paren(char *buf, int index){
