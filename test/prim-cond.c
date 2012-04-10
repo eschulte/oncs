@@ -37,6 +37,15 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr3");
 
+  char expr4[] = "((= 0 1) #S1 #S2)";
+  run_expr(expr4, place);
+  fix(place);
+  SHOULD(count(LAMBDA) == 0);
+  SHOULD(count(SYMBOL) == 1);
+  SHOULD(count(INTEGER) == 0);
+
+  if(fail_p) ERROR("failed expr4");
+
   /* return indicates success or failure */
   return fail_p;
 }
