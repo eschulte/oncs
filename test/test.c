@@ -340,6 +340,7 @@ unsigned long world_hash(){
 }
 
 void run_at(int x, int y){
+  debug(2, "running at (%d,%d)\n", x, y);
   coord coord;
   coord.x = x; coord.y = y;
   run(coord);
@@ -352,7 +353,8 @@ void fix(coord place){
   hash_old = hash_new = 0;
   debug(2, "running to a fixed point\n");
   do{
-    if(! (queue_population() > 0 && run_queue()))
+    if((queue_population() == 0) ||
+       (! run_queue()))
       for(i=0;i<SIZE;i++)
         for(j=0;j<SIZE;j++)
           if(world[i][j].refs > 0)

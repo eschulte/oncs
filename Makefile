@@ -15,7 +15,8 @@ TESTS = \
 	test/cond	\
 	test/prim-opt	\
 	test/prim-cond	\
-	test/y-comb
+	test/fact-0
+#	test/y-comb
 
 all: vm
 
