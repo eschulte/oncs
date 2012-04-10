@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr0");
 
-  char expr1[] = "+ (~ 2) (~ 3)";
+  char expr1[] = "+ (~ . 2) (~ . 3)";
   run_expr(expr1, place);
   run_down(place);
   place.x = 4; place.y = 3;
@@ -41,16 +41,18 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr1");
 
-  char expr2[] = "* ((+ (1 (2))) ((- (32 (8)))))";
+  char expr2[] = "* (+ 1 2) (- 32 8)";
   run_expr(expr2, place);
   run_down(place);
-  place.x = 4; place.y = 3;
+  place.x = 4; place.y = 4;
   run_down(place);
-  place.x = 4; place.y = 2;
+  place.x = 4; place.y = 4;
   run_down(place);
-  place.x = 3; place.y = 2;
+  place.x = 4; place.y = 4;
   run_down(place);
-  place.x = 3; place.y = 1;
+  place.x = 4; place.y = 4;
+  run_down(place);
+  place.x = 4; place.y = 4;
   run_down(place);
   place.x = 4; place.y = 4;
   run_down(place);
