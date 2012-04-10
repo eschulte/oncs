@@ -48,7 +48,7 @@ void clear_world(){
       world[i][j].refs = 0;
       /* world[i][j].car.hdr = 0; */
       /* world[i][j].cdr.hdr = 0; */
-    }  
+    }
 }
 
 void clear_queue(){
@@ -206,11 +206,14 @@ void run(coord place){
       COORD_OF_PTR(c1, AT(place).car);
       switch(AT(c1).car.hdr){
       case LAMBDA: app_abs(place); break;
-      case PRIMOPT: break;
+      case UNPACK:
+        AT(place).car = replace_ptr(AT(place).car, AT(c1).cdr);
+        break;
+      default: run(c1); break;
       }
       break;
-    case PRIMOPT: break;
-    case CURRIED: break;
+    case PRIMOPT: ERROR("PRIMOPTS are not implemented"); break;
+    case CURRIED: ERROR("CURRIED are not implemented"); break;
     }
     break;
   case INTEGER:                 /* update number of references */
