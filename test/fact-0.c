@@ -5,7 +5,7 @@ int main(int argc, char *argv[]){
   coord place, left, right;
   left.x = 4; left.y = 4;
 
-  char f[] = "(#L2 (#L3 ((= #S3 0) 1 (* #S3 (#S2 (- #S3 1))))))";
+  char f[] = "(#L2 (#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))))";
 
   /* Factorial */
   string_to_onc(left, f);

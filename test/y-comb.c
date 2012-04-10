@@ -6,7 +6,7 @@ int main(int argc, char *argv[]){
   left.x = 4; left.y = 4;
 
   char y[] = "#L0 (#L1 #S0 (#S1 #S1)) (#L1 #S0 (#S1 #S1))";
-  char f[] = "(#L2 (#L3 ((= #S3 0) 1 (* #S3 (#S2 (- #S3 1))))))";
+  char f[] = "(#L2 (#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))))";
 
   /* Y combinator */
   string_to_onc(left, y);
