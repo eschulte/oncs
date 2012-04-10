@@ -23,7 +23,7 @@ vm: $(LIB) src/vm.c
 	$(CC) -o vm -Isrc/ src/vm.c src/oncs.c
 
 test/%.test: $(LIB) test/test.c test/test.h test/%.c
-	$(CC) -Itest/ -Isrc/ -o test/$*.test src/oncs.c test/test.c test/$*.c
+	$(CC) -Itest/ -Isrc/ -o test/$*.test $^
 
 check: $(TESTS:=.test)
 	for test in $(TESTS:=.test);do \
