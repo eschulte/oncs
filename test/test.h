@@ -30,6 +30,8 @@ int close_paren(char *buf, int index);
 void show_all(coord place);
 void run_down(coord place);
 void run_expr(char *expr, coord place);
+int read_int(char *buf, int *index);
+void simple_app(coord place);
 
 /* state placing macros */
 #define NIL_SET(place, sub)              \

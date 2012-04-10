@@ -1,6 +1,8 @@
 #include "test.h"
 #define BUF_SIZE 1024
 
+void place_ints(coord place);
+
 int main(int argc, char *argv[]){
   init(argc, argv);
   int i, j;
@@ -31,4 +33,36 @@ int main(int argc, char *argv[]){
   
   /* return indicates success or failure */
   return fail_p;
+}
+
+void place_ints(coord place){
+  coord tmp;
+  /* () */
+  AT(place).refs++;
+  tmp = open_space(place);
+  AT(tmp).refs++;
+  LOCAL_SET(place, car, tmp);
+  NIL_SET(place, cdr);
+  /* (1 _ _ _) */
+  place = tmp;
+  INTEGER_SET(place, car, 1);
+  tmp = open_space(place);
+  AT(tmp).refs++;
+  LOCAL_SET(place, cdr, tmp);
+  /* (_ 2 _ _) */
+  place = tmp;
+  INTEGER_SET(place, car, 2);
+  tmp = open_space(place);
+  AT(tmp).refs++;
+  LOCAL_SET(place, cdr, tmp);
+  /* (_ _ 3 _) */
+  place = tmp;
+  INTEGER_SET(place, car, 3);
+  tmp = open_space(place);
+  AT(tmp).refs++;
+  LOCAL_SET(place, cdr, tmp);
+  /* (_ _ _ 4) */
+  place = tmp;
+  INTEGER_SET(place, car, 4);
+  NIL_SET(place, cdr);
 }

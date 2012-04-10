@@ -136,5 +136,11 @@ ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
 ptr duplicate_ptr(ptr ptr, int refs);
 
+/* apply the lambda message L_MSG to PTR */
+ptr lambda_app(msg l_msg, ptr ptr, int refs);
+
+/* perform lambda application at PLACE */
+void app_abs(coord place);
+
 /* run the onc at PLACE according to its contents and message */
 void run(coord place);
