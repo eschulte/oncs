@@ -37,6 +37,26 @@
     DEBUG("enqueue from INTEGER_APP\n");        \
     enqueue(msg);                               \
   }
+#define CURRIED_APP(op, arg) {                                  \
+    switch(op.car.car){                                         \
+    case PLUS:   op.cdr.car = op.car.cdr + arg.car; break;      \
+    case MINUS:  op.cdr.car = op.car.cdr - arg.car; break;      \
+    case TIMES:  op.cdr.car = op.car.cdr * arg.car; break;      \
+    case DIVIDE: op.cdr.car = op.car.cdr / arg.car; break;      \
+    case EQUAL:                                                 \
+      if(op.car.cdr == arg.car) op.cdr.car = TRUE;              \
+      else op.cdr.car = FALSE;                                  \
+      break;                                                    \
+    case LESS:                                                  \
+      if(op.car.cdr < arg.car) op.cdr.car = TRUE;               \
+      else op.cdr.car = FALSE;                                  \
+      break;                                                    \
+    default: ERROR("unsupported CURRIED op.careration"); break; \
+    }                                                           \
+    if(op.car.car <= DIVIDE) op.cdr.hdr = INTEGER;              \
+    else                     op.cdr.hdr = BOOLEAN;              \
+    op.car.hdr  = UNPACK;                                       \
+  }
 
 /* utility macros */
 #define DEBUG_P 0

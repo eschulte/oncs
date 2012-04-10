@@ -212,8 +212,38 @@ void run(coord place){
       default: run(c1); break;
       }
       break;
-    case PRIMOPT: ERROR("PRIMOPTS are not implemented"); break;
-    case CURRIED: ERROR("CURRIED are not implemented"); break;
+    case PRIMOPT:
+      switch(AT(place).cdr.hdr){
+      case INTEGER:
+        AT(place).car.cdr = AT(place).cdr.car;
+        AT(place).car.hdr = CURRIED;
+        break;
+      case LOCAL:
+        COORD_OF_PTR(c2, AT(place).cdr);
+        if(AT(c2).car.hdr == INTEGER){
+          AT(place).car.cdr = AT(c2).car.car;
+          AT(place).car.hdr = CURRIED;
+          AT(place).cdr = replace_ptr(AT(place).cdr, AT(c2).cdr);
+        } else run(c2);
+        break;
+      }
+      break;
+    case CURRIED:
+      switch(AT(place).cdr.hdr){
+      case INTEGER:
+        CURRIED_APP(AT(place), AT(place).cdr);
+        break;
+      case LOCAL:
+        COORD_OF_PTR(c2, AT(place).cdr);
+        if(AT(c2).car.hdr == INTEGER){
+          if(AT(c2).cdr.hdr != NIL)
+            ERROR("CURRIED primitive operations take only 1 arg");
+          CURRIED_APP(AT(place), AT(c2).car);
+          update_ref_msg(c2, -1);
+        } else run(c2);
+        break;
+      }      
+      break;
     }
     break;
   case INTEGER:                 /* update number of references */
