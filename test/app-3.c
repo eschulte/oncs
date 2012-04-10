@@ -8,7 +8,7 @@ int main(int argc, char *argv[]){
   coord place, holder;
   holder.x = holder.y = place.x = place.y = 4;
 
-  app(place); show_all(holder);
+  simple_app(place); show_all(holder);
   run(place);        show_all(holder);
   do{
     place = queue[qbeg].coord;
@@ -16,8 +16,8 @@ int main(int argc, char *argv[]){
     run(place);  show_all(holder);
   } while(queue_population() > 0);
 
-  SHOULD(count(INTEGER) == 8);
-  SHOULD(count(LOCAL)   == 10);
+  SHOULD(count(INTEGER) == 6);
+  SHOULD(count(LOCAL)   == 8);
   SHOULD(count(LAMBDA)  == 0);
   SHOULD(count(SYMBOL)  == 0);
 

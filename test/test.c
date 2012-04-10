@@ -299,6 +299,38 @@ int read_int(char *buf, int *index){
   return result;
 }
 
+void place_ints(coord place){
+  coord tmp;
+  /* () */
+  AT(place).refs++;
+  tmp = open_space(place);
+  AT(tmp).refs++;
+  LOCAL_SET(place, car, tmp);
+  NIL_SET(place, cdr);
+  /* (1 _ _ _) */
+  place = tmp;
+  INTEGER_SET(place, car, 1);
+  tmp = open_space(place);
+  AT(tmp).refs++;
+  LOCAL_SET(place, cdr, tmp);
+  /* (_ 2 _ _) */
+  place = tmp;
+  INTEGER_SET(place, car, 2);
+  tmp = open_space(place);
+  AT(tmp).refs++;
+  LOCAL_SET(place, cdr, tmp);
+  /* (_ _ 3 _) */
+  place = tmp;
+  INTEGER_SET(place, car, 3);
+  tmp = open_space(place);
+  AT(tmp).refs++;
+  LOCAL_SET(place, cdr, tmp);
+  /* (_ _ _ 4) */
+  place = tmp;
+  INTEGER_SET(place, car, 4);
+  NIL_SET(place, cdr);
+}
+
 void app_1(coord place){
   coord tmp1, tmp2;
   /* setup world: ((lambda x (x)) 1) */
@@ -327,6 +359,39 @@ void app_1(coord place){
   place = tmp2;
   INTEGER_SET(place, car, 1);
   NIL_SET(place, cdr);
+}
+
+void app_2(coord place){
+  coord tmp1, tmp2;
+  /* setup world: ((lambda x (x)) (1)) */
+  AT(place).refs++;
+  debug(2, "(%d,%d) -- ((lambda x (x)) (1))\n", place.x, place.y);
+  tmp1 = open_space(place);
+  AT(tmp1).refs++;
+  LOCAL_SET(place, car, tmp1);
+  debug(2, "(%d,%d) -- (lambda x (x))\n", tmp1.x, tmp1.y);
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, cdr, tmp2);
+  debug(2, "(%d,%d) -- (1)\n", tmp2.x, tmp2.y);
+  /* (lambda x (x)) */
+  place = tmp1;
+  LAMBDA_SET(place, 1);
+  tmp1 = open_space(place);
+  AT(tmp1).refs++;
+  debug(2, "(%d,%d) -- (x)\n", tmp1.x, tmp1.y);
+  LOCAL_SET(place, cdr, tmp1);
+  /* (x) */
+  place = tmp1;
+  SYMBOL_SET(place, car, 1);
+  NIL_SET(place, cdr);
+  /* ((1)) */
+  place = tmp2;
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, car, tmp2);
+  INTEGER_SET(tmp2, car, 1);
+  NIL_SET(tmp2, cdr);
 }
 
 void simple_app(coord place){
@@ -379,5 +444,64 @@ void simple_app(coord place){
   /* (_ _ 3) */
   place = tmp2;
   INTEGER_SET(place, car, 3);
+  NIL_SET(place, cdr);
+}
+
+void app(coord place){
+  coord tmp1, tmp2;
+  /* setup world: ((lambda x (x x)) (1 2 3 4)) */
+  AT(place).refs++;
+  debug(2, "(%d,%d) -- ((lambda x (x x)) (1 2 3))\n", place.x, place.y);
+  tmp1 = open_space(place);
+  AT(tmp1).refs++;
+  LOCAL_SET(place, car, tmp1);
+  debug(2, "(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, cdr, tmp2);
+  debug(2, "(%d,%d) -- (1 2 3 4)\n", tmp2.x, tmp2.y);
+  /* (lambda x (x x)) */
+  place = tmp1;
+  LAMBDA_SET(place, 1);
+  tmp1 = open_space(place);
+  AT(tmp1).refs++;
+  debug(2, "(%d,%d) -- (x x)\n", tmp1.x, tmp1.y);
+  LOCAL_SET(place, cdr, tmp1);
+  /* (x x) */
+  place = tmp1;
+  SYMBOL_SET(place, car, 1);
+  tmp1 = open_space(place);
+  AT(tmp1).refs++;
+  debug(2, "(%d,%d) -- (_ x)\n", tmp1.x, tmp1.y);
+  LOCAL_SET(place, cdr, tmp1);
+  SYMBOL_SET(tmp1, car, 1);
+  NIL_SET(tmp1, cdr);
+  /* ((1 2 3 4)) */
+  place = tmp2;
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, car, tmp2);
+  NIL_SET(place, cdr);
+  /* (1 _ _ _) */
+  place = tmp2;
+  INTEGER_SET(place, car, 1);
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, cdr, tmp2);
+  /* (_ 2 _ _) */
+  place = tmp2;
+  INTEGER_SET(place, car, 2);
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, cdr, tmp2);
+  /* (_ _ 3 _) */
+  place = tmp2;
+  INTEGER_SET(place, car, 3);
+  tmp2 = open_space(place);
+  AT(tmp2).refs++;
+  LOCAL_SET(place, cdr, tmp2);
+  /* (_ _ _ 4) */
+  place = tmp2;
+  INTEGER_SET(place, car, 4);
   NIL_SET(place, cdr);
 }

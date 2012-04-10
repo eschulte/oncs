@@ -104,6 +104,7 @@ ptr copy_ptr(ptr ptr){
   coord temp;
   if(ptr.hdr == LOCAL){
     COORD_OF_PTR(temp, ptr);
+    DEBUG("update_ref_msg from copy_ptr\n");
     update_ref_msg(temp, 1);
   }
   return ptr;
@@ -113,6 +114,7 @@ ptr delete_ptr(ptr ptr){
   coord temp;
   if(ptr.hdr == LOCAL){
     COORD_OF_PTR(temp, ptr);
+    DEBUG("update_ref_msg from delete_ptr\n");
     update_ref_msg(temp, -1);
   }
   return ptr;
@@ -124,21 +126,21 @@ ptr replace_ptr(ptr old, ptr new){
   return new;
 }
 
-ptr duplicate_ptr(ptr ptr){
+ptr duplicate_ptr(ptr ptr, int refs){
   coord orig, new;
   if(ptr.hdr == LOCAL){
     COORD_OF_PTR(orig, ptr);
-    update_ref_msg(orig, 1);
     new = open_space(orig);
+    AT(new).refs = refs;
     ptr.car = new.x; ptr.cdr = new.y;
-    AT(new).refs = 1;
-    AT(new).car = duplicate_ptr(AT(orig).car);
-    AT(new).cdr = duplicate_ptr(AT(orig).cdr);
+    AT(new).car = duplicate_ptr(AT(orig).car, refs);
+    AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs);
   }
   return ptr;
 }
 
-ptr lambda_app(msg l_msg, ptr ptr){
+ptr lambda_app(msg l_msg, ptr ptr, int refs){
+  coord coord;
   switch(ptr.hdr){
   case NIL:
   case INTEGER:
@@ -146,7 +148,7 @@ ptr lambda_app(msg l_msg, ptr ptr){
   case LAMBDA: break;
   case SYMBOL:
     if(l_msg.mcar.car == ptr.car)
-      ptr = duplicate_ptr(l_msg.mcdr);
+      ptr = duplicate_ptr(l_msg.mcdr, refs);
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.coord, ptr);
@@ -183,7 +185,7 @@ void app_abs(coord place){
   /* 5. replace 1 with 8 */
   AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
   /* 6. msg goes to 1 */
-  AT(place).car = lambda_app(msg, AT(place).car);
+  AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
 }
 
 void run(coord place){
@@ -212,10 +214,14 @@ void run(coord place){
   case LAMBDA:                  /* perform lambda application */
     msg.mcar = AT(place).mcar; msg.mcdr = AT(place).mcdr;
     if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(c2, AT(place).mcdr);
-    AT(place).car = lambda_app(msg, AT(place).car);
+    AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
+    /* don't descend down shadowing lambdas */
     if(! (AT(place).car.hdr == LAMBDA &&
-          AT(place).car.car == msg.mcar.car))
-      AT(place).cdr = lambda_app(msg, AT(place).cdr);
+          AT(place).car.car == msg.mcar.car)) {
+      copy_ptr(msg.mcdr);
+      AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
+    }
+    DEBUG("update_ref_msg from run:lambda_application\n");
     if(AT(place).mcdr.hdr == LOCAL) update_ref_msg(c2, -1);
     break;
   }

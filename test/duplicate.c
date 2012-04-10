@@ -8,8 +8,10 @@ int main(int argc, char *argv[]){
   coord place, holder;
   holder.x = holder.y = place.x = place.y = 4;
 
-  app(place); show_all(holder);
-  run(place);        show_all(holder);
+  place_ints(place);
+  show_all(place);
+  duplicate_ptr(AT(place).car, 1);
+  show_all(place);
   do{
     place = queue[qbeg].coord;
     run_queue(); show_all(holder);
@@ -17,7 +19,7 @@ int main(int argc, char *argv[]){
   } while(queue_population() > 0);
 
   SHOULD(count(INTEGER) == 8);
-  SHOULD(count(LOCAL)   == 10);
+  SHOULD(count(LOCAL)   == 7);
   SHOULD(count(LAMBDA)  == 0);
   SHOULD(count(SYMBOL)  == 0);
 

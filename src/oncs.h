@@ -89,7 +89,7 @@ void update_ref_msg(coord place, int diff);
 ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
-ptr duplicate_ptr(ptr ptr);
+ptr duplicate_ptr(ptr ptr, int refs);
 
 /* run the onc at PLACE according to its contents and message */
 void run(coord place);
