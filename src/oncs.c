@@ -199,6 +199,7 @@ void app_abs(coord place){
 void run(coord place){
   msg msg;
   coord c1, c2;
+  int i1;
   switch(AT(place).mcar.hdr){
   case NIL:                     /* waiting loop */
     switch(AT(place).car.hdr){
@@ -242,9 +243,13 @@ void run(coord place){
           update_ref_msg(c2, -1);
         } else run(c2);
         break;
-      }      
+      }
       break;
     }
+    if(AT(place).car.hdr == BOOLEAN)
+      BOOLEAN_APP(place, AT(place).car, c1, c2, i1);
+    if(AT(place).cdr.hdr == BOOLEAN)
+      BOOLEAN_APP(place, AT(place).cdr, c1, c2, i1);
     break;
   case INTEGER:                 /* update number of references */
     AT(place).refs += AT(place).mcar.car;

@@ -57,6 +57,31 @@
     else                     op.cdr.hdr = BOOLEAN;              \
     op.car.hdr  = UNPACK;                                       \
   }
+#define BOOLEAN_APP(place, ptr, c1, c2, i1) {           \
+    c1 = open_space(place);                             \
+    AT(c1).refs = 1;                                    \
+    i1 = ptr.car;                                       \
+    ptr.hdr = LOCAL;                                    \
+    ptr.car = c1.x;                                     \
+    ptr.cdr = c1.y;                                     \
+    c2 = open_space(c1);                                \
+    AT(c2).refs = 1;                                    \
+    AT(c1).car.hdr = LAMBDA;                            \
+    AT(c1).car.car = TRUE;                              \
+    AT(c1).cdr.hdr = LOCAL;                             \
+    AT(c1).cdr.car = c2.x;                              \
+    AT(c1).cdr.cdr = c2.y;                              \
+    c1 = open_space(c2);                                \
+    AT(c1).refs = 1;                                    \
+    AT(c2).car.hdr = LAMBDA;                            \
+    AT(c2).car.car = FALSE;                             \
+    AT(c2).cdr.hdr = LOCAL;                             \
+    AT(c2).cdr.car = c1.x;                              \
+    AT(c2).cdr.cdr = c1.y;                              \
+    AT(c1).car.hdr = SYMBOL;                            \
+    AT(c1).car.car = i1;                                \
+    AT(c1).cdr.hdr = NIL;                               \
+  }
 
 /* utility macros */
 #define DEBUG_P 0
