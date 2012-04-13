@@ -21,11 +21,11 @@ TESTS = \
 
 all: vm repl
 
-vm: $(LIB) src/vm.c
-	$(CC) -o vm -Isrc/ $^
+vm: $(LIB) $(TEST_LIB) src/vm.c
+	$(CC) -o vm -Isrc/ -Itest/ $^
 
 repl: $(LIB) $(TEST_LIB) src/repl.c
-	$(CC) -o repl -Itest/ -Isrc/ $^
+	$(CC) -o repl -Isrc/ -Itest/ $^
 
 test/%.test: $(LIB) $(TEST_LIB) test/%.c
 	$(CC) -Itest/ -Isrc/ -o test/$*.test $^
