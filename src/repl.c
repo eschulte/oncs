@@ -1,10 +1,11 @@
 #include "test.h"
 #define MAX_INPUT_LENGTH 1000
-#define OTHER 0
-#define QUIT  1
-#define FIX   2
-#define SHOW  3
-#define CLEAR 4
+#define OTHER   0
+#define QUIT    1
+#define FIX     2
+#define SHOW    3
+#define CLEAR   4
+#define VERBOSE 5
 
 int code(char *string);
 
@@ -43,6 +44,11 @@ int main(int argc, char *argv[]){
       case CLEAR:
         clear_world();
         break;
+      case VERBOSE:
+        if(verbose == 1) verbose=0;
+        else             verbose=1;
+        printf("verbose=%d\n", verbose);
+        break;
       case OTHER:
         run_string(input);
         printf("%s\n", input);
@@ -56,10 +62,11 @@ int main(int argc, char *argv[]){
 
 static struct lookup_table { char *string; int code;
 } codes[] = {
-  {"quit",  QUIT},  {"Quit",  QUIT},  {"QUIT",  QUIT},
-  {"fix",   FIX},   {"Fix",   FIX},   {"FIX",   FIX},
-  {"show",  SHOW},  {"Show",  SHOW},  {"SHOW",  SHOW},
-  {"clear", CLEAR}, {"Clear",  CLEAR}, {"CLEAR",  CLEAR}
+  {"quit", QUIT}, {"Quit", QUIT}, {"QUIT", QUIT},
+  {"fix", FIX}, {"Fix", FIX}, {"FIX", FIX},
+  {"show", SHOW}, {"Show", SHOW}, {"SHOW", SHOW},
+  {"clear", CLEAR}, {"Clear", CLEAR}, {"CLEAR", CLEAR},
+  {"verbose", VERBOSE}, {"Verbose", VERBOSE}, {"VERBOSE", VERBOSE}
 };
 
 int code(char *string){
