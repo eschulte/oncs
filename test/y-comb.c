@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
   place = open_space(left);
   AT(place).refs = 1;
   LOCAL_SET(place, car, left);
-  INTEGER_SET(place, cdr, 4);
+  INTEGER_SET(place, cdr, 2);
   show_all(place);
 
   /* The resulting structure embedded in the space:
