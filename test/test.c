@@ -378,6 +378,15 @@ void run_expr(char *expr, coord place){
   debug(2, "leaving full_run\n");
 }
 
+void run_string(char *expr){
+  int mid=SIZE/2;
+  coord place;
+  place.x = mid; place.y = mid;
+  clear_world();
+  run_expr(expr, place);
+  onc_to_string(place, expr, 0);
+}
+
 int read_int(char *buf, int *index){
   int result, tmp;
   result = 0;

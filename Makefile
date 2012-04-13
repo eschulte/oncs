@@ -24,8 +24,8 @@ all: vm repl
 vm: $(LIB) src/vm.c
 	$(CC) -o vm -Isrc/ $^
 
-repl: $(LIB) src/repl.c
-	$(CC) -o repl -Isrc/ -Itest/ $^
+repl: $(LIB) $(TEST_LIB) src/repl.c
+	$(CC) -o repl -Itest/ -Isrc/ $^
 
 test/%.test: $(LIB) $(TEST_LIB) test/%.c
 	$(CC) -Itest/ -Isrc/ -o test/$*.test $^
