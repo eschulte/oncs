@@ -1,5 +1,6 @@
 CC=gcc -g
 LIB = src/oncs.c src/oncs.h
+TEST_LIB= test/test.c test/test.h
 TESTS = \
 	test/open_space	\
 	test/queue	\
@@ -18,12 +19,15 @@ TESTS = \
 	test/fact-0	\
 	test/y-comb
 
-all: vm
+all: vm repl
 
 vm: $(LIB) src/vm.c
-	$(CC) -o vm -Isrc/ src/vm.c src/oncs.c
+	$(CC) -o vm -Isrc/ $^
 
-test/%.test: $(LIB) test/test.c test/test.h test/%.c
+repl: $(LIB) src/repl.c
+	$(CC) -o repl -Isrc/ -Itest/ $^
+
+test/%.test: $(LIB) $(TEST_LIB) test/%.c
 	$(CC) -Itest/ -Isrc/ -o test/$*.test $^
 
 check: $(TESTS:=.test)
@@ -34,8 +38,8 @@ check: $(TESTS:=.test)
 		echo "$$result $$test"; \
 	done
 
-etags: $(LIB) $(TESTS:=.c) test/test.c test/test.h
+etags: $(LIB) $(TESTS:=.c) $(TEST_LIB)
 	etags $^
 
 clean:
-	rm -f vm test/*.test
+	rm -f vm repl test/*.test
