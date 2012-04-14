@@ -146,12 +146,14 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
   ;; the main html page
   (add-to-list 'org-publish-project-alist
                `("oncs-html"
-                  :base-directory ,oncs-dir
-                  :include ("README")
-                  :publishing-directory ,(format "/ssh:eschulte@%s:~/public_html/code/oncs/"
-                                                 oncs-server)
-                  :publishing-function org-publish-org-to-html
-                  :style "<style type=\"text/css\">\n <!--/*--><![CDATA[/*><!--*/
+                 :section-numbers nil
+                 :table-of-contents nil
+                 :base-directory ,oncs-dir
+                 :include ("README")
+                 :publishing-directory ,(format "/ssh:eschulte@%s:~/public_html/code/oncs/"
+                                                oncs-server)
+                 :publishing-function org-publish-org-to-html
+                 :style "<style type=\"text/css\">\n <!--/*--><![CDATA[/*><!--*/
     pre{display:table-cell;background:#232323; color:#e6e1dc;}
     #content{max-width:1000px;margin:auto;} body{ font-size:small; } table{ font-size:small; }
     .outline-text-2{margin-left:2em;}.outline-text-3{margin-left:3em;}

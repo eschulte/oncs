@@ -20,7 +20,7 @@ The main design goals of this effort are
 - fully implicitly parallel
   meaning every portion of the world executes simultaneously
 
-
+* Structures
 ** ONC
 Composed of an integer reference counter and four pointers.
 :         an ONC
@@ -75,3 +75,62 @@ The message values and their meanings are.
 | INTEGER | increments or decrements the ref counter by value |
 | LAMBDA  | λ-application, ptrs specify variable and value    |
 | others  | undefined                                         |
+* Usage
+1. Build with
+   : make
+
+2. Optionally run all test with
+   : make check
+
+3. Run a REPL
+   : oncs$ ./repl
+   : > help
+   :     quit -- quit the repl
+   :      fix -- run until reaching a fixed point
+   :     show -- show the contents of the ONC world
+   :    clear -- clear the ONC world
+   :  verbose -- toggle verbose execution
+   :     help -- show this help message
+   :
+   : All other inputs should be lambda calculus
+   : expressions.  Allowed atoms include...
+   : #Ln -- λn, `n' is an integer symbol identifier
+   : #Sn -- symbol n, `n' is an integer symbol identifier
+   :   n -- literal integer `n'
+   :  op -- where `op' is a primitive integer operation
+   :        and op is one of (+ - * / = <)
+   : > (#L1 (= #S1 0) 1 (* #S1 2)) 0
+   : ((#L1 (= #S1 0 ) 1 (* #S1 2 ) ) 0 )
+   : > show
+   :     0   1   2   3   4   5   6   7   8   9
+   : 0                  #1^ i1_
+   : 1                  ^1_ s1^
+   : 2                  i1^ #1^
+   : 3                      ^1^
+   : 4                  i1_ l1^
+   : 5                      ^1^
+   : 6
+   : 7
+   : 8                  i1_
+   : 9                  s1^
+   : > fix
+   : (((1 ) ) )
+   : > show
+   :     0   1   2   3   4   5   6   7   8   9
+   : 0
+   : 1              i1_
+   : 2
+   : 3                      ^1_
+   : 4
+   : 5                      ^1_
+   : 6
+   : 7
+   : 8
+   : 9
+   : > (#L1 (= #S1 0) 1 (* #S1 2)) 8
+   : ((#L1 (= #S1 0 ) 1 (* #S1 2 ) ) 8 )
+   : > fix
+   : (((16 ) ) )
+   : > quit
+   : bye
+   : oncs$
