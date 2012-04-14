@@ -1,4 +1,5 @@
 CC=gcc -g
+READLINE_LIB=-lreadline
 LIB = src/oncs.c src/oncs.h
 TEST_LIB= test/test.c test/test.h
 TESTS = \
@@ -25,7 +26,7 @@ vm: $(LIB) $(TEST_LIB) src/vm.c
 	$(CC) -o vm -Isrc/ -Itest/ $^
 
 repl: $(LIB) $(TEST_LIB) src/repl.c
-	$(CC) -o repl -Isrc/ -Itest/ $^
+	$(CC) -o repl $(READLINE_LIB) -Isrc/ -Itest/ $^
 
 test/%.test: $(LIB) $(TEST_LIB) test/%.c
 	$(CC) -Itest/ -Isrc/ -o test/$*.test $^
