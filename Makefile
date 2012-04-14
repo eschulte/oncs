@@ -23,10 +23,10 @@ TESTS = \
 all: vm repl
 
 vm: $(LIB) $(TEST_LIB) src/vm.c
-	$(CC) -o vm -Isrc/ -Itest/ $^
+	$(CC) -Isrc/ -Itest/ -o vm $^
 
 repl: $(LIB) $(TEST_LIB) src/repl.c
-	$(CC) -o repl $(READLINE_LIB) -Isrc/ -Itest/ $^
+	$(CC) -Isrc/ -Itest/ $(READLINE_LIB) -o repl $^
 
 test/%.test: $(LIB) $(TEST_LIB) test/%.c
 	$(CC) -Itest/ -Isrc/ -o test/$*.test $^
