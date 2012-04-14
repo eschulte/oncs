@@ -1,60 +1,69 @@
 # -*- mode:org -*-
 #+Title: Oncs -- A distributed lisp virtual machine
 #+Author: Eric Schulte
-#+Copyright: 2012 Eric Schulte
-#+License: GPLV3
-#+Options: ^:nil toc:nil num:nil
 
-There is a large grid /world/ of ONC structures linked by local
-relative pointers.  These structures perform calculations through
-\lambda-application.  All of the action consists of passing messages between
-ONCS.  Messages are used to maintain reference counts and duplicate
-and replace linked ONC structures, all in the service of
-\lambda-application.  Once this is working I'll add primitive integer
-operations, then look to porting to GPU and IXM.
+There is a large grid world of ONC structures linked by local relative
+pointers.  These linked ONC structures encode λ-expressions and
+perform calculations through λ-application.  All actions consist of
+passing messages between ONCS.  Messages are used to maintain
+reference counts, to duplicate and replace linked ONC structures, and
+to propagate λ-applications across large structures.
 
-See file:oncs.h for an overview of the functions and objects being
-used.  See file:oncs.lisp for a simulation of the world in lisp.
+The main design goals of this effort are
 
-- ONC :: are linked structures composed of
-     #+begin_src C
-       typedef struct { ptr car, cdr, mcar, mcdr; int refs; } onc;
-     #+end_src
-     which perform the following actions
-  - replace self with the value at a pointer uniquifying variables
-  - propagate an application message through self
-  - find free space for setting car/cdr to a pointer
-  - reference count maintenance, an onc with ref \equiv 0 is considered
-    free space
+- physicality of the computational abstraction
+  meaning no action at a distance and indefinite scalability
 
-- Pointer :: header indicating type of contents, then car and cdr
-     #+begin_src C
-       typedef struct { int hdr, car, cdr; } ptr;
-     #+end_src
-     | header | interpretation                       |
-     |--------+--------------------------------------|
-     |      0 | nil                                  |
-     |      1 | local pointer (car,cdr)              |
-     |      2 | integer car+cdr                      |
-     |      3 | symbol car (cdr for disambiguation?) |
-     |      4 | \lambda same as symbol                     |
-     |      5 | primitive integer operation          |
-     |      6 | curried primitive integer operation  |
-     |      7 | unpack "(foo)" into "foo"            |
-     |      8 | Boolean true or false                |
+- homogeneity among elements
+  meaning no privileged points in space or time
 
-- Messages :: passed between oncs
-     #+begin_src C
-       typedef struct { int x, y; } coord;
-       typedef struct { ptr mcar,mcdr; coord coord; } msg;
-     #+end_src
-     indicate next action for an onc to take, broken out by header
-     type below
-  - =NIL= runs the holding loop
-  - =LOCAL= undefined
-  - =INTEGER= increments or decrements the ref counter by the given
-    value
-  - =SYMBOL= undefined
-  - =LAMBDA= performs lambda application using one ptr to specify the
-    variable to be replaced and the second the specify the replacement
-    value
+- fully implicitly parallel
+  meaning every portion of the world executes simultaneously
+
+
+** ONC
+Linked structures composed of an integer reference counter and four
+pointers.
+:         an ONC
+: +-------------------+
+: |       #refs       |
+: +---------+---------+
+: |  mcar   |  car    |
+: |         |         |
+: +---------+---------+
+: |  mcdr   |  cdr    |
+: |         |         |
+: +---------+---------+
+
+Oncs perform the following actions.
+- reference count maintenance, an onc with ref≡0 is free
+- propagate a λ-application message through self
+- replace self with a value or ONC
+- find nearby free space for new oncs
+
+** Pointer
+Composed of a header indicating type of contents, then car and cdr
+which hold integer values.
+
+| header | interpretation                       |
+|--------+--------------------------------------|
+|      0 | nil                                  |
+|      1 | local pointer (car,cdr)              |
+|      2 | integer car+cdr                      |
+|      3 | symbol car (cdr for disambiguation?) |
+|      4 | λ same as symbol                     |
+|      5 | primitive integer operation          |
+|      6 | curried primitive integer operation  |
+|      7 | unpack "(foo)" into "foo"            |
+|      8 | Boolean true or false                |
+
+** Messages
+Composed of a coordinate and two pointers.  Messages are passed
+between ONCS and cause ONCS to perform local actions.
+
+The message values and their meanings are.
+| NIL     | default, runs the waiting loop                    |
+| INTEGER | increments or decrements the ref counter by value |
+| LAMBDA  | λ-application, ptrs specify variable and value    |
+| SYMBOL  | undefined                                         |
+| LOCAL   | undefined                                         |
