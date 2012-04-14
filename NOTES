@@ -140,6 +140,7 @@ the key is just to start the application from the next level up
 This code is used to publish this page to the =cs.unm.edu= webserver.
 #+begin_src emacs-lisp :results silent
   (setq oncs-dir (file-name-directory (or load-file-name buffer-file-name)))
+  (setq oncs-server "moons.cs.unm.edu") ;; was kenworth.cs.unm.edu
   (unless (boundp 'org-publish-project-alist)
     (setq org-publish-project-alist nil))
   ;; the main html page
@@ -147,7 +148,8 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                `("oncs-html"
                   :base-directory ,oncs-dir
                   :include ("README")
-                  :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
+                  :publishing-directory ,(format "/ssh:eschulte@%s:~/public_html/code/oncs/"
+                                                 oncs-server)
                   :publishing-function org-publish-org-to-html
                   :style "<style type=\"text/css\">\n <!--/*--><![CDATA[/*><!--*/
     pre{display:table-cell;background:#232323; color:#e6e1dc;}
@@ -171,19 +173,22 @@ This code is used to publish this page to the =cs.unm.edu= webserver.
                  :base-directory ,oncs-dir
                  :include ("COPYING")
                  :base-extension "h\\|c\\|txt\\|lisp"
-                 :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/"
+                 :publishing-directory ,(format "/ssh:eschulte@%s:~/public_html/code/oncs/"
+                                                oncs-server)
                  :publishing-function org-publish-attachment))
   (add-to-list 'org-publish-project-alist
                `("oncs-src"
                  :base-directory ,(expand-file-name "src" oncs-dir)
                  :base-extension "h\\|c\\|txt\\|lisp"
-                 :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/src/"
+                 :publishing-directory ,(format "/ssh:eschulte@%s:~/public_html/code/oncs/src/"
+                                                oncs-server)
                  :publishing-function org-publish-attachment))
   (add-to-list 'org-publish-project-alist
                `("oncs-test"
                  :base-directory ,(expand-file-name "test" oncs-dir)
                  :base-extension "h\\|c\\|txt\\|lisp"
-                 :publishing-directory "/ssh:eschulte@kenworth.cs.unm.edu:~/public_html/code/oncs/test/"
+                 :publishing-directory ,(format "/ssh:eschulte@%s:~/public_html/code/oncs/test/"
+                                                oncs-server)
                  :publishing-function org-publish-attachment))
   ;; a single combined project to publish both html and supporting materials
   (add-to-list 'org-publish-project-alist

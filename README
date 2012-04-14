@@ -43,22 +43,22 @@ Oncs perform the following actions.
 ** Pointer
 Composed of a header indicating type of contents, then car and cdr
 which hold integer values.
-:      a Pointer   
+:      a Pointer
 : +-----------------+
 : | hdr | car | cdr |
 : +-----------------+
 
-| header | interpretation                       |
-|--------+--------------------------------------|
-|      0 | nil                                  |
-|      1 | local pointer (car,cdr)              |
-|      2 | integer car+cdr                      |
-|      3 | symbol car (cdr for disambiguation?) |
-|      4 | λ same as symbol                     |
-|      5 | primitive integer operation          |
-|      6 | curried primitive integer operation  |
-|      7 | unpack "(foo)" into "foo"            |
-|      8 | Boolean true or false                |
+| header  | interpretation                       |
+|---------+--------------------------------------|
+| NIL     | nil                                  |
+| POINTER | local pointer (car,cdr)              |
+| INTEGER | integer car+cdr                      |
+| SYMBOL  | symbol car (cdr for disambiguation?) |
+| LAMBDA  | λ same as symbol                     |
+| PRIMOPT | primitive integer operation          |
+| CURRIED | curried primitive integer operation  |
+| UNPACK  | unpack "(foo)" into "foo"            |
+| BOOLEAN | Boolean true or false                |
 
 ** Message
 Composed of a coordinate and two pointers.  Messages are passed
@@ -69,8 +69,9 @@ between ONCS and cause ONCS to perform local actions.
 : +---------------------+
 
 The message values and their meanings are.
+| value   | interpretation                                    |
+|---------+---------------------------------------------------|
 | NIL     | default, runs the waiting loop                    |
 | INTEGER | increments or decrements the ref counter by value |
 | LAMBDA  | λ-application, ptrs specify variable and value    |
-| SYMBOL  | undefined                                         |
-| LOCAL   | undefined                                         |
+| others  | undefined                                         |
