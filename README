@@ -22,8 +22,7 @@ The main design goals of this effort are
 
 
 ** ONC
-Linked structures composed of an integer reference counter and four
-pointers.
+Composed of an integer reference counter and four pointers.
 :         an ONC
 : +-------------------+
 : |       #refs       |
@@ -44,6 +43,10 @@ Oncs perform the following actions.
 ** Pointer
 Composed of a header indicating type of contents, then car and cdr
 which hold integer values.
+:      a Pointer   
+: +-----------------+
+: | hdr | car | cdr |
+: +-----------------+
 
 | header | interpretation                       |
 |--------+--------------------------------------|
@@ -57,9 +60,13 @@ which hold integer values.
 |      7 | unpack "(foo)" into "foo"            |
 |      8 | Boolean true or false                |
 
-** Messages
+** Message
 Composed of a coordinate and two pointers.  Messages are passed
 between ONCS and cause ONCS to perform local actions.
+:        a Message
+: +---------------------+
+: | coord | mcar | mcdr |
+: +---------------------+
 
 The message values and their meanings are.
 | NIL     | default, runs the waiting loop                    |
