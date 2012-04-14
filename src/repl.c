@@ -69,7 +69,8 @@ int main(int argc, char *argv[]){
              "       and op is one of (+ - * / = <)\n");
       break;
     case OTHER:
-      run_string(input);
+      string_to_onc(place, input);
+      onc_to_string(place, input, 0);
       printf("%s\n", input);
       break;
     }

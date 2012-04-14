@@ -30,7 +30,6 @@ int close_paren(char *buf, int index);
 void show_all(coord place);
 void run_down(coord place);
 void run_expr(char *expr, coord place);
-void run_string(char *expr);
 int read_int(char *buf, int *index);
 void simple_app(coord place);
 
