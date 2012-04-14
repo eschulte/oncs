@@ -75,12 +75,17 @@ The message values and their meanings are.
 | INTEGER | increments or decrements the ref counter by value |
 | LAMBDA  | λ-application, ptrs specify variable and value    |
 | others  | undefined                                         |
+
 * Usage
-1. Build with
+1. Build
    : make
 
-2. Optionally run all test with
+2. Optionally run all tests
    : make check
+
+   To run a particular test with verbose output do the following and
+   press SPACEBAR to step through stages of evaluation.
+   : oncs$ ./test/fact-0.test -v|more -c
 
 3. Run a REPL
    : oncs$ ./repl
