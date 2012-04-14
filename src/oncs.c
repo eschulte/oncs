@@ -193,8 +193,14 @@ void app_abs(coord place){
     msg.mcdr = copy_ptr(AT(place).cdr);
     AT(place).cdr.hdr = NIL;
   }
-  /* 5. replace 1 with 8 */
-  AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
+  /* 5. replace 1 with 9 (or with 9's target) */
+  if(0 && AT(c_car).cdr.hdr == LOCAL){
+    COORD_OF_PTR(c_cdr, AT(c_car).cdr);
+    AT(place).car = replace_ptr(AT(place).car, AT(c_cdr).car);
+    AT(place).cdr = replace_ptr(AT(place).car, AT(c_cdr).car);
+  } else {
+    AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
+  }
   /* 6. msg goes to 1 */
   AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
 }
