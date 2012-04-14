@@ -59,6 +59,14 @@ int main(int argc, char *argv[]){
     case HELP:
       for(i = 0; i < sizeof(codes) / sizeof(codes[0]); i++)
         printf("%8s -- %s\n", codes[i].string, codes[i].doc);
+      printf("\n"
+             "All other inputs should be lambda calculus\n"
+             "expressions.  Allowed atoms include...\n"
+             "#Ln -- λn, `n' is an integer symbol identifier\n"
+             "#Sn -- symbol n, `n' is an integer symbol identifier\n"
+             "  n -- literal integer `n'\n"
+             " op -- where `op' is a primitive integer operation\n"
+             "       and op is one of (+ - * / = <)\n");
       break;
     case OTHER:
       run_string(input);
