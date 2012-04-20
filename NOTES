@@ -1,5 +1,21 @@
 # -*- mode:org -*-
 
+* y-comb.c evaluation order of operations
+#+begin_src sh
+  ./test/y-comb.test -v|grep expr|sed 's/ )/)/g'|uniq|cut -c11-
+#+end_src
+
+: ((((#L0 (#L1 (#S0 #L2 ((#S1 #S1) #S2))) (#L1 (#S0 #L2 ((#S1 #S1) #S2)))) (#L3 (#L4 ((= 0 #S4) 1 (* #S4 (#S3 (- 1 #S4))))))) 2))
+: ((((((#S0 #L2 ((#S1 #S1) #S2))))) 2))
+: ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((#S1 #S1) #S2))))) 2))
+: ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((#S0 #L2 ((#S1 #S1) #S2))) #S1) #S2))))) 2))
+: ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((#S0 #L2 ((#S1 #S1) #S2))) ((#S0 #S0 (( #S1) #S2)))) #S2))))) 2))
+: ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 #S0 (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) ((#S0 #S0 (( #S1) #S2)))) #S2))))) 2))
+: ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 #S0 (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) (((#S0 #S0 (( #S1) #S2))))) #S2))))) 2))
+: ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 ((((#S0 #S0 (( #S1) #S2))))) (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) (((#S0 ((((#S0 #S0 (( #S1) #S2))))) (( #S1) #S2))))) #S2))))) 2))
+
+Will need an order of application.
+
 * play with y-comb in scheme
 #+begin_src scheme
   ;; most naive, just duplicate function and pass it to itself
@@ -13,8 +29,6 @@
        (lambda (f) (m (lambda (a) ((f f) a))))))
     (lambda (r) (lambda (n) (if (zero? n) 1 (* n (r (1- n))))))) 4)
 #+end_src
-
-
 
 * should implement a duplicate message type
 * unpack lambdas not just applications of curried functions
