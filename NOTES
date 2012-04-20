@@ -5,7 +5,7 @@ Given that we're using =nil= for the ends of lists, we need to keep
 lambdas from applying themselves to =nil= so they don't evaporate.
 
 * y-comb.c evaluation order of operations
-Will need an order of application.
+Will need some control over order of application.
 
 ** application abstractions
 : app_abs(4,0) ((#L1 (#S0 (#L2 ((#S1 #S1) #S2)))) (#L1 (#S0 (#L2 ((#S1 #S1) #S2)))))
