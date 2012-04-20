@@ -136,6 +136,10 @@ ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
 ptr duplicate_ptr(ptr ptr, int refs);
 
+/* read strings out from onc world */
+int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
+int onc_to_string(coord place, char *buf, int index);
+
 /* apply the lambda message L_MSG to PTR */
 ptr lambda_app(msg l_msg, ptr ptr, int refs);
 

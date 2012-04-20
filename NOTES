@@ -8,11 +8,9 @@ lambdas from applying themselves to =nil= so they don't evaporate.
 Will need an order of application.
 
 ** application abstractions
-: app_abs(2,9) ((#L4 ((=0 #S4) 1 (* #S4 (#S3 (- 1 #S4))))))
-: app_abs(3,1) ((#L3 (((=0 #S4) 1 (* #S4 (#S3 (- 1 #S4)))))))
-: app_abs(3,9) ((#L1 (#S0 #L2 ((#S1 #S1) #S2))))
-: app_abs(4,0) ((#L1 (#S0 #L2 ((#S1 #S1) #S2))) ((#S0 #L2 ((#S1 #S1) #S2))))
-: app_abs(4,2) ((#L0 ((#S0 #L2 ((#S1 #S1) #S2)))) ((((=0 #S4) 1 (* #S4 (#S3 (- 1 #S4)))))))
+: app_abs(4,0) ((#L1 (#S0 (#L2 ((#S1 #S1) #S2)))) (#L1 (#S0 (#L2 ((#S1 #S1) #S2)))))
+: app_abs(4,2) ((#L0 ((#S0 (#L2 ((#S1 #S1) #S2))))) (#L3 (#L4 ((= 0 #S4) 1 (* #S4 (#S3 (- 1 #S4)))))))
+: app_abs(4,7) ((#L3 (#L4 ((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) (#L2 ((#S1 #S1) #S2)))
 
 ** raw expressions at place
 #+begin_src sh

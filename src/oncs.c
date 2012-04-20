@@ -145,6 +145,84 @@ ptr duplicate_ptr(ptr ptr, int refs){
   return ptr;
 }
 
+int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
+  int i, j;
+  char c;
+  char s[20];
+  coord coord;
+  switch(ptr.hdr){
+  case UNPACK: buf[index] = '~'; index++; break;
+  case NIL: break;
+  case LOCAL:
+    coord.x = ptr.car; coord.y = ptr.cdr;
+    if(car_p) { buf[index] = '('; index++; }
+    index = ptr_to_string(AT(coord).car, buf, index, 1);
+    buf[index] = ' '; index++;
+    index = ptr_to_string(AT(coord).cdr, buf, index, 0);
+    if(car_p) { buf[index] = ')'; index++; }
+    return index;
+  case LAMBDA:
+    buf[index] = '#'; index++;
+    buf[index] = 'L'; index++;
+  case SYMBOL:
+    if(ptr.hdr != LAMBDA){
+      buf[index] = '#'; index++;
+      buf[index] = 'S'; index++;
+    }
+  case INTEGER:
+    i = sprintf(s, "%d", ptr.car);
+    for(j=0;j<i;j++){
+      buf[index] = s[j];
+      index++;
+    }
+    break;
+  case PRIMOPT:
+    switch(ptr.car){
+    case PLUS:   buf[index] = '+'; break;
+    case MINUS:  buf[index] = '-'; break;
+    case TIMES:  buf[index] = '*'; break;
+    case DIVIDE: buf[index] = '/'; break;
+    case EQUAL:  buf[index] = '='; break;
+    case LESS:   buf[index] = '<'; break;
+    }
+    index++;
+    break;
+  case CURRIED:
+    switch(ptr.car){
+    case PLUS:   c = '+'; break;
+    case MINUS:  c = '-'; break;
+    case TIMES:  c = '*'; break;
+    case DIVIDE: c = '/'; break;
+    case EQUAL:  c = '='; break;
+    case LESS:   c = '<'; break;
+    }
+    i = sprintf(s, "%c%d", c, ptr.cdr);
+    for(j=0;j<i;j++){
+      buf[index] = s[j];
+      index++;
+    }
+    break;
+  case BOOLEAN:
+    switch(ptr.car){
+    case TRUE:  buf[index] = 't'; break;
+    case FALSE: buf[index] = 'f'; break;
+    }
+    index++;
+    break;
+  }
+  return index;
+}
+
+int onc_to_string(coord place, char *buf, int index){
+  buf[index] = '('; index++;
+  index = ptr_to_string(AT(place).car, buf, index, 1);
+  buf[index] = ' '; index++;
+  index = ptr_to_string(AT(place).cdr, buf, index, 0);
+  buf[index] = ')'; index++;
+  buf[index] = '\0';
+  return index;
+}
+
 ptr lambda_app(msg l_msg, ptr ptr, int refs){
   coord coord;
   switch(ptr.hdr){
@@ -168,6 +246,7 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
 }
 
 void app_abs(coord place){
+  char str[4000];
   msg msg;
   coord c_car, c_cdr;
   /* setup */
@@ -182,6 +261,8 @@ void app_abs(coord place){
     COORD_OF_PTR(c_cdr, AT(place).cdr);
   /* don't apply to nil or ends of lists */
   if(AT(place).cdr.hdr != NIL){
+    onc_to_string(place, str, 0);
+    DEBUG3("app_abs(%d,%d) %s\n", place.x, place.y, str);
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */

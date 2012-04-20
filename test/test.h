@@ -23,8 +23,6 @@ void show_ptr(ptr ptr);
 void show_queue();
 void show_world();
 void get_expr(coord place, char *buf, int index);
-int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
-int onc_to_string(coord place, char *buf, int index);
 int string_to_onc(coord place, char *buf);
 int close_paren(char *buf, int index);
 void show_all(coord place);
