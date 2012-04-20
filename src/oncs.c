@@ -180,29 +180,32 @@ void app_abs(coord place){
     ERROR("malformed app_abs.car");
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
-  /* 1. make new message */
-  msg.mcar.hdr = LAMBDA;
-  /* 2. copy λ1 to msg.car */
-  msg.mcar = copy_ptr(AT(c_car).car);
-  if(AT(place).cdr.hdr == LOCAL){
-    /* 3. copy a to msg.cdr */
-    msg.mcdr = copy_ptr(AT(c_cdr).car);
-    /* 4. replace 2 with 4 */
-    AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
-  } else {
-    msg.mcdr = copy_ptr(AT(place).cdr);
-    AT(place).cdr.hdr = NIL;
+  /* don't apply to nil or ends of lists */
+  if(AT(place).cdr.hdr != NIL){
+    /* 1. make new message */
+    msg.mcar.hdr = LAMBDA;
+    /* 2. copy λ1 to msg.car */
+    msg.mcar = copy_ptr(AT(c_car).car);
+    if(AT(place).cdr.hdr == LOCAL){
+      /* 3. copy a to msg.cdr */
+      msg.mcdr = copy_ptr(AT(c_cdr).car);
+      /* 4. replace 2 with 4 */
+      AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
+    } else {
+      msg.mcdr = copy_ptr(AT(place).cdr);
+      AT(place).cdr.hdr = NIL;
+    }
+    /* 5. replace 1 with 9 (or with 9's target) */
+    if(0 && AT(c_car).cdr.hdr == LOCAL){
+      COORD_OF_PTR(c_cdr, AT(c_car).cdr);
+      AT(place).car = replace_ptr(AT(place).car, AT(c_cdr).car);
+      AT(place).cdr = replace_ptr(AT(place).car, AT(c_cdr).car);
+    } else {
+      AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
+    }
+    /* 6. msg goes to 1 */
+    AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
   }
-  /* 5. replace 1 with 9 (or with 9's target) */
-  if(0 && AT(c_car).cdr.hdr == LOCAL){
-    COORD_OF_PTR(c_cdr, AT(c_car).cdr);
-    AT(place).car = replace_ptr(AT(place).car, AT(c_cdr).car);
-    AT(place).cdr = replace_ptr(AT(place).car, AT(c_cdr).car);
-  } else {
-    AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
-  }
-  /* 6. msg goes to 1 */
-  AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
 }
 
 void run(coord place){

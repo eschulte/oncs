@@ -1,6 +1,20 @@
 # -*- mode:org -*-
 
+* DONE lambdas are /evaporating/ through application to nil
+Given that we're using =nil= for the ends of lists, we need to keep
+lambdas from applying themselves to =nil= so they don't evaporate.
+
 * y-comb.c evaluation order of operations
+Will need an order of application.
+
+** application abstractions
+: app_abs(2,9) ((#L4 ((=0 #S4) 1 (* #S4 (#S3 (- 1 #S4))))))
+: app_abs(3,1) ((#L3 (((=0 #S4) 1 (* #S4 (#S3 (- 1 #S4)))))))
+: app_abs(3,9) ((#L1 (#S0 #L2 ((#S1 #S1) #S2))))
+: app_abs(4,0) ((#L1 (#S0 #L2 ((#S1 #S1) #S2))) ((#S0 #L2 ((#S1 #S1) #S2))))
+: app_abs(4,2) ((#L0 ((#S0 #L2 ((#S1 #S1) #S2)))) ((((=0 #S4) 1 (* #S4 (#S3 (- 1 #S4)))))))
+
+** raw expressions at place
 #+begin_src sh
   ./test/y-comb.test -v|grep expr|sed 's/ )/)/g'|uniq|cut -c11-
 #+end_src
@@ -13,8 +27,6 @@
 : ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 #S0 (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) ((#S0 #S0 (( #S1) #S2)))) #S2))))) 2))
 : ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 #S0 (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) (((#S0 #S0 (( #S1) #S2))))) #S2))))) 2))
 : ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 ((((#S0 #S0 (( #S1) #S2))))) (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) (((#S0 ((((#S0 #S0 (( #S1) #S2))))) (( #S1) #S2))))) #S2))))) 2))
-
-Will need an order of application.
 
 * play with y-comb in scheme
 #+begin_src scheme

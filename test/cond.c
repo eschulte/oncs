@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
   debug(2, "lambda:%d symbol:%d integer:%d\n",
         count(LAMBDA), count(SYMBOL), count(INTEGER));
   SHOULD(count(INTEGER) == 1);
-  SHOULD(count(LAMBDA) == 0);
+  SHOULD(count(LAMBDA) == 1);
   SHOULD(count(SYMBOL) == 0);
 
   if(fail_p) ERROR("failed expr2");
