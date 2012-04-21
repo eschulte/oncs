@@ -95,7 +95,7 @@
 typedef struct { int x, y; } coord;
 typedef struct { int hdr, car, cdr; } ptr;
 typedef struct { ptr mcar, mcdr; coord coord; } msg;
-typedef struct { ptr car, cdr, mcar, mcdr; int refs, locked; } onc;
+typedef struct { ptr car, cdr, mcar, mcdr; int refs; } onc;
 
 /* global state */
 extern onc world[SIZE][SIZE];
@@ -135,13 +135,10 @@ ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
 ptr duplicate_ptr(ptr ptr, int refs);
-
-/* Order of evaluation */
 int value_p(ptr ptr);
-int eval_p(coord place);
 
 /* read strings out from onc world */
-int ptr_to_string(ptr ptr, char *buf, int index, int locked, int car_p);
+int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
 int onc_to_string(coord place, char *buf, int index);
 
 /* apply the lambda message L_MSG to PTR */
