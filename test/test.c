@@ -55,7 +55,8 @@ void show_ptr(ptr ptr, int locked){
   case NIL:     printf("_"); break;
   case LOCAL:   printf("^"); break;
   case INTEGER: printf("i"); break;
-  case SYMBOL:  printf("s"); break;
+  case SYMBOL:
+    if(locked) printf("s"); else printf("S"); break;
   case LAMBDA:
     if(locked) printf("l"); else printf("L"); break;
   case PRIMOPT: printf("#"); break;
@@ -118,12 +119,14 @@ void show_world(){
 int string_to_onc(coord place, int locked, char *buf){
   debug(2, "string_to_onc[%d]((%d,%d), %s)\n",
         locked, place.x, place.y, buf);
-  int i, car_p, parend, index;
+  int i, car_p, parend, index, lock_child;
   index = 0;
+  lock_child = FALSE;
   car_p = TRUE;
   coord t1;
   char *interum = buf;
   while(buf[index] != '\0') {
+    if(lock_child) locked = TRUE;
     while((buf[index] == '#') || (buf[index] == ' ')) index++;
     AT(place).refs = 1;
     if(car_p){

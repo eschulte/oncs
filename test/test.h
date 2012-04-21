@@ -71,7 +71,7 @@ void step(coord place);
     where.hdr = LAMBDA;                                         \
     index++;                                                    \
     where.car = read_int(buf, &index);                          \
-    locked = TRUE;                                              \
+    lock_child = TRUE;                                          \
     break;                                                      \
   case 'S': /* SYMBOL */                                        \
     debug(2, "\tSYMBOL:(%d,%d)\n", place.x, place.y);           \

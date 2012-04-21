@@ -132,15 +132,16 @@ ptr replace_ptr(ptr old, ptr new){
   return new;
 }
 
-ptr duplicate_ptr(ptr ptr, int refs){
+ptr duplicate_ptr(ptr ptr, int locked, int refs){
   coord orig, new;
   if(ptr.hdr == LOCAL){
     COORD_OF_PTR(orig, ptr);
     new = open_space(orig);
     AT(new).refs = refs;
+    AT(new).locked = locked;
     ptr.car = new.x; ptr.cdr = new.y;
-    AT(new).car = duplicate_ptr(AT(orig).car, refs);
-    AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs);
+    AT(new).car = duplicate_ptr(AT(orig).car, locked, refs);
+    AT(new).cdr = duplicate_ptr(AT(orig).cdr, locked, refs);
   }
   return ptr;
 }
@@ -158,6 +159,8 @@ int value_p(ptr ptr){
 }
 
 int eval_p(coord place){
+  DEBUG3("eval_p(%d,%d)=%d\n",
+         place.x, place.y, (! AT(place).locked));
   return ! AT(place).locked;
 }
 
@@ -185,7 +188,9 @@ int ptr_to_string(ptr ptr, char *buf, int index, int locked, int car_p){
   case SYMBOL:
     if(ptr.hdr != LAMBDA){
       buf[index] = '#'; index++;
-      buf[index] = 'S'; index++;
+      if(locked) buf[index] = 's';
+      else       buf[index] = 'S';
+      index++;
     }
   case INTEGER:
     i = sprintf(s, "%d", ptr.car);
@@ -241,7 +246,7 @@ int onc_to_string(coord place, char *buf, int index){
   return index;
 }
 
-ptr lambda_app(msg l_msg, ptr ptr, int refs){
+ptr lambda_app(msg l_msg, ptr ptr, int locked, int refs){
   coord coord;
   switch(ptr.hdr){
   case NIL:
@@ -250,7 +255,7 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
   case LAMBDA: break;
   case SYMBOL:
     if(l_msg.mcar.car == ptr.car)
-      ptr = duplicate_ptr(l_msg.mcdr, refs);
+      ptr = duplicate_ptr(l_msg.mcdr, locked, refs);
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.coord, ptr);
@@ -279,6 +284,7 @@ void app_abs(coord place){
     COORD_OF_PTR(c_cdr, AT(place).cdr);
   /* don't apply to non values -- call-by-value */
   if(value_p(AT(place).cdr)){
+    AT(c_car).locked = FALSE;
     onc_to_string(place, str, 0);
     DEBUG3("app_abs(%d,%d) %s\n", place.x, place.y, str);
     /* 1. make new message */
@@ -303,7 +309,9 @@ void app_abs(coord place){
       AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
     }
     /* 6. msg goes to 1 */
-    AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
+    AT(place).car = lambda_app(msg, AT(place).car, FALSE, AT(place).refs);
+  } else {
+    DEBUG2("can't eval at (%d,%d)\n", place.x, place.y);
   }
 }
 
@@ -317,7 +325,7 @@ void run(coord place){
     case LOCAL:
       COORD_OF_PTR(c1, AT(place).car);
       switch(AT(c1).car.hdr){
-      case LAMBDA: if(eval_p(place)) app_abs(place); break;
+      case LAMBDA: if(eval_p(c1)) app_abs(place); break;
       case UNPACK:
         AT(place).car = replace_ptr(AT(place).car, AT(c1).cdr);
         break;
@@ -371,12 +379,14 @@ void run(coord place){
   case LAMBDA:                  /* perform lambda application */
     msg.mcar = AT(place).mcar; msg.mcdr = AT(place).mcdr;
     if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(c2, AT(place).mcdr);
-    AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
+    AT(place).car = lambda_app(msg, AT(place).car,
+                               AT(place).locked, AT(place).refs);
     /* don't descend down shadowing lambdas */
     if(! (AT(place).car.hdr == LAMBDA &&
           AT(place).car.car == msg.mcar.car)) {
       copy_ptr(msg.mcdr);
-      AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
+      AT(place).cdr = lambda_app(msg, AT(place).cdr,
+                                 AT(place).locked, AT(place).refs);
     }
     DEBUG("update_ref_msg from run:lambda_application\n");
     if(AT(place).mcdr.hdr == LOCAL) update_ref_msg(c2, -1);
