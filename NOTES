@@ -7,6 +7,18 @@ lambdas from applying themselves to =nil= so they don't evaporate.
 * y-comb.c evaluation order of operations
 Will need some control over order of application.
 
+See many papers here.
+http://homepages.inf.ed.ac.uk/wadler/topics/call-by-need.html
+
+| call by value | only values substituted into a lambda |
+| normal order  | always work with the outermost redex  |
+| call by name  | dont dive into a lambda               |
+
+- Haskell is /call by name/ with laziness which makes it call by need.
+- Java, C, ML etc... are all /call by value/
+
+For now lets look at call by value.
+
 ** application abstractions
 : app_abs(4,0) ((#L1 (#S0 (#L2 ((#S1 #S1) #S2)))) (#L1 (#S0 (#L2 ((#S1 #S1) #S2)))))
 : app_abs(4,2) ((#L0 ((#S0 (#L2 ((#S1 #S1) #S2))))) (#L3 (#L4 ((= 0 #S4) 1 (* #S4 (#S3 (- 1 #S4)))))))
