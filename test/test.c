@@ -290,6 +290,31 @@ void fix(coord place){
   } while( hash_old != hash_new );
 }
 
+void step(coord place){
+  int i, j;
+  char buf_strt[EXPR_BUF_SIZE];
+  char buf_comp[EXPR_BUF_SIZE];
+  unsigned long hash_old, hash_new;
+  hash_old = hash_new = 0;
+  onc_to_string(place, buf_strt, 0);
+  do{
+    if((queue_population() == 0) ||
+       (! run_queue()))
+      for(i=0;i<SIZE;i++)
+        for(j=0;j<SIZE;j++)
+          if(world[i][j].refs > 0)
+            run_at(i, j);
+    show_both();
+    onc_to_string(place, buf_comp, 0);
+    debug(1, "expr(%d,%d):%s\n",
+          place.x, place.y, buf_comp);
+    hash_old = hash_new;
+    hash_new = world_hash() ^ queue_hash();
+    debug(1, "hash:%x\n", hash_new);
+  } while( hash_old != hash_new &&
+           strcmp(buf_strt, buf_comp) == 0 );
+}
+
 void run_expr(char *expr, coord place){
   clear_world();
   string_to_onc(place, expr);

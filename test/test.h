@@ -34,7 +34,8 @@ void simple_app(coord place);
 /* hashing functions from http://www.cse.yorku.ca/~oz/hash.html */
 unsigned long coord_hash();
 unsigned long world_hash();
-void fix();
+void fix(coord place);
+void step(coord place);
 
 /* state placing macros */
 #define NIL_SET(place, sub)              \

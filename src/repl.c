@@ -10,6 +10,7 @@
 #define CLEAR   4
 #define VERBOSE 5
 #define HELP    6
+#define STEP    7
 static struct lookup_table { char *string; int code; char *doc;
 } codes[] = {
   {"quit", QUIT, "quit the repl"},
@@ -17,7 +18,8 @@ static struct lookup_table { char *string; int code; char *doc;
   {"show", SHOW, "show the contents of the ONC world"},
   {"clear", CLEAR, "clear the ONC world"},
   {"verbose", VERBOSE, "toggle verbose execution"},
-  {"help", HELP, "show this help message"}
+  {"help", HELP, "show this help message"},
+  {"step", STEP, "run a single step"}
 };
 
 int code(char *string);
@@ -67,6 +69,11 @@ int main(int argc, char *argv[]){
              "  n -- literal integer `n'\n"
              " op -- where `op' is a primitive integer operation\n"
              "       and op is one of (+ - * / = <)\n");
+      break;
+    case STEP:
+      step(place);
+      onc_to_string(place, input, 0);
+      printf("%s\n", input);
       break;
     case OTHER:
       string_to_onc(place, input);
