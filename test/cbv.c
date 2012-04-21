@@ -6,7 +6,6 @@ int main(int argc, char *argv[]){
   place.x = 4; place.y = 4;
 
   char expr[] = "(#L0 #S0)((#L0 #S0) (#L1 (#L0 #S0) #S1))";
-  /* char expr[] = "(#L0 #S0) (#L1 (#L0 #S0) #S1)"; */
   string_to_onc(place, FALSE, expr);
   show_all(place);
   fix(place);

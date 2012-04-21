@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
 
   place_ints(place);
   show_all(place);
-  duplicate_ptr(AT(place).car, FALSE, 1);
+  duplicate_ptr(AT(place).car, 1);
   show_all(place);
   do{
     place = queue[qbeg].coord;
