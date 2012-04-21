@@ -17,7 +17,8 @@ TESTS = \
 	test/cond	\
 	test/prim-opt	\
 	test/prim-cond	\
-	test/l-promote	\
+	test/cbv
+#	test/l-promote	\
 	test/fact-0	\
 	test/y-comb
 

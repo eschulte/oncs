@@ -135,6 +135,7 @@ ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
 ptr duplicate_ptr(ptr ptr, int refs);
+int value_p(ptr ptr);
 
 /* read strings out from onc world */
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p);

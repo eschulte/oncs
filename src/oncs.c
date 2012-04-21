@@ -145,6 +145,11 @@ ptr duplicate_ptr(ptr ptr, int refs){
   return ptr;
 }
 
+int value_p(ptr ptr){
+  if(ptr.hdr == NIL) return 0;
+  else               return 1;
+}
+
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   int i, j;
   char c;
@@ -259,8 +264,8 @@ void app_abs(coord place){
     ERROR("malformed app_abs.car");
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
-  /* don't apply to nil or ends of lists */
-  if(AT(place).cdr.hdr != NIL){
+  /* don't apply to non values -- call-by-value */
+  if(value_p(AT(place).cdr)){
     onc_to_string(place, str, 0);
     DEBUG3("app_abs(%d,%d) %s\n", place.x, place.y, str);
     /* 1. make new message */
