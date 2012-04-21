@@ -146,11 +146,22 @@ ptr duplicate_ptr(ptr ptr, int refs){
 }
 
 int value_p(ptr ptr){
-  if(ptr.hdr == NIL) return 0;
-  else               return 1;
+  coord place;
+  switch(ptr.hdr){
+  case NIL: return FALSE;
+  case LOCAL:
+    /* lambda abstraction is not a value */
+    COORD_OF_PTR(place, ptr);
+    return (AT(place).car.hdr != LAMBDA || AT(place).cdr.hdr == NIL);
+  default: return TRUE;
+  }
 }
 
-int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
+int eval_p(coord place){
+  return ! AT(place).locked;
+}
+
+int ptr_to_string(ptr ptr, char *buf, int index, int locked, int car_p){
   int i, j;
   char c;
   char s[20];
@@ -161,14 +172,16 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   case LOCAL:
     coord.x = ptr.car; coord.y = ptr.cdr;
     if(car_p) { buf[index] = '('; index++; }
-    index = ptr_to_string(AT(coord).car, buf, index, 1);
+    index = ptr_to_string(AT(coord).car, buf, index, AT(coord).locked, 1);
     buf[index] = ' '; index++;
-    index = ptr_to_string(AT(coord).cdr, buf, index, 0);
+    index = ptr_to_string(AT(coord).cdr, buf, index, AT(coord).locked, 0);
     if(car_p) { buf[index] = ')'; index++; }
     return index;
   case LAMBDA:
     buf[index] = '#'; index++;
-    buf[index] = 'L'; index++;
+    if(locked) buf[index] = 'l';
+    else       buf[index] = 'L';
+    index++;
   case SYMBOL:
     if(ptr.hdr != LAMBDA){
       buf[index] = '#'; index++;
@@ -220,9 +233,9 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
 
 int onc_to_string(coord place, char *buf, int index){
   buf[index] = '('; index++;
-  index = ptr_to_string(AT(place).car, buf, index, 1);
+  index = ptr_to_string(AT(place).car, buf, index, AT(place).locked, 1);
   buf[index] = ' '; index++;
-  index = ptr_to_string(AT(place).cdr, buf, index, 0);
+  index = ptr_to_string(AT(place).cdr, buf, index, AT(place).locked, 0);
   buf[index] = ')'; index++;
   buf[index] = '\0';
   return index;
@@ -304,7 +317,7 @@ void run(coord place){
     case LOCAL:
       COORD_OF_PTR(c1, AT(place).car);
       switch(AT(c1).car.hdr){
-      case LAMBDA: app_abs(place); break;
+      case LAMBDA: if(eval_p(place)) app_abs(place); break;
       case UNPACK:
         AT(place).car = replace_ptr(AT(place).car, AT(c1).cdr);
         break;

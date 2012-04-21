@@ -50,13 +50,14 @@ int count(int type){
   return count;
 }
 
-void show_ptr(ptr ptr){
+void show_ptr(ptr ptr, int locked){
   switch(ptr.hdr){
   case NIL:     printf("_"); break;
   case LOCAL:   printf("^"); break;
   case INTEGER: printf("i"); break;
   case SYMBOL:  printf("s"); break;
-  case LAMBDA:  printf("l"); break;
+  case LAMBDA:
+    if(locked) printf("l"); else printf("L"); break;
   case PRIMOPT: printf("#"); break;
   case CURRIED: printf("@"); break;
   case UNPACK:  printf("~"); break;
@@ -100,10 +101,10 @@ void show_world(){
         else{
           tmp = world[j][i];
           if(tmp.refs > 0) {
-            show_ptr(tmp.car);
+            show_ptr(tmp.car, tmp.locked);
             if(tmp.mcar.hdr == NIL) printf("%d", tmp.refs);
             else printf("I");
-            show_ptr(tmp.cdr);
+            show_ptr(tmp.cdr, tmp.locked);
           } else printf("   ");
         }
       }
@@ -114,9 +115,9 @@ void show_world(){
   }
 }
 
-int string_to_onc(coord place, char *buf){
-  debug(2, "string_to_onc((%d,%d), %s)\n",
-        place.x, place.y, buf);
+int string_to_onc(coord place, int locked, char *buf){
+  debug(2, "string_to_onc[%d]((%d,%d), %s)\n",
+        locked, place.x, place.y, buf);
   int i, car_p, parend, index;
   index = 0;
   car_p = TRUE;
@@ -137,7 +138,7 @@ int string_to_onc(coord place, char *buf){
         for(i=index;i<parend;i++) interum[(i-index)] = buf[i];
         interum[parend-index] = '\0';
         debug(2, "substring %s\n", interum);
-        string_to_onc(t1, interum);
+        string_to_onc(t1, locked, interum);
         index = parend+1;
       } else {
         CHAR_TO_PTR(place, AT(place).car, buf[index]);
@@ -317,7 +318,7 @@ void step(coord place){
 
 void run_expr(char *expr, coord place){
   clear_world();
-  string_to_onc(place, expr);
+  string_to_onc(place, FALSE, expr);
   show_all(place);
   run_down(place);
   place.x = place.y = 4;

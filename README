@@ -25,7 +25,7 @@ The main design goals of this effort are
 Composed of an integer reference counter and four pointers.
 :         an ONC
 : +-------------------+
-: |       #refs       |
+: |  #refs  | locked  |
 : +---------+---------+
 : |  mcar   |  car    |
 : |         |         |
@@ -36,6 +36,8 @@ Composed of an integer reference counter and four pointers.
 
 Oncs perform the following actions.
 - reference count maintenance, an onc with ref≡0 is free
+- track if executable under the current order of evaluation e.g.,
+  call-by-name, call-by-value or full Β-reduction.
 - propagate a λ-application message through self
 - replace self with a value or ONC
 - find nearby free space for new oncs

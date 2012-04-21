@@ -19,11 +19,11 @@ int debug(int level, const char *format, ...);
 int queue_population();
 int population();
 int count(int type);
-void show_ptr(ptr ptr);
+void show_ptr(ptr ptr, int locked);
 void show_queue();
 void show_world();
 void get_expr(coord place, char *buf, int index);
-int string_to_onc(coord place, char *buf);
+int string_to_onc(coord place, int locked, char *buf);
 int close_paren(char *buf, int index);
 void show_all(coord place);
 void run_down(coord place);
@@ -56,6 +56,7 @@ void step(coord place);
 #define CHAR_TO_PTR(place, where, char)                         \
   debug(2, "char_to_ptr((%d,%d), %c)\n",                        \
         place.x, place.y, char);                                \
+  AT(place).locked = locked;                                    \
   switch(char){                                                 \
   case '\0':                                                    \
     debug(2, "\tNIL:(%d,%d)\n", place.x, place.y);              \
@@ -70,6 +71,7 @@ void step(coord place);
     where.hdr = LAMBDA;                                         \
     index++;                                                    \
     where.car = read_int(buf, &index);                          \
+    locked = TRUE;                                              \
     break;                                                      \
   case 'S': /* SYMBOL */                                        \
     debug(2, "\tSYMBOL:(%d,%d)\n", place.x, place.y);           \

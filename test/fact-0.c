@@ -8,7 +8,7 @@ int main(int argc, char *argv[]){
   char f[] = "#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))";
 
   /* Factorial */
-  string_to_onc(left, f);
+  string_to_onc(left, FALSE, f);
 
   /* list holding factorial and argument */
   place = open_space(left);

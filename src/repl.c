@@ -76,7 +76,7 @@ int main(int argc, char *argv[]){
       printf("%s\n", input);
       break;
     case OTHER:
-      string_to_onc(place, input);
+      string_to_onc(place, FALSE, input);
       onc_to_string(place, input, 0);
       printf("%s\n", input);
       break;

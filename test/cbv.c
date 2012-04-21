@@ -6,7 +6,7 @@ int main(int argc, char *argv[]){
   place.x = 4; place.y = 4;
 
   char expr[] = "(#L0 #S0)((#L0 #S0) (#L1 (#L0 #S0) #S1))";
-  string_to_onc(place, expr);
+  string_to_onc(place, FALSE, expr);
   show_all(place);
   fix(place);
   onc_to_string(place, expr, 0);
@@ -28,4 +28,14 @@ int main(int argc, char *argv[]){
  * #S0 -> (#L1 (#L0 #S0) #S1)
  * #S0 -> (#L1 #S0 -> #S1)
  * (#L1 (#S0))
+ *
+ * Should be
+ * ---------
+ * (#L0 #S0) ((#L0 #S0) (#L1 (#L0 #S0) #S1))
+ * (#L0 #S0) (#L1 (#L0 #S0) #S1)
+ * (#L1 (#L0 #S0) #S1)
+ *
+ * because can only evaluate when
+ * - outside of a lambda-expression
+ * - the argument is a value
  */
