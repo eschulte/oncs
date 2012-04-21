@@ -284,7 +284,6 @@ void app_abs(coord place){
     COORD_OF_PTR(c_cdr, AT(place).cdr);
   /* don't apply to non values -- call-by-value */
   if(value_p(AT(place).cdr)){
-    AT(c_car).locked = FALSE;
     onc_to_string(place, str, 0);
     DEBUG3("app_abs(%d,%d) %s\n", place.x, place.y, str);
     /* 1. make new message */

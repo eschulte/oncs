@@ -38,6 +38,16 @@ For now lets look at call by value.
 : ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 #S0 (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) (((#S0 #S0 (( #S1) #S2))))) #S2))))) 2))
 : ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 ((((#S0 #S0 (( #S1) #S2))))) (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) (((#S0 ((((#S0 #S0 (( #S1) #S2))))) (( #S1) #S2))))) #S2))))) 2))
 
+** extra field of an Onc, or a field of a lambda expression
+currently a lambda expression holds something like
+:   +-----------------------+
+:   | λ | int id | empty    |
+:   +-----------------------+
+perhaps the could be replaced with
+:   +-----------------------+
+:   | λ | int id | locked   |
+:   +-----------------------+
+
 * play with y-comb in scheme
 #+begin_src scheme
   ;; most naive, just duplicate function and pass it to itself
