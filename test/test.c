@@ -56,7 +56,10 @@ void show_ptr(ptr ptr){
   case LOCAL:   printf("^"); break;
   case INTEGER: printf("i"); break;
   case SYMBOL:  printf("s"); break;
-  case LAMBDA:  printf("l"); break;
+  case LAMBDA: /* show lock status for lambda */
+    if(ptr.cdr) printf("l");
+    else        printf("L");
+    break;
   case PRIMOPT: printf("#"); break;
   case CURRIED: printf("@"); break;
   case UNPACK:  printf("~"); break;
@@ -114,15 +117,17 @@ void show_world(){
   }
 }
 
-int string_to_onc(coord place, char *buf){
-  debug(2, "string_to_onc((%d,%d), %s)\n",
-        place.x, place.y, buf);
-  int i, car_p, parend, index;
+int string_to_onc(coord place, int locked, char *buf){
+  debug(2, "string_to_onc[%d]((%d,%d), %s)\n",
+        locked, place.x, place.y, buf);
+  int i, car_p, parend, index, lock_child;
   index = 0;
+  lock_child = FALSE;
   car_p = TRUE;
   coord t1;
   char *interum = buf;
   while(buf[index] != '\0') {
+    if(lock_child) locked = TRUE;
     while((buf[index] == '#') || (buf[index] == ' ')) index++;
     AT(place).refs = 1;
     if(car_p){
@@ -137,7 +142,7 @@ int string_to_onc(coord place, char *buf){
         for(i=index;i<parend;i++) interum[(i-index)] = buf[i];
         interum[parend-index] = '\0';
         debug(2, "substring %s\n", interum);
-        string_to_onc(t1, interum);
+        string_to_onc(t1, locked, interum);
         index = parend+1;
       } else {
         CHAR_TO_PTR(place, AT(place).car, buf[index]);
@@ -317,7 +322,7 @@ void step(coord place){
 
 void run_expr(char *expr, coord place){
   clear_world();
-  string_to_onc(place, expr);
+  string_to_onc(place, FALSE, expr);
   show_all(place);
   run_down(place);
   place.x = place.y = 4;
@@ -328,7 +333,9 @@ void run_expr(char *expr, coord place){
 int read_int(char *buf, int *index){
   int result, tmp;
   result = 0;
-  while(0 <= (tmp = (buf[(*index)] - '0')) && tmp <= 9) {
+  while(buf[(*index)] &&
+        0 <= (tmp = (buf[(*index)] - '0')) &&
+        tmp <= 9) {
     result = (result * 10) + tmp;
     (*index)++;
     tmp = (buf[(*index)] - '0');

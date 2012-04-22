@@ -146,8 +146,25 @@ ptr duplicate_ptr(ptr ptr, int refs){
 }
 
 int value_p(ptr ptr){
-  if(ptr.hdr == NIL) return 0;
-  else               return 1;
+  coord place;
+  switch(ptr.hdr){
+  case NIL: return FALSE; break;
+  case LOCAL:
+    /* lambda abstraction is value if can't be applied */
+    COORD_OF_PTR(place, ptr);
+    DEBUG2("-> (%d,%d)", place.x, place.y);
+    if(AT(place).car.hdr == LAMBDA){
+      DEBUG3(".cdr(%d,%d,%d) ",
+             AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr);
+      return ! value_p(AT(place).cdr);
+    } else {
+      DEBUG3(".car(%d,%d,%d) ",
+             AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr);
+      return value_p(AT(place).car);
+    }
+    break;
+  default: return TRUE; break;
+  }
 }
 
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
@@ -168,7 +185,9 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
     return index;
   case LAMBDA:
     buf[index] = '#'; index++;
-    buf[index] = 'L'; index++;
+    if(ptr.cdr) buf[index] = 'l';
+    else        buf[index] = 'L';
+    index++;
   case SYMBOL:
     if(ptr.hdr != LAMBDA){
       buf[index] = '#'; index++;
@@ -233,8 +252,13 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
   switch(ptr.hdr){
   case NIL:
   case INTEGER:
-  case BOOLEAN:
-  case LAMBDA: break;
+  case BOOLEAN: break;
+  case LAMBDA:
+    /* lock lambda if message is locked */
+    DEBUG3("L%d locking %d->%d\n",
+           ptr.car, ptr.cdr, l_msg.mcar.cdr);
+    ptr.cdr = l_msg.mcar.cdr;
+    break;
   case SYMBOL:
     if(l_msg.mcar.car == ptr.car)
       ptr = duplicate_ptr(l_msg.mcdr, refs);
@@ -251,6 +275,7 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
 }
 
 void app_abs(coord place){
+  int v;
   char str[4000];
   msg msg;
   coord c_car, c_cdr;
@@ -265,7 +290,10 @@ void app_abs(coord place){
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
   /* don't apply to non values -- call-by-value */
-  if(value_p(AT(place).cdr)){
+  DEBUG2("(app_abs) value_p(AT(%d,%d).cdr) ", place.x, place.y);
+  v = value_p(AT(place).cdr);
+  DEBUG1("-> %d\n", v);
+  if(v){
     onc_to_string(place, str, 0);
     DEBUG3("app_abs(%d,%d) %s\n", place.x, place.y, str);
     /* 1. make new message */
@@ -304,7 +332,7 @@ void run(coord place){
     case LOCAL:
       COORD_OF_PTR(c1, AT(place).car);
       switch(AT(c1).car.hdr){
-      case LAMBDA: app_abs(place); break;
+      case LAMBDA: if(! AT(c1).car.cdr) app_abs(place); break;
       case UNPACK:
         AT(place).car = replace_ptr(AT(place).car, AT(c1).cdr);
         break;
@@ -360,8 +388,10 @@ void run(coord place){
     if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(c2, AT(place).mcdr);
     AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
     /* don't descend down shadowing lambdas */
-    if(! (AT(place).car.hdr == LAMBDA &&
-          AT(place).car.car == msg.mcar.car)) {
+    if(AT(place).car.hdr != LAMBDA ||
+       AT(place).car.car != msg.mcar.car){
+      /* lock the lambda msg when passing a lambda */
+      if(AT(place).car.hdr == LAMBDA) msg.mcar.cdr = TRUE;
       copy_ptr(msg.mcdr);
       AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
     }

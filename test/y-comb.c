@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
     "       (#L1 (#S0 (#L2 ((#S1 #S1) #S2)))))"
     "  (#L3 (#L4 ((= 0 #S4) 1 (* #S4 (#S3 (- 1 #S4)))))))"
     " 2)";
-  string_to_onc(place, expr);
+  string_to_onc(place, FALSE, expr);
   show_all(place);
   fix(place);
 

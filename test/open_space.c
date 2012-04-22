@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
   SYMBOL_SET(new, car, 32);
 
   /* fill up the world */
-  for(i=0;i<97;i++){
+  for(i=0;i<(SIZE*SIZE-3);i++){
     new = open_space(place);
     AT(new).refs = 1;
     debug(1, "\n");

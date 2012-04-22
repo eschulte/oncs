@@ -19,6 +19,19 @@ http://homepages.inf.ed.ac.uk/wadler/topics/call-by-need.html
 
 For now lets look at call by value.
 
+** extra field of an Onc, or a field of a lambda expression
+currently a lambda expression holds something like
+:   +-----------------------+
+:   | λ | int id | empty    |
+:   +-----------------------+
+perhaps the could be replaced with
+:   +-----------------------+
+:   | λ | int id | locked   |
+:   +-----------------------+
+
+This way λ-messages propagating through ONC structures could carry
+updating locking information down the structure.
+
 ** application abstractions
 : app_abs(4,0) ((#L1 (#S0 (#L2 ((#S1 #S1) #S2)))) (#L1 (#S0 (#L2 ((#S1 #S1) #S2)))))
 : app_abs(4,2) ((#L0 ((#S0 (#L2 ((#S1 #S1) #S2))))) (#L3 (#L4 ((= 0 #S4) 1 (* #S4 (#S3 (- 1 #S4)))))))
@@ -37,16 +50,6 @@ For now lets look at call by value.
 : ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 #S0 (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) ((#S0 #S0 (( #S1) #S2)))) #S2))))) 2))
 : ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 #S0 (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) (((#S0 #S0 (( #S1) #S2))))) #S2))))) 2))
 : ((((((((((=0 #S4) 1 (* #S4 (#S3 (-1 #S4)))))) #L2 ((((((((#S0 ((((#S0 #S0 (( #S1) #S2))))) (( #S1) #S2))))) #L2 ((#S1 #S1) #S2))) (((#S0 ((((#S0 #S0 (( #S1) #S2))))) (( #S1) #S2))))) #S2))))) 2))
-
-** extra field of an Onc, or a field of a lambda expression
-currently a lambda expression holds something like
-:   +-----------------------+
-:   | λ | int id | empty    |
-:   +-----------------------+
-perhaps the could be replaced with
-:   +-----------------------+
-:   | λ | int id | locked   |
-:   +-----------------------+
 
 * play with y-comb in scheme
 #+begin_src scheme

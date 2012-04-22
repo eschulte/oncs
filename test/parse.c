@@ -5,7 +5,7 @@ void insert_into_world(coord place, char *buf){
   clear_world();
   place.x = place.y = 3;
   debug(1, "exp:%s\n", buf);
-  string_to_onc(place, buf);
+  string_to_onc(place, FALSE, buf);
   show_all(place);
 }
 
