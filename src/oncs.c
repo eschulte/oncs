@@ -190,7 +190,7 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   coord coord;
   switch(ptr.hdr){
   case UNPACK: buf[index] = '~'; index++; break;
-  case NIL: break;
+  case NIL: index--; break;
   case LOCAL:
     coord.x = ptr.car; coord.y = ptr.cdr;
     if(car_p) { buf[index] = '('; index++; }
@@ -254,11 +254,9 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
 }
 
 int onc_to_string(coord place, char *buf, int index){
-  buf[index] = '('; index++;
   index = ptr_to_string(AT(place).car, buf, index, 1);
   buf[index] = ' '; index++;
   index = ptr_to_string(AT(place).cdr, buf, index, 0);
-  buf[index] = ')'; index++;
   buf[index] = '\0';
   return index;
 }
