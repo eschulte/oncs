@@ -66,7 +66,8 @@ void step(coord place);
     where.hdr = UNPACK;                                         \
     index++;                                                    \
     break;                                                      \
-  case 'L': /* LAMBDA */                                        \
+  case 'l': /* LAMBDA */                                        \
+  case 'L':                                                     \
     debug(2, "\tLAMBDA:(%d,%d)\n", place.x, place.y);           \
     where.hdr = LAMBDA;                                         \
     index++;                                                    \

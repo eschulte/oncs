@@ -19,8 +19,10 @@ TESTS = \
 	test/prim-cond	\
 	test/cbv	\
 	test/fact-0	\
-	test/y-comb	\
-	test/examp-1
+	test/examp-1	\
+	test/y-comb-0
+#	test/y-comb-1
+#	test/y-comb-2
 # 	test/l-promote
 
 all: vm repl

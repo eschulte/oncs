@@ -273,19 +273,23 @@ void run_at(int x, int y){
   run(coord);
 }
 
+void run_all(){
+  int i, j;
+  for(i=0;i<SIZE;i++)
+    for(j=0;j<SIZE;j++)
+      if(world[i][j].refs > 0)
+        run_at(i, j);
+}
+
 void fix(coord place){
   char buf[EXPR_BUF_SIZE];
-  int i, j;
   unsigned long hash_old, hash_new;
   hash_old = hash_new = 0;
   debug(2, "running to a fixed point\n");
   do{
     if((queue_population() == 0) ||
        (! run_queue()))
-      for(i=0;i<SIZE;i++)
-        for(j=0;j<SIZE;j++)
-          if(world[i][j].refs > 0)
-            run_at(i, j);
+      run_all();
     show_both();
     onc_to_string(place, buf, 0);
     debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
