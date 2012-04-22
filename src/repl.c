@@ -12,6 +12,7 @@
 #define HELP    6
 #define STEP    7
 #define PRINT   8
+#define QUEUE   9
 static struct lookup_table { char *string; int code; char *doc;
 } codes[] = {
   {"quit", QUIT, "quit the repl"},
@@ -21,7 +22,8 @@ static struct lookup_table { char *string; int code; char *doc;
   {"verbose", VERBOSE, "toggle verbose execution"},
   {"help", HELP, "show this help message"},
   {"step", STEP, "run a single step"},
-  {"print", PRINT, "print a point in the world"}
+  {"print", PRINT, "print a point in the world"},
+  {"queue", QUEUE, "run down the queue"}
 };
 
 int code(char *string);
@@ -106,6 +108,9 @@ int main(int argc, char *argv[]){
              AT(print).cdr.hdr,
              AT(print).cdr.car,
              AT(print).cdr.cdr);
+      break;
+    case QUEUE:
+      while(queue_population() > 0) run_queue();
       break;
     case OTHER:
       string_to_onc(place, FALSE, input);

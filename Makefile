@@ -20,7 +20,7 @@ TESTS = \
 	test/cbv	\
 	test/fact-0	\
 	test/examp-1	\
-	test/y-comb-0
+	test/examp-2
 #	test/y-comb-1
 #	test/y-comb-2
 # 	test/l-promote

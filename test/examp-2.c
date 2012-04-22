@@ -5,7 +5,7 @@ int main(int argc, char *argv[]){
   coord place;
   place.x = 4; place.y = 4;
 
-  char expr[] = "(#L1 (#S0 #S1)) (#L1 (#S0 #S1))";
+  char expr[] = "(#L1 (#S0 #S1)) (78)";
   string_to_onc(place, FALSE, expr);
   show_all(place);
   fix(place);
@@ -21,3 +21,10 @@ int main(int argc, char *argv[]){
   /* return indicates success or failure */
   return fail_p;
 }
+
+/* Possible Examples
+ * -----------------
+ *
+ * (#L1 (#S0 #S1)) (#L1 (#S0 #S1))
+ * 
+ */
