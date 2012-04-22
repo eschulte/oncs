@@ -162,21 +162,32 @@ ptr duplicate_ptr(ptr ptr, int refs){
 }
 
 int value_p(ptr ptr){
-  coord place;
+  coord place, place2;
   switch(ptr.hdr){
   case NIL: return FALSE; break;
   case LOCAL:
     /* lambda abstraction is value if can't be applied */
     COORD_OF_PTR(place, ptr);
     DEBUG2("-> (%d,%d)", place.x, place.y);
-    if(AT(place).car.hdr == LAMBDA){
+    switch(AT(place).car.hdr){
+    case LAMBDA:
       DEBUG3(".cdr(%d,%d,%d) ",
              AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr);
       return ! value_p(AT(place).cdr);
-    } else {
+      break;
+    case LOCAL:
+      /* if lambda pointing to nil return TRUE */
+      if(AT(place).cdr.hdr == NIL){
+        COORD_OF_PTR(place2, AT(place).car);
+        if(AT(place2).car.hdr == LAMBDA){
+          return TRUE; break;
+        }
+      }
+    default:
       DEBUG3(".car(%d,%d,%d) ",
              AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr);
       return value_p(AT(place).car);
+      break;
     }
     break;
   default: return TRUE; break;

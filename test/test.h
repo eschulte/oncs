@@ -29,6 +29,7 @@ void show_all(coord place);
 void run_down(coord place);
 void run_expr(char *expr, coord place);
 int read_int(char *buf, int *index);
+void expr_to_expr(char *expr);
 void simple_app(coord place);
 
 /* hashing functions from http://www.cse.yorku.ca/~oz/hash.html */

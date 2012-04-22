@@ -343,6 +343,16 @@ int read_int(char *buf, int *index){
   return result;
 }
 
+void expr_to_expr(char *expr){
+  coord place;
+  place.x = SIZE/2; place.y = SIZE/2;
+  clear_world();
+  string_to_onc(place, FALSE, expr);
+  show_all(place);
+  fix(place);
+  onc_to_string(place, expr, 0);
+}
+
 void simple_app(coord place){
   coord tmp1, tmp2;
   /* setup world: ((lambda x (x x)) (1 2 3)) */
