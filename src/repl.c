@@ -11,6 +11,7 @@
 #define VERBOSE 5
 #define HELP    6
 #define STEP    7
+#define PRINT   8
 static struct lookup_table { char *string; int code; char *doc;
 } codes[] = {
   {"quit", QUIT, "quit the repl"},
@@ -19,17 +20,20 @@ static struct lookup_table { char *string; int code; char *doc;
   {"clear", CLEAR, "clear the ONC world"},
   {"verbose", VERBOSE, "toggle verbose execution"},
   {"help", HELP, "show this help message"},
-  {"step", STEP, "run a single step"}
+  {"step", STEP, "run a single step"},
+  {"print", PRINT, "print a point in the world"}
 };
 
 int code(char *string);
 
 int main(int argc, char *argv[]){
   int mid=SIZE/2;
-  coord place;
+  coord place, print;
   place.x = mid; place.y = mid;
   char* input;
   static char* shell_prompt = "> ";
+  static char* x_prompt = "x: ";
+  static char* y_prompt = "y: ";
   int running=1;
   int i;
   do{
@@ -74,6 +78,34 @@ int main(int argc, char *argv[]){
       step(place);
       onc_to_string(place, input, 0);
       printf("%s\n", input);
+      break;
+    case PRINT:
+      input = readline(x_prompt);
+      i = 0; print.x = read_int(input, &i);
+      input = readline(y_prompt);
+      i = 0; print.y = read_int(input, &i);
+      printf("world[%d,%d].refs -> %d\n",
+             print.x, print.y, AT(print).refs);
+      printf("world[%d,%d].mcar -> (%d,%d,%d)\n",
+             print.x, print.y,
+             AT(print).mcar.hdr,
+             AT(print).mcar.car,
+             AT(print).mcar.cdr);
+      printf("world[%d,%d].mcdr -> (%d,%d,%d)\n",
+             print.x, print.y,
+             AT(print).mcdr.hdr,
+             AT(print).mcdr.car,
+             AT(print).mcdr.cdr);
+      printf("world[%d,%d].car -> (%d,%d,%d)\n",
+             print.x, print.y,
+             AT(print).car.hdr,
+             AT(print).car.car,
+             AT(print).car.cdr);
+      printf("world[%d,%d].cdr -> (%d,%d,%d)\n",
+             print.x, print.y,
+             AT(print).cdr.hdr,
+             AT(print).cdr.car,
+             AT(print).cdr.cdr);
       break;
     case OTHER:
       string_to_onc(place, input);
