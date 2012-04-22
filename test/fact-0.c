@@ -5,6 +5,7 @@ int main(int argc, char *argv[]){
   coord place, left, right;
   left.x = 4; left.y = 4;
 
+  /* (#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))) 0 */
   char f[] = "#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))";
 
   /* Factorial */
@@ -18,12 +19,14 @@ int main(int argc, char *argv[]){
 
   show_all(place);
   fix(place);
+  onc_to_string(place, f, 0);
+  SHOULD(strcmp(f, "(((1 ) ) )"));
 
-  SHOULD(count(INTEGER) == 1);
-  SHOULD(count(LAMBDA) == 0);
-  SHOULD(count(SYMBOL) == 0);
-  SHOULD(AT(place).cdr.hdr == INTEGER);
-  SHOULD(AT(place).cdr.car == 1);
+  /* SHOULD(count(INTEGER) == 1); */
+  /* SHOULD(count(LAMBDA) == 0); */
+  /* SHOULD(count(SYMBOL) == 0); */
+  /* SHOULD(AT(place).cdr.hdr == INTEGER); */
+  /* SHOULD(AT(place).cdr.car == 1); */
 
   /* return indicates success or failure */
   return fail_p;

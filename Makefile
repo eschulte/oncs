@@ -17,10 +17,10 @@ TESTS = \
 	test/cond	\
 	test/prim-opt	\
 	test/prim-cond	\
-	test/cbv
-#	test/l-promote	\
-	test/fact-0	\
-	test/y-comb
+	test/cbv	\
+	test/fact-0
+#	test/y-comb
+# 	test/l-promote
 
 all: vm repl
 
