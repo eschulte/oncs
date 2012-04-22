@@ -348,14 +348,6 @@ void app_abs(coord place){
 }
 
 void run(coord place){
-  if(place.x == 3 && place.y == 2){
-    printf("=====%d=====\n(%d,%d,%d)(%d,%d,%d)\n(%d,%d,%d)(%d,%d,%d)\n",
-           AT(place).refs,
-           AT(place).mcar.hdr, AT(place).mcar.car, AT(place).mcar.cdr,
-           AT(place).mcdr.hdr, AT(place).mcdr.car, AT(place).mcdr.cdr,
-           AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr,
-           AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr);
-  }
   msg msg;
   coord c1, c2;
   int i1;
@@ -418,19 +410,13 @@ void run(coord place){
     break;
   case LAMBDA:                  /* perform lambda application */
     msg.mcar = AT(place).mcar; msg.mcdr = AT(place).mcdr;
-    printf("(%d,%d)->lambda:%d->(%d,%d,%d)\n",
-           place.x, place.y,
-           AT(place).mcar.car,
-           AT(place).mcdr.hdr, AT(place).mcdr.car, AT(place).mcdr.cdr);
     if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(c2, AT(place).mcdr);
-    printf("to car\n");
     AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
     /* don't descend down shadowing lambdas */
     if(AT(place).car.hdr != LAMBDA ||
        AT(place).car.car != msg.mcar.car){
       /* lock the lambda msg when passing a lambda */
       if(AT(place).car.hdr == LAMBDA) msg.mcar.cdr = TRUE;
-      printf("to cdr\n");
       copy_ptr(msg.mcdr);
       AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
     }
