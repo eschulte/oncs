@@ -106,7 +106,8 @@ extern int qbeg, qend;
 void enqueue(msg msg);
 msg dequeue();
 
-/* set all ref counters to 0 clearing out the world */
+/* clear spaces and whole worlds */
+void clear_place(coord place);
 void clear_world();
 
 /* forcefully empty the queue */

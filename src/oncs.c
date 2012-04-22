@@ -41,13 +41,29 @@ msg dequeue(){
   } else ERROR("queue underflow");
 }
 
+void clear_place(coord place){
+  AT(place).refs = 0;
+  AT(place).mcar.hdr = 0;
+  AT(place).mcar.car = 0;
+  AT(place).mcar.cdr = 0;
+  AT(place).mcdr.hdr = 0;
+  AT(place).mcdr.car = 0;
+  AT(place).mcdr.cdr = 0;
+  AT(place).car.hdr = 0;
+  AT(place).car.car = 0;
+  AT(place).car.cdr = 0;
+  AT(place).cdr.hdr = 0;
+  AT(place).cdr.car = 0;
+  AT(place).cdr.cdr = 0;
+}
+
 void clear_world(){
   int i,j;
+  coord place;
   for(i=0;i<SIZE;i++)
     for(j=0;j<SIZE;j++) {
+      place.x = i; place.y = j;
       world[i][j].refs = 0;
-      /* world[i][j].car.hdr = 0; */
-      /* world[i][j].cdr.hdr = 0; */
     }
 }
 
@@ -78,7 +94,7 @@ coord open_space(coord place){
     if (AT(place).refs == 0) break;
   } while (tried <= SIZE*SIZE);
   if (tried >= SIZE*SIZE) { ERROR("exhausted world"); }
-  else { return place; }
+  else { clear_place(place); return place; }
 }
 
 int run_queue(){
