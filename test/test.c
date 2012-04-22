@@ -97,9 +97,9 @@ void show_world(){
       /* index labels */
       if(i<0){
         if(j<0) printf("  ");
-        else    printf(" %d ", j);
+        else    printf(" %2d", j);
       } else {
-        if(j<0) printf("%d ", i);
+        if(j<0) printf("%2d ", i);
         else{
           tmp = world[j][i];
           if(tmp.refs > 0) {
