@@ -1,5 +1,11 @@
 # -*- mode:org -*-
 
+* TODO cleanup leftover lambdas in symbols
+[[file:test/cbv.c::/*%20TODO:%20Need%20to%20cleanup%202-each%20extra%20lambdas%20and%20symbols%20*/][file:test/cbv.c::/* TODO: Need to cleanup 2-each extra lambdas and symbols */]]
+
+* TODO ensure that free variables don't clash
+variable renaming on application may not be implemented/working
+
 * DONE lambdas are /evaporating/ through application to nil
 Given that we're using =nil= for the ends of lists, we need to keep
 lambdas from applying themselves to =nil= so they don't evaporate.
@@ -19,7 +25,7 @@ http://homepages.inf.ed.ac.uk/wadler/topics/call-by-need.html
 
 For now lets look at call by value.
 
-** extra field of an Onc, or a field of a lambda expression
+** DONE use the cdr of lambda pointers to track locking information
 currently a lambda expression holds something like
 :   +-----------------------+
 :   | λ | int id | empty    |

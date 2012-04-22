@@ -41,6 +41,15 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr1");
 
+  /* TODO: Ensure free variables are renamed on application */
+  /* char expr2[] = "(#L0 #S0)((#L0 #S0)(#L1 (#L0 #S0) #S1))"; */
+  /* do_run(expr2); */
+  /* debug(2, "expr2->'%s' => %d\n", expr2); */
+  /* SHOULD(strcmp(expr2, */
+  /*               "((((((#L1 (#l0 #S0 ) #S1 ) ) ) ) ) )") == 0); */
+
+  /* if(fail_p) ERROR("failed expr2"); */
+
   /* return indicates success or failure */
   return fail_p;
 }
