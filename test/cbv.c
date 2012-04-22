@@ -24,20 +24,12 @@ int main(int argc, char *argv[]){
   do_run(expr1);
   SHOULD(strcmp(expr1, "(((((#L1 (#l0 #S0 ) #S1 ) ) ) ) )") == 0);
 
-  /* TODO: Need to cleanup 2-each extra lambdas and symbols */
-  /* debug(2, "%d lambdas\n", count(LAMBDA)); */ /* => 4 */
-  /* SHOULD(count(LAMBDA) == 2); */
-  /* debug(2, "%d symbols\n", count(SYMBOL)); */ /* => 4 */
-  /* SHOULD(count(SYMBOL) == 2); */
+  debug(2, "%d lambdas\n", count(LAMBDA));
+  SHOULD(count(LAMBDA) == 2);
+  debug(2, "%d symbols\n", count(SYMBOL));
+  SHOULD(count(SYMBOL) == 2);
 
   if(fail_p) ERROR("failed expr1");
-
-  char expr2[] = "(#L0 #S0) ((#L0 #S0)(#L1 (#L0 #S0) #S1))";
-  do_run(expr2);
-  debug(2, "expr2->'%s' => %d\n", expr2);
-  SHOULD(strcmp(expr2, "(((((#L1 (#l0 #S0 ) #S1 ) ) ) ) )") == 0);
-
-  if(fail_p) ERROR("failed expr2");
 
   /* return indicates success or failure */
   return fail_p;
