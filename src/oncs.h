@@ -84,7 +84,7 @@
   }
 
 /* utility macros */
-#define DEBUG_P 1
+#define DEBUG_P 0
 #define DEBUG(fmt) if(DEBUG_P) printf(fmt);
 #define DEBUG1(fmt, x) if(DEBUG_P) printf(fmt, x);
 #define DEBUG2(fmt, x, y) if(DEBUG_P) printf(fmt, x, y);

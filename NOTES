@@ -1,7 +1,7 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* TODO ensure that referenced variables are never deleted
+* DONE ensure that referenced variables are never deleted
 Somewhere there are poorly interleaved reference messages.
 
 ** Walking through file:test/examp-2.c execution with =gdb=.
