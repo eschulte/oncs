@@ -126,7 +126,8 @@ ptr copy_ptr(ptr ptr){
   coord temp;
   if(ptr.hdr == LOCAL){
     COORD_OF_PTR(temp, ptr);
-    DEBUG("update_ref_msg from copy_ptr\n");
+    DEBUG2("update_ref_msg(%d,%d) from copy_ptr\n",
+           temp.x, temp.y);
     update_ref_msg(temp, 1);
   }
   return ptr;
@@ -136,7 +137,8 @@ ptr delete_ptr(ptr ptr){
   coord temp;
   if(ptr.hdr == LOCAL){
     COORD_OF_PTR(temp, ptr);
-    DEBUG("update_ref_msg from delete_ptr\n");
+    DEBUG2("update_ref_msg(%d,%d) from delete_ptr\n",
+           temp.x, temp.y);
     update_ref_msg(temp, -1);
   }
   return ptr;
@@ -290,6 +292,8 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.coord, ptr);
+    DEBUG2("copy_ptr(%d,%d) from lambda_app\n",
+           l_msg.mcdr.car, l_msg.mcdr.cdr);
     l_msg.mcdr = copy_ptr(l_msg.mcdr);
     DEBUG("enqueue from LAMBDA_APP\n");
     enqueue(l_msg);
@@ -324,13 +328,24 @@ void app_abs(coord place){
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */
+    DEBUG2("copy_ptr(%d,%d) from app_abs_1\n",
+           AT(c_car).car, AT(c_car).cdr);
     msg.mcar = copy_ptr(AT(c_car).car);
     if(AT(place).cdr.hdr == LOCAL){
       /* 3. copy a to msg.cdr */
+      DEBUG2("c_cdr -> (%d,%d)\n", c_cdr.x, c_cdr.y);
+      DEBUG2("copy_ptr(%d,%d) from app_abs_2\n",
+             AT(c_cdr).car.car, AT(c_cdr).car.cdr);
+      /* TODO: seems I should be duplicating the whole pair */
+      /* msg.mcdr = copy_ptr(AT(place).cdr); */
       msg.mcdr = copy_ptr(AT(c_cdr).car);
+      printf("msg.mcdr -> (%d,%d,%d)\n",
+             msg.mcdr.hdr, msg.mcdr.car, msg.mcdr.cdr);
       /* 4. replace 2 with 4 */
       AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
     } else {
+      DEBUG2("copy_ptr(%d,%d) from app_abs_3\n",
+             AT(place).cdr.car, AT(place).cdr.cdr);
       msg.mcdr = copy_ptr(AT(place).cdr);
       AT(place).cdr.hdr = NIL;
     }
@@ -391,6 +406,8 @@ void run(coord place){
           if(AT(c2).cdr.hdr != NIL)
             ERROR("CURRIED primitive operations take only 1 arg");
           CURRIED_APP(AT(place), AT(c2).car);
+          DEBUG2("update_ref_msg(%d,%d) from curried function\n",
+                 c2.x, c2.y);
           update_ref_msg(c2, -1);
         } else run(c2);
         break;
@@ -417,10 +434,13 @@ void run(coord place){
        AT(place).car.car != msg.mcar.car){
       /* lock the lambda msg when passing a lambda */
       if(AT(place).car.hdr == LAMBDA) msg.mcar.cdr = TRUE;
+      DEBUG2("copy_ptr(%d,%d) from lambda message\n",
+             msg.mcdr.car, msg.mcdr.cdr);
       copy_ptr(msg.mcdr);
       AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
     }
-    DEBUG("update_ref_msg from run:lambda_application\n");
+    DEBUG2("update_ref_msg from run:lambda_application\n",
+           c2.x, c2.y);
     if(AT(place).mcdr.hdr == LOCAL) update_ref_msg(c2, -1);
     break;
   }

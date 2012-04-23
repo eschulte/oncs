@@ -10,7 +10,7 @@ int main(int argc, char *argv[]){
   show_all(place);
   fix(place);
 
-  SHOULD(strcmp(expr, "(#S0 (#L1 (#S0 #S1)))") == 0);
+  SHOULD(strcmp(expr, "(#S0 (78))") == 0);
 
   /* SHOULD(count(INTEGER) == 2); */
   /* SHOULD(count(LAMBDA) == 0); */
