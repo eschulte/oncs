@@ -304,8 +304,6 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
 }
 
 void app_abs(coord place){
-  int v;
-  char str[4000];
   msg msg;
   coord c_car, c_cdr;
   /* setup */
@@ -319,34 +317,20 @@ void app_abs(coord place){
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
   /* don't apply to non values -- call-by-value */
-  DEBUG2("(app_abs) value_p(AT(%d,%d).cdr) ", place.x, place.y);
-  v = value_p(AT(place).cdr);
-  DEBUG1("-> %d\n", v);
-  if(v){
-    onc_to_string(place, str, 0);
-    DEBUG3("app_abs(%d,%d) %s\n", place.x, place.y, str);
+  if(value_p(AT(place).cdr)){
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */
-    DEBUG2("copy_ptr(%d,%d) from app_abs_1\n",
-           AT(c_car).car, AT(c_car).cdr);
     msg.mcar = copy_ptr(AT(c_car).car);
     if(AT(place).cdr.hdr == LOCAL){
       /* 3. copy a to msg.cdr */
-      DEBUG2("c_cdr -> (%d,%d)\n", c_cdr.x, c_cdr.y);
-      /* DEBUG3("copy_ptr(%d,%d,%d) from app_abs_2\n", */
-      /*        AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr); */
-      DEBUG3("copy_ptr(%d,%d,%d) from app_abs_2\n",
-             AT(c_cdr).car.hdr, AT(c_cdr).car.car, AT(c_cdr).car.cdr);
       msg.mcdr = copy_ptr(AT(c_cdr).car);
-      DEBUG3("msg.mcdr -> (%d,%d,%d)\n",
-             msg.mcdr.hdr, msg.mcdr.car, msg.mcdr.cdr);
       /* 4. replace 2 with 4 */
       AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
     } else {
-      DEBUG2("copy_ptr(%d,%d) from app_abs_3\n",
-             AT(place).cdr.car, AT(place).cdr.cdr);
+      /* 3. copy a to msg.cdr */
       msg.mcdr = copy_ptr(AT(place).cdr);
+      /* 4. replace 2 with 4 */
       AT(place).cdr.hdr = NIL;
     }
     /* 5. replace 1 with 9 (or with 9's target) */
