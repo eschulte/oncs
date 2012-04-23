@@ -112,8 +112,14 @@ updating locking information down the structure.
 #+end_src
 
 * should implement a duplicate message type
-* unpack lambdas not just applications of curried functions
+* TODO unpack lambdas not just applications of curried functions
+When replacing the pointer to the lambda application, don't point its
+car at the body and its cdr at the following expressions, rather
+follow the body down to its end, and point /that/ at the following
+expressions.
+
 * variables in the =run= function
+** before
 :                  ((λ1 s1 ...) a b ...)
 : 
 :                     
@@ -132,8 +138,7 @@ updating locking information down the structure.
 :         |        |        |          |        |        |                          
 :         +--------+--------+          +--------+--------+
 
-goes to
-
+** goes to
 :   +--+-+         ((λ1 s1 ...) a b ...)
 :   |λ1|a|---+
 :   +--+-+   |          +------------------------------------------------+
