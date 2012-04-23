@@ -40,6 +40,38 @@ with *one* linked child, decrements the total number of references to
 the target of the lambda message, while it should keep the original
 value.
 
+** Too many reference decrements in file:test/examp-1.c
+Only when evaluated with =fix=, not when run with =run_down=.
+
+Spot (7,6) has it's refs decremented down to 0 while it is referenced
+by (7,7).  Thus, when (7,7) is duplicated into (8,2) or so, an open
+space is requested and (7,6) *happens* to be returned, thus
+overwriting it's value just before it's value is requested.
+
+in line 411 placed
+#+begin_src C
+    if(place.x == 7 && (place.y == 5 || place.y == 6))
+      printf("(%d,%d)->%d\n", place.x, place.y, AT(place).mcar.car);
+#+end_src
+
+#+name: print-some-refs
+#+begin_src sh
+./test/examp-1.test |grep 5|cut -c8-
+#+end_src
+
+#+begin_src emacs-lisp :var messages=print-some-refs
+  (format "%s"
+           (let ((sum 1))
+             (mapcar (lambda (new) (setq sum (+ sum new))) 
+                     messages)))
+#+end_src
+
+ref counts for (7,6)
+: (2 3 4 3 2 3 2 1 2 3 4 3 2 3 2 1 0 1 2 1 0)
+
+ref counts for (7,5)
+: (2 3 4 3 2 1 0 1 2 1 2 3 2 1 2 1 0 -1 -2 -3)
+
 * DONE cleanup leftover lambdas in symbols
 [[file:test/cbv.c::/*%20TODO:%20Need%20to%20cleanup%202-each%20extra%20lambdas%20and%20symbols%20*/][file:test/cbv.c::/* TODO: Need to cleanup 2-each extra lambdas and symbols */]]
 
@@ -112,7 +144,7 @@ updating locking information down the structure.
 #+end_src
 
 * should implement a duplicate message type
-* TODO unpack lambdas not just applications of curried functions
+* DONE unpack lambdas not just applications of curried functions
 When replacing the pointer to the lambda application, don't point its
 car at the body and its cdr at the following expressions, rather
 follow the body down to its end, and point /that/ at the following
@@ -130,7 +162,7 @@ message will /leak/ through to the following expressions.  So either,
    propagate down the structure after the lambda application message,
    ensuring that it is applied immediately after lambda replacement.
 
-** TODO implement option (3) above with "extension" messages
+** DONE implement option (3) above with "extension" messages
 * variables in the =run= function
 ** before
 :                  ((λ1 s1 ...) a b ...)
