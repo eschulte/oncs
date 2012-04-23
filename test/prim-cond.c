@@ -37,12 +37,14 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr3");
 
-  char expr4[] = "((= 0 1) #S1 #S2)";
+  char expr4[] = "(= 0 1) 1 2";
   run_expr(expr4, place);
   fix(place);
+  debug(2, "lambda:%d symbol:%d integer:%d\n",
+        count(LAMBDA), count(SYMBOL), count(INTEGER));
   SHOULD(count(LAMBDA) == 0);
-  SHOULD(count(SYMBOL) == 1);
-  SHOULD(count(INTEGER) == 0);
+  SHOULD(count(SYMBOL) == 0);
+  SHOULD(count(INTEGER) == 1);
 
   if(fail_p) ERROR("failed expr4");
 

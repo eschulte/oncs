@@ -73,14 +73,20 @@
     AT(c1).cdr.cdr = c2.y;                              \
     c1 = open_space(c2);                                \
     AT(c1).refs = 1;                                    \
-    AT(c2).car.hdr = LAMBDA;                            \
-    AT(c2).car.car = FALSE;                             \
-    AT(c2).cdr.hdr = LOCAL;                             \
-    AT(c2).cdr.car = c1.x;                              \
-    AT(c2).cdr.cdr = c1.y;                              \
-    AT(c1).car.hdr = SYMBOL;                            \
-    AT(c1).car.car = i1;                                \
-    AT(c1).cdr.hdr = NIL;                               \
+    AT(c2).car.hdr = LOCAL;                             \
+    AT(c2).car.car = c1.x;                              \
+    AT(c2).car.cdr = c1.y;                              \
+    AT(c2).cdr.hdr = NIL;                               \
+    c2 = open_space(c1);                                \
+    AT(c2).refs = 1;                                    \
+    AT(c1).car.hdr = LAMBDA;                            \
+    AT(c1).car.car = FALSE;                             \
+    AT(c1).cdr.hdr = LOCAL;                             \
+    AT(c1).cdr.car = c2.x;                              \
+    AT(c1).cdr.cdr = c2.y;                              \
+    AT(c2).car.hdr = SYMBOL;                            \
+    AT(c2).car.car = i1;                                \
+    AT(c2).cdr.hdr = NIL;                               \
   }
 
 /* utility macros */

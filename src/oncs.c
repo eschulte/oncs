@@ -354,7 +354,8 @@ void app_abs(coord place){
       AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_car).cdr);
     } else {
       AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
-      AT(place).cdr.hdr = NIL;
+      ptr.hdr = NIL;
+      AT(place).cdr = replace_ptr(AT(place).cdr, ptr);
     }
     /* 5. replace end of 10 with 4 */
     replace_at_end(place, AT(c_cdr).cdr);

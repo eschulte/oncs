@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr2");
 
-  char expr3[] = "(#L1 #L2 #S2) 1 2";
+  char expr3[] = "(#L1 (#L2 #S2)) 1 2";
   run_expr(expr3, place);
   debug(2, "counting integers\n");
   SHOULD(count(INTEGER) == 1);
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
 
   if(fail_p) ERROR("failed expr3");
 
-  char expr4[] = "(#L1 #L2 #S1) (3 4) 8";
+  char expr4[] = "(#L1 (#L2 #S1)) (3 4) 8";
   run_expr(expr4, place);
   place.x = place.y = 4;
   run_down(place);
