@@ -334,12 +334,12 @@ void app_abs(coord place){
     if(AT(place).cdr.hdr == LOCAL){
       /* 3. copy a to msg.cdr */
       DEBUG2("c_cdr -> (%d,%d)\n", c_cdr.x, c_cdr.y);
-      DEBUG2("copy_ptr(%d,%d) from app_abs_2\n",
-             AT(c_cdr).car.car, AT(c_cdr).car.cdr);
-      /* TODO: seems I should be duplicating the whole pair */
-      /* msg.mcdr = copy_ptr(AT(place).cdr); */
+      /* DEBUG3("copy_ptr(%d,%d,%d) from app_abs_2\n", */
+      /*        AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr); */
+      DEBUG3("copy_ptr(%d,%d,%d) from app_abs_2\n",
+             AT(c_cdr).car.hdr, AT(c_cdr).car.car, AT(c_cdr).car.cdr);
       msg.mcdr = copy_ptr(AT(c_cdr).car);
-      printf("msg.mcdr -> (%d,%d,%d)\n",
+      DEBUG3("msg.mcdr -> (%d,%d,%d)\n",
              msg.mcdr.hdr, msg.mcdr.car, msg.mcdr.cdr);
       /* 4. replace 2 with 4 */
       AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
