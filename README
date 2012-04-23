@@ -62,7 +62,10 @@ which hold integer values.
 
 ** Message
 Composed of a coordinate and two pointers.  Messages are passed
-between ONCS and cause ONCS to perform local actions.
+between ONCS and cause ONCS to perform local actions.  No global order
+on messages is required, only that for each particular onc (maybe even
+just for any given sender/receiver pair of oncs), the messages are
+received in the order in which they are sent.
 :        a Message
 : +---------------------+
 : | coord | mcar | mcdr |
