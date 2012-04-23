@@ -118,6 +118,19 @@ car at the body and its cdr at the following expressions, rather
 follow the body down to its end, and point /that/ at the following
 expressions.
 
+Note, if the extension of the end of the body of the lambda expression
+is done /before/ the lambda application message is sent, then the
+message will /leak/ through to the following expressions.  So either,
+1. the extension must be made /after/ the lambda application message
+   has finished propagating or
+2. the lambda application message must expire at the end of the body,
+   which could be done through either counting, or some marker at the
+   end of the body
+3. even better, there could be an "extension" message, which could
+   propagate down the structure after the lambda application message,
+   ensuring that it is applied immediately after lambda replacement.
+
+** TODO implement option (3) above with "extension" messages
 * variables in the =run= function
 ** before
 :                  ((λ1 s1 ...) a b ...)
@@ -162,8 +175,8 @@ Steps
 2. copy λ1 to msg.car
 3. copy a to msg.cdr
 4. replace (1,2) with (9,10)
-5. replace end of 10 with 4
-6. msg goes to 1
+5. msg goes to 1
+6. replace end of 10 with 4
 
 | functions | refs                                                       |
 |-----------+------------------------------------------------------------|

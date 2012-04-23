@@ -357,11 +357,15 @@ void app_abs(coord place){
       ptr.hdr = NIL;
       AT(place).cdr = replace_ptr(AT(place).cdr, ptr);
     }
-    /* 5. replace end of 10 with 4 */
-    replace_at_end(place, AT(c_cdr).cdr);
     /* 6. msg goes to 1 */
     msg.coord = place;
-    enqueue(msg);
+    AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
+    /* 6. replace end of 10 with 4 */
+    /* TODO: this will require an extension message:
+     *   msg.mcar.hdr = EXTENSION;
+     *   msg.mcdr = copy_ptr(AT(c_cdr).cdr);
+     */
+    replace_at_end(place, AT(c_cdr).cdr);
   }
 }
 
