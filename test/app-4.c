@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
   } while(queue_population() > 0);
 
   SHOULD(count(INTEGER) == 8);
-  SHOULD(count(LOCAL)   == 10);
+  SHOULD(count(LOCAL)   == 9);
   SHOULD(count(LAMBDA)  == 0);
   SHOULD(count(SYMBOL)  == 0);
 

@@ -359,7 +359,8 @@ void app_abs(coord place){
     /* 5. replace end of 10 with 4 */
     replace_at_end(place, AT(c_cdr).cdr);
     /* 6. msg goes to 1 */
-    AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
+    msg.coord = place;
+    enqueue(msg);
   }
 }
 

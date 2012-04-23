@@ -10,7 +10,7 @@ TESTS = \
 	test/app-1	\
 	test/app-2	\
 	test/app-3	\
-	test/app	\
+	test/app-4	\
 	test/expr	\
 	test/paren	\
 	test/parse	\
