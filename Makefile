@@ -15,8 +15,8 @@ TESTS = \
 	test/paren	\
 	test/parse	\
 	test/cond	\
-	test/bool
-#	test/prim-opt	\
+	test/bool	\
+	test/prim-opt	\
 	test/prim-cond	\
 	test/cbv	\
 	test/fact-0	\

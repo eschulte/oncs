@@ -8,7 +8,7 @@ int main(int argc, char *argv[]){
   expr_to_expr(expr);
 
   debug(1, "expr:%s\n", expr);
-  SHOULD(strcmp(expr, "((#S0 (78)))") == 0);
+  SHOULD(strcmp(expr, "(#S0 (78))") == 0);
   
   SHOULD(count(INTEGER) == 1);
   SHOULD(count(LAMBDA) == 0);

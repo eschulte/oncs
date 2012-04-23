@@ -16,12 +16,13 @@ int main(int argc, char *argv[]){
 
   char expr0[] = "(#L0 #S0) (#L1 (#L0 #S0) #S1)";
   expr_to_expr(expr0);
-  SHOULD(strcmp(expr0, "((#L1 (#l0 #S0) #S1))") == 0);
+  SHOULD(strcmp(expr0, "(#L1 (#l0 #S0) #S1)") == 0);
   if(fail_p) ERROR("failed expr0");
 
   char expr1[] = "(#L0 #S0) ((#L0 #S0) (#L1 (#L0 #S0) #S1))";
   expr_to_expr(expr1);
-  SHOULD(strcmp(expr1, "((((#L1 (#l0 #S0) #S1))))") == 0);
+  /* TODO: should there be one less set of parens here */
+  SHOULD(strcmp(expr1, "((#L1 (#l0 #S0) #S1))") == 0);
 
   debug(2, "%d lambdas\n", count(LAMBDA));
   SHOULD(count(LAMBDA) == 2);
