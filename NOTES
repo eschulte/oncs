@@ -1,7 +1,44 @@
 # -*- mode:org -*-
+#+Options: ^:nil
 
 * TODO ensure that referenced variables are never deleted
 Somewhere there are poorly interleaved reference messages.
+
+** Walking through file:test/examp-2.c execution with =gdb=.
+| run (4,4)    |                           |                              |         |
+| app_abs      |                           |                              |         |
+|              | copy a to msg.cdr         | copy_ptr (3,2)               | (3,2)+1 |
+|              | replace 2 with 4          | replace_ptr (3,3) with nil   | (3,3)-1 |
+|              | replace 1 with 9          | replace_ptr (4,3) with (4,2) | (4,2)+1 |
+|              |                           |                              | (4,3)-1 |
+| λ app(4,2)   |                           |                              |         |
+|              | copy down local pointer   | copy_ptr (3,2)               | (3,2)+1 |
+|              | delete l_msg.mcdr         | delete_ptr (3,2)             | (3,2)-1 |
+| run (3,2)+1  |                           |                              |         |
+| run (3,3)-1  |                           | decrement msg to (3,2)       | (3,2)-1 |
+| run (4,2)+1  |                           | increment msg to (4,1)       | (4,1)+1 |
+| run (4,3)-1  |                           | decrement msg to (4,2)       | (4,2)-1 |
+| run (3,2)+1  |                           |                              |         |
+| λ msg (4,2)  |                           |                              |         |
+|--------------+---------------------------+------------------------------+---------|
+| λ app(4,1)   |                           |                              |         |
+|              | copy down local pointer   | copy_ptr (3,2)               | (3.2)+1 |
+|              | delete l_msg.mcdr         | delete_ptr (3,2)             | (3,2)-1 |
+|              |                           |                              |         |
+|              | copy target to cdr? (432) | copy_ptr (3,2)               | (3,2)+1 |
+| λ app to nil |                           |                              |         |
+|              |                           | delete_ptr (3,2)             | (3,2)-1 |
+|              | cleanup target            | delete_ptr (3,2)             | (3,2)-1 |
+|--------------+---------------------------+------------------------------+---------|
+| run (3,2)-1  |                           |                              |         |
+| run (3,2)-1  |                           |                              |         |
+| run (4,1)+1  |                           | increment msg to (4,0)       | (4,0)+1 |
+|              |                           |                              |         |
+
+In the offset region above, the passing of a λ-message down an ONC
+with *one* linked child, decrements the total number of references to
+the target of the lambda message, while it should keep the original
+value.
 
 * DONE cleanup leftover lambdas in symbols
 [[file:test/cbv.c::/*%20TODO:%20Need%20to%20cleanup%202-each%20extra%20lambdas%20and%20symbols%20*/][file:test/cbv.c::/* TODO: Need to cleanup 2-each extra lambdas and symbols */]]

@@ -423,9 +423,6 @@ void run(coord place){
       copy_ptr(msg.mcdr);
       AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
     }
-    DEBUG2("update_ref_msg from run:lambda_application\n",
-           c2.x, c2.y);
-    if(AT(place).mcdr.hdr == LOCAL) update_ref_msg(c2, -1);
     break;
   }
   AT(place).mcar.hdr = NIL;
