@@ -161,8 +161,8 @@ Steps
 1. make new msg
 2. copy λ1 to msg.car
 3. copy a to msg.cdr
-4. replace 2 with 4
-5. replace 1 with 8
+4. replace (1,2) with (9,10)
+5. replace end of 10 with 4
 6. msg goes to 1
 
 | functions | refs                                                       |

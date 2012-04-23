@@ -163,6 +163,25 @@ ptr duplicate_ptr(ptr ptr, int refs){
   return ptr;
 }
 
+void replace_at_end(coord place, ptr new){
+  coord temp;
+  switch(AT(place).cdr.hdr){
+  case LOCAL:
+    COORD_OF_PTR(temp, AT(place).cdr);
+    replace_at_end(temp, new);
+    break;
+  case NIL:
+    AT(place).cdr = replace_ptr(AT(place).cdr, new);
+    break;
+  default:
+    temp = open_space(place);
+    AT(temp).refs = 1;
+    AT(temp).car = replace_ptr(AT(temp).car, AT(place).cdr);
+    AT(temp).cdr = replace_ptr(AT(temp).cdr, new);
+    break;
+  }
+}
+
 int value_p(ptr ptr){
   coord place, place2;
   switch(ptr.hdr){
@@ -304,6 +323,7 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
 }
 
 void app_abs(coord place){
+  ptr ptr;
   msg msg;
   coord c_car, c_cdr;
   /* setup */
@@ -322,25 +342,22 @@ void app_abs(coord place){
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */
     msg.mcar = copy_ptr(AT(c_car).car);
-    if(AT(place).cdr.hdr == LOCAL){
-      /* 3. copy a to msg.cdr */
+    /* 3. copy a to msg.cdr */
+    if(AT(place).cdr.hdr == LOCAL)
       msg.mcdr = copy_ptr(AT(c_cdr).car);
-      /* 4. replace 2 with 4 */
-      AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_cdr).cdr);
-    } else {
-      /* 3. copy a to msg.cdr */
+    else
       msg.mcdr = copy_ptr(AT(place).cdr);
-      /* 4. replace 2 with 4 */
-      AT(place).cdr.hdr = NIL;
-    }
-    /* 5. replace 1 with 9 (or with 9's target) */
-    if(0 && AT(c_car).cdr.hdr == LOCAL){
-      COORD_OF_PTR(c_cdr, AT(c_car).cdr);
-      AT(place).car = replace_ptr(AT(place).car, AT(c_cdr).car);
-      AT(place).cdr = replace_ptr(AT(place).car, AT(c_cdr).car);
+    /* 4. replace (1,2) with (9,10) */
+    if(AT(c_car).cdr.hdr == LOCAL){
+      COORD_OF_PTR(c_car, AT(c_car).cdr);
+      AT(place).car = replace_ptr(AT(place).car, AT(c_car).car);
+      AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_car).cdr);
     } else {
       AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
+      AT(place).cdr.hdr = NIL;
     }
+    /* 5. replace end of 10 with 4 */
+    replace_at_end(place, AT(c_cdr).cdr);
     /* 6. msg goes to 1 */
     AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
   }

@@ -136,6 +136,7 @@ ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
 ptr duplicate_ptr(ptr ptr, int refs);
+void replace_at_end(coord place, ptr new);
 int value_p(ptr ptr);
 
 /* read strings out from onc world */
