@@ -12,6 +12,7 @@
 #define CURRIED 6
 #define UNPACK  7
 #define BOOLEAN 8
+#define EXTEND  9
 
 /* types of primitive operations */
 #define PLUS   0
@@ -142,7 +143,6 @@ ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
 ptr duplicate_ptr(ptr ptr, int refs);
-void replace_at_end(coord place, ptr new);
 int value_p(ptr ptr);
 
 /* read strings out from onc world */

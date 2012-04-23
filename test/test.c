@@ -64,6 +64,7 @@ void show_ptr(ptr ptr){
   case CURRIED: printf("@"); break;
   case UNPACK:  printf("~"); break;
   case BOOLEAN: printf("b"); break;
+  case EXTEND:  printf("e"); break;
   default:      printf("?"); break;
   }
 }
@@ -82,6 +83,8 @@ void show_queue(){
     case INTEGER: c='i'; break;
     case SYMBOL:  c='s'; break;
     case LAMBDA:  c='l'; break;
+    case EXTEND:  c='e'; break;
+    default:      c='?'; break;
     }
     printf("(%d,%d)%c", msg.coord.x, msg.coord.y, c);
   }

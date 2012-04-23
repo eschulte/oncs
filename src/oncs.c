@@ -163,25 +163,6 @@ ptr duplicate_ptr(ptr ptr, int refs){
   return ptr;
 }
 
-void replace_at_end(coord place, ptr new){
-  coord temp;
-  switch(AT(place).cdr.hdr){
-  case LOCAL:
-    COORD_OF_PTR(temp, AT(place).cdr);
-    replace_at_end(temp, new);
-    break;
-  case NIL:
-    AT(place).cdr = replace_ptr(AT(place).cdr, new);
-    break;
-  default:
-    temp = open_space(place);
-    AT(temp).refs = 1;
-    AT(temp).car = replace_ptr(AT(temp).car, AT(place).cdr);
-    AT(temp).cdr = replace_ptr(AT(temp).cdr, new);
-    break;
-  }
-}
-
 int value_p(ptr ptr){
   coord place, place2;
   switch(ptr.hdr){
@@ -359,13 +340,11 @@ void app_abs(coord place){
     }
     /* 6. msg goes to 1 */
     msg.coord = place;
-    AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
+    enqueue(msg);
     /* 6. replace end of 10 with 4 */
-    /* TODO: this will require an extension message:
-     *   msg.mcar.hdr = EXTENSION;
-     *   msg.mcdr = copy_ptr(AT(c_cdr).cdr);
-     */
-    replace_at_end(place, AT(c_cdr).cdr);
+    msg.mcar.hdr = EXTEND;
+    msg.mcdr = copy_ptr(AT(c_cdr).cdr);
+    enqueue(msg);
   }
 }
 
@@ -445,6 +424,28 @@ void run(coord place){
              msg.mcdr.car, msg.mcdr.cdr);
       copy_ptr(msg.mcdr);
       AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
+    }
+    break;
+  case EXTEND:
+    switch(AT(place).cdr.hdr){
+    case LOCAL:
+      COORD_OF_PTR(c2, AT(place).cdr);
+      msg.coord = c2;
+      msg.mcar = AT(place).mcar;
+      msg.mcdr = AT(place).mcdr;
+      enqueue(msg);
+      break;
+    case NIL:
+      AT(place).cdr = replace_ptr(AT(place).cdr, AT(place).mcdr);
+      delete_ptr(AT(place).mcdr);
+      break;
+    default:
+      c1 = open_space(place);
+      AT(c1).refs = 1;
+      AT(c1).car = copy_ptr(AT(place).cdr);
+      AT(c1).cdr = copy_ptr(AT(place).mcdr);
+      delete_ptr(AT(place).mcdr);
+      break;
     }
     break;
   }

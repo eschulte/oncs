@@ -77,6 +77,7 @@ The message values and their meanings are.
 | NIL     | default, runs the waiting loop                    |
 | INTEGER | increments or decrements the ref counter by value |
 | LAMBDA  | λ-application, ptrs specify variable and value    |
+| EXTEND  | extend the end of the expression with by value    |
 | others  | undefined                                         |
 
 * Usage
