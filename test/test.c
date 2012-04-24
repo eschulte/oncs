@@ -285,14 +285,24 @@ void run_all(){
 }
 
 void fix(coord place){
+  msg msg;
   char buf[EXPR_BUF_SIZE];
   unsigned long hash_old, hash_new;
   hash_old = hash_new = 0;
   debug(2, "running to a fixed point\n");
   do{
-    if((queue_population() == 0) ||
-       (! run_queue()))
-      run_all();
+    if(queue_population() > 0){
+      msg = queue[qbeg];
+      /* only pop from queue if dest. is empty */
+      if(AT(msg.coord).mcar.hdr == NIL){
+        msg = dequeue();
+        AT(msg.coord).mcar = msg.mcar;
+        AT(msg.coord).mcdr = msg.mcdr;
+      }
+      /* run destination either way */
+      run(msg.coord);
+    }
+    run_all();
     show_both();
     onc_to_string(place, buf, 0);
     debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);

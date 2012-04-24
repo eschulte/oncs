@@ -1,6 +1,19 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* TODO inbound messages for ONCS which are moved in app_abs
+app_abs will now /move/ linked ONCS into the place of a lambda
+abstraction when it is applied.  This causes problem when those ONC
+structures have inbound message.
+
+* replace =requeue= as it violates consistency requirements
+Violates the need for messages sent to a particular ONC to be received
+in the order they are sent.
+
+For now this has been fixed in the =fix= function (it now runs the
+related ONC when such a situation is encountered), but a full solution
+it still required.
+
 * DONE ensure that referenced variables are never deleted
 Somewhere there are poorly interleaved reference messages.
 
@@ -48,6 +61,14 @@ by (7,7).  Thus, when (7,7) is duplicated into (8,2) or so, an open
 space is requested and (7,6) *happens* to be returned, thus
 overwriting it's value just before it's value is requested.
 
+*** looking at senders of these messages w/printf debug
+| message | from  | in      | why                   |
+|---------+-------+---------+-----------------------|
+| (7,7)-1 | (8,8) | app_abs | replace 1,2 with 9,10 |
+| (7,6)-1 | (7,7) |         | propagate deletion    |
+| (7,6)   | (7,6) |         | re-queue              |
+
+*** analysis
 in line 411 placed
 #+begin_src C
     if(place.x == 7 && (place.y == 5 || place.y == 6))
