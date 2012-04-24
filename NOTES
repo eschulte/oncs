@@ -1,10 +1,54 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* TODO inbound messages for ONCS which are moved in app_abs
-app_abs will now /move/ linked ONCS into the place of a lambda
-abstraction when it is applied.  This causes problem when those ONC
+* inbound messages for ONCS which are moved in app_abs
+=app_abs= will now /move/ linked ONCS into the place of a lambda
+abstraction when it is applied.  This causes problems when those ONC
 structures have inbound message.
+
+** Ideas -- may need to revisit this on different architectures
+*** delay λ-application or app_abs when argument has λ-messages
+The only time this happens over a distance is λ-application, so maybe
+we can just deal with this at =lambda_app= and =app_abs=.
+
+- Skip over =lambda_app= and =app_abs= when the argument has
+  outstanding λ-messages.  Actually, if we just do this for =app_abs=
+  then such arguments won't be enqueued and we don't need to worry
+  about those on the queue.
+
+*** apply message *before* the move
+Actually, it would be better to /apply/ all message to the ONC before
+it is duplicated away.  This avoids the two problems of;
+- messages restarting propagation from the new location of the copied
+  ONC could escape through to places it was never meant to visit
+- large message duplication
+
+Just this of this as pulling the ONC through it's message queue on its
+way out of the square.  The problem then becomes, how to stall the
+execution of the copying action while all of these other actions
+complete.  It seems that any deviation from purely local interactions
+(e.g., copying instantly and remotely in this case) tends to cause
+problems down the line... Perhaps it is time to re-implement *all*
+copy and movement through local messages.
+
+*** copy messages
+somehow copy (or duplicate) all messages in the queue to the new
+location, like send a message down the queue which enqueues all
+non-reference messages directed at the copied ONC to the target ONC.
+This would work well with the future distributed queue, but could
+likely greatly increase the total number of message applications, but
+that doesn't really matter as they'll all take place in parallel.
+
+*** stop moving any ONCS with references
+Stop moving any ONCS with positive reference counts, and rather just
+link to them, maybe with an UNPACK action.
+
+** Possible worries
+*** could an ONC be duplicated past a lambda replacement message
+Picture an ONC which contains a symbol which is due to be replaced by
+an incoming lambda message.  If this ONC is then duplicated *before*
+the message is applied to someplace where the message will not reach,
+then how will the message be applied?
 
 * replace =requeue= as it violates consistency requirements
 Violates the need for messages sent to a particular ONC to be received
