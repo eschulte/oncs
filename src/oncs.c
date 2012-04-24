@@ -322,9 +322,6 @@ void app_abs(coord place){
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */
-    /* DEBUG2("(%d,%d) copy_ptr(%d,%d,%d) -- copy λ1 to msg.car\n" */
-    /*        place.x, place.y, */
-    /*        AT(c_car).car.hdr, AT(c_car).car.car, AT(c_car).car.cdr) */
     msg.mcar = copy_ptr(AT(c_car).car);
     /* 3. copy a to msg.cdr */
     if(AT(place).cdr.hdr == LOCAL)
@@ -334,24 +331,28 @@ void app_abs(coord place){
     /* 4. replace (1,2) with (9,10) */
     if(AT(c_car).cdr.hdr == LOCAL){
       COORD_OF_PTR(c_car, AT(c_car).cdr);
-      DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)-replace (1,2) with (9,10)\n",
+      DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)"
+             "-replace (1,2) with (9,10)\n",
              place.x, place.y,
              AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr,
              AT(c_car).car.hdr, AT(c_car).car.car, AT(c_car).car.cdr);
       AT(place).car = replace_ptr(AT(place).car, AT(c_car).car);
-      DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)-replace (1,2) with (9,10)\n",
+      DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)"
+             "-replace (1,2) with (9,10)\n",
              place.x, place.y,
              AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr,
              AT(c_car).cdr.hdr, AT(c_car).cdr.car, AT(c_car).cdr.cdr);
       AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_car).cdr);
     } else {
-      DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)-replace (1,2) with (9,10)\n",
+      DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)"
+             "-replace (1,2) with (9,10)\n",
              place.x, place.y,
              AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr,
              AT(c_car).cdr.hdr, AT(c_car).cdr.car, AT(c_car).cdr.cdr);
       AT(place).car = replace_ptr(AT(place).car, AT(c_car).cdr);
       ptr.hdr = NIL;
-      DEBUG5("(%d,%d) replace_ptr(%d,%d,%d,)NIL-replace (1,2) with (9,10)\n",
+      DEBUG5("(%d,%d) replace_ptr(%d,%d,%d,)NIL"
+             "-replace (1,2) with (9,10)\n",
              place.x, place.y,
              AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr);
       AT(place).cdr = replace_ptr(AT(place).cdr, ptr);
