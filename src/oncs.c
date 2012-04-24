@@ -113,6 +113,20 @@ int run_queue(){
   }
 }
 
+int num_lambda_messages_for(coord place){
+  int i, counter;
+  counter = 0;
+  for(i=qbeg;i!=qend;i=QWRAP(i+1))
+    if(queue[i].mcar.hdr != NIL &&
+       queue[i].coord.x  == place.x &&
+       queue[i].coord.y  == place.y &&
+       queue[i].mcar.hdr == LAMBDA)
+      counter++;
+  DEBUG3("num λ-msg for (%d,%d) = %d\n",
+         place.x, place.y, counter);
+  return counter;
+}
+
 void update_ref_msg(coord place, int diff){
   msg msg;
   msg.coord = place;
@@ -317,8 +331,10 @@ void app_abs(coord place){
     ERROR("malformed app_abs.car");
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
-  /* don't apply to non values -- call-by-value */
-  if(value_p(AT(place).cdr)){
+  if(/* don't apply to non values -- call-by-value */
+     value_p(AT(place).cdr) &&
+     /* don't apply to places with outstanding λ-messages */
+     num_lambda_messages_for(c_cdr) == 0){
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */

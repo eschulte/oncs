@@ -138,6 +138,9 @@ coord open_space(coord place);
 /* try to apply a message from the queue */
 int run_queue();
 
+/* return the number of lambda messages directed at PLACE */
+int num_lambda_messages_for(coord place);
+
 /* send a message to PLACE to change its ref counter by DIFF */
 void update_ref_msg(coord place, int diff);
 
