@@ -1,10 +1,17 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* probably prim-opts need same checks as lambda applications
+* probably prim-opts need similar pre-exec checks to lambdas
 Distill into a =safe_arg= or =safe_to_apply= function.
 
 Maybe this is needed for EXTEND as well?
+
+It looks like curried operations applied to =LOCAL='s pointing to
+=LAMBDA='s end up erasing the =LAMBDA='s.
+
+This could be a symptom
+: ((*2 ((#L0 (= #S0 0 1 (* #S0 (-1 #S0)))) 1)))
+: ((*2 )))
 
 * DONE might consider de-nesting
 So that =((1))= -> =1=.
