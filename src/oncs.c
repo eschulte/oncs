@@ -434,10 +434,10 @@ void run(coord place){
       if(AT(c2).car.hdr == INTEGER){
         i1 = AT(place).car.cdr; i2 = AT(c2).car.car;
         switch(AT(place).car.car){
-        case PLUS:   i1 = i1 + i2; break;
-        case MINUS:  i1 = i1 - i2; break;
-        case TIMES:  i1 = i1 * i2; break;
-        case DIVIDE: i1 = i1 / i2; break;
+        case PLUS:   i1 = i2 + i1; break;
+        case MINUS:  i1 = i2 - i1; break;
+        case TIMES:  i1 = i2 * i1; break;
+        case DIVIDE: i1 = i2 / i1; break;
         case EQUAL: if(i1 == i2) i1 = TRUE; else i1 = FALSE; break;
         case LESS:  if(i1  < i2) i1 = TRUE; else i1 = FALSE; break;
         default: ERROR("unsupported CURRIED AT(place).car"); break;
