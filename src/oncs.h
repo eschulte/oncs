@@ -10,8 +10,7 @@
 #define LAMBDA  4
 #define PRIMOPT 5
 #define CURRIED 6
-#define UNPACK  7
-#define BOOLEAN 8
+#define BOOLEAN 7
 #define EXTEND  9
 
 /* types of primitive operations */
@@ -37,26 +36,6 @@
     COORD_OF_PTR(msg.coord, where);             \
     DEBUG("enqueue from INTEGER_APP\n");        \
     enqueue(msg);                               \
-  }
-#define CURRIED_APP(op, arg) {                                  \
-    switch(op.car.car){                                         \
-    case PLUS:   op.cdr.car = op.car.cdr + arg.car; break;      \
-    case MINUS:  op.cdr.car = op.car.cdr - arg.car; break;      \
-    case TIMES:  op.cdr.car = op.car.cdr * arg.car; break;      \
-    case DIVIDE: op.cdr.car = op.car.cdr / arg.car; break;      \
-    case EQUAL:                                                 \
-      if(op.car.cdr == arg.car) op.cdr.car = TRUE;              \
-      else op.cdr.car = FALSE;                                  \
-      break;                                                    \
-    case LESS:                                                  \
-      if(op.car.cdr < arg.car) op.cdr.car = TRUE;               \
-      else op.cdr.car = FALSE;                                  \
-      break;                                                    \
-    default: ERROR("unsupported CURRIED op.careration"); break; \
-    }                                                           \
-    if(op.car.car <= DIVIDE) op.cdr.hdr = INTEGER;              \
-    else                     op.cdr.hdr = BOOLEAN;              \
-    op.car.hdr  = UNPACK;                                       \
   }
 #define BOOLEAN_APP(place, ptr, c1, c2, i1) {           \
     c1 = open_space(place);                             \

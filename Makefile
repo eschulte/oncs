@@ -22,8 +22,8 @@ TESTS = \
 	test/fact-0	\
 	test/examp-1	\
 	test/examp-2	\
-	test/l-promote
-#	test/y-comb-1
+	test/l-promote	\
+	test/y-comb-1
 #	test/y-comb-2
 
 

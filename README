@@ -57,7 +57,6 @@ which hold integer values.
 | LAMBDA  | λ same as symbol                     |
 | PRIMOPT | primitive integer operation          |
 | CURRIED | curried primitive integer operation  |
-| UNPACK  | unpack "(foo)" into "foo"            |
 | BOOLEAN | Boolean true or false                |
 
 ** Message

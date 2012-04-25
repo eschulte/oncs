@@ -212,7 +212,6 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   char s[20];
   coord coord;
   switch(ptr.hdr){
-  case UNPACK: buf[index] = '~'; index++; break;
   case NIL: index--; break;
   case LOCAL:
     coord.x = ptr.car; coord.y = ptr.cdr;
@@ -389,7 +388,7 @@ void app_abs(coord place){
 void run(coord place){
   msg msg;
   coord c1, c2;
-  int i1;
+  int i1, i2;
   switch(AT(place).mcar.hdr){
   case NIL:                     /* waiting loop */
     switch(AT(place).car.hdr){
@@ -397,14 +396,6 @@ void run(coord place){
       COORD_OF_PTR(c1, AT(place).car);
       switch(AT(c1).car.hdr){
       case LAMBDA: if(! AT(c1).car.cdr) app_abs(place); break;
-      case UNPACK:
-        DEBUG8("(%d,%d) run->replace_ptr(%d,%d,%d,)(%d,%d,%d) c1\n",
-               place.x, place.y,
-               AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr,
-               AT(c1).cdr.hdr, AT(c1).cdr.car, AT(c1).cdr.cdr);
-        AT(place).car = replace_ptr(AT(place).car, AT(c1).cdr);
-        break;
-      default: run(c1); break;
       }
       break;
     case PRIMOPT:
@@ -428,22 +419,28 @@ void run(coord place){
       }
       break;
     case CURRIED:
-      switch(AT(place).cdr.hdr){
-      case INTEGER:
-        CURRIED_APP(AT(place), AT(place).cdr);
-        break;
-      case LOCAL:
-        COORD_OF_PTR(c2, AT(place).cdr);
-        if(AT(c2).car.hdr == INTEGER){
-          if(AT(c2).cdr.hdr != NIL)
-            ERROR("CURRIED primitive operations take only 1 arg");
-          CURRIED_APP(AT(place), AT(c2).car);
-          DEBUG2("update_ref_msg(%d,%d) from curried function\n",
-                 c2.x, c2.y);
-          update_ref_msg(c2, -1);
-        } else run(c2);
-        break;
-      }
+      if(AT(place).cdr.hdr != LOCAL)
+        ERROR("curried application must point to something");
+      COORD_OF_PTR(c2, AT(place).cdr);
+      if(AT(c2).car.hdr == INTEGER){
+        i1 = AT(place).car.cdr; i2 = AT(c2).car.car;
+        switch(AT(place).car.car){
+        case PLUS:   i1 = i1 + i2; break;
+        case MINUS:  i1 = i1 - i2; break;
+        case TIMES:  i1 = i1 * i2; break;
+        case DIVIDE: i1 = i1 / i2; break;
+        case EQUAL: if(i1 == i2) i1 = TRUE; else i1 = FALSE; break;
+        case LESS:  if(i1  < i2) i1 = TRUE; else i1 = FALSE; break;
+        default: ERROR("unsupported CURRIED AT(place).car"); break;
+        }
+        if(AT(place).car.car <= DIVIDE) AT(place).car.hdr = INTEGER;
+        else                            AT(place).car.hdr = BOOLEAN;
+        AT(place).car.car = i1;
+        AT(place).cdr = copy_ptr(AT(c2).cdr);
+        DEBUG2("update_ref_msg(%d,%d) from curried function\n",
+               c2.x, c2.y);
+        update_ref_msg(c2, -1);
+      } else run(c2);
       break;
     }
     if(AT(place).car.hdr == BOOLEAN)

@@ -62,7 +62,6 @@ void show_ptr(ptr ptr){
     break;
   case PRIMOPT: printf("#"); break;
   case CURRIED: printf("@"); break;
-  case UNPACK:  printf("~"); break;
   case BOOLEAN: printf("b"); break;
   case EXTEND:  printf("e"); break;
   default:      printf("?"); break;

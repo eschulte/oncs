@@ -2,31 +2,10 @@
 
 int main(int argc, char *argv[]){
   init(argc, argv);
-  coord place, left, right;
-  left.x = 4; left.y = 4;
 
-  /* (#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))) 0 */
-  char f[] = "#L3 ((= 0 #S3) 1 (* #S3 (#S2 (- #S3 1))))";
-
-  /* Factorial */
-  string_to_onc(left, FALSE, f);
-
-  /* list holding factorial and argument */
-  place = open_space(left);
-  AT(place).refs = 1;
-  LOCAL_SET(place, car, left);
-  INTEGER_SET(place, cdr, 0);
-
-  show_all(place);
-  fix(place);
-  onc_to_string(place, f, 0);
-  SHOULD(strcmp(f, "(((1 ) ) )"));
-
-  /* SHOULD(count(INTEGER) == 1); */
-  /* SHOULD(count(LAMBDA) == 0); */
-  /* SHOULD(count(SYMBOL) == 0); */
-  /* SHOULD(AT(place).cdr.hdr == INTEGER); */
-  /* SHOULD(AT(place).cdr.car == 1); */
+  char expr[] = "(#L3 (= 0 #S3 1 (* #S3 (#S2 - #S3 1)))) 1";
+  expr_to_expr(expr);
+  SHOULD(strcmp(expr, "(*1 (#S2 0)))") == 0);
 
   /* return indicates success or failure */
   return fail_p;

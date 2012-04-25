@@ -1,6 +1,31 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* might consider implementing promotion
+So that =((1))= -> =1=.
+
+This reduces the number of expressions, but may make writing and
+evaluating expressions easier.
+
+If this isn't done during evaluation then it should maybe be done
+during translation of written expressions into ONC expressions.
+
+* fact-0 bug
+gdb
+: break app_abs if (place.x == 8 && place.y == 4)
+: break run     if (place.x == 8 && place.y == 4 && world[8][2].car.hdr == 2)
+
+Somehow when =(-0 1)= is replace with =TRUE=, it's =cdr= is lost.
+
+As if the boolean is =UNPACK='ed out from under the reference, which
+then pushes the reference back to point part way into the =BOOLEAN=.
+
+: =0 1 1 2
+: TRUE 1 2
+
+: +1 1 3 4
+: 2 3 4
+
 * consider inbound messages for ONCS which are moved in app_abs
 =app_abs= will now /move/ linked ONCS into the place of a lambda
 abstraction when it is applied.  This causes problems when those ONC
