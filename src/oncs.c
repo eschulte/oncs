@@ -400,14 +400,12 @@ void run(coord place){
     switch(AT(place).car.hdr){
     case LOCAL:
       COORD_OF_PTR(c1, AT(place).car);
-      switch(AT(c1).car.hdr){
-      case LAMBDA: if(! AT(c1).car.cdr) app_abs(place); break;
-      case LOCAL: /* eliminate redundant nested parenthesis */
-        if(AT(place).cdr.hdr == NIL && AT(c1).cdr.hdr == NIL &&
-           num_lambda_messages_for(c1) == 0)
-            AT(place).car = replace_ptr(AT(place).car, AT(c1).car);
-        break;
-      }
+      /* apply unlocked λ's */
+      if(AT(c1).car.hdr == LAMBDA && AT(c1).car.cdr == FALSE)
+        app_abs(place);
+      /* eliminate redundant nested parenthesis */
+      else if(AT(c1).cdr.hdr == NIL && num_lambda_messages_for(c1) == 0)
+        AT(place).car = replace_ptr(AT(place).car, AT(c1).car);
       break;
     case PRIMOPT:
       switch(AT(place).cdr.hdr){
