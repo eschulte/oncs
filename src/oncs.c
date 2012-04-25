@@ -34,10 +34,9 @@ void enqueue(msg msg){
 }
 
 msg dequeue(){
-  int tmp = qbeg;
-  if(queue[tmp].mcar.hdr != NIL){
+  if(queue[qbeg].mcar.hdr != NIL){
     qbeg = QWRAP(qbeg+1);
-    return queue[tmp];
+    return queue[QWRAP(qbeg-1)];
   } else ERROR("queue underflow");
 }
 

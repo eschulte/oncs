@@ -25,10 +25,10 @@
 
 /* world size and access */
 #define SIZE 16
-#define QLENGTH 1000
+#define QLENGTH 10000
 #define AT(point) world[point.x][point.y]
 #define WRAP(x) (SIZE+x)%SIZE
-#define QWRAP(x) x%QLENGTH
+#define QWRAP(x) (QLENGTH+x)%QLENGTH
 #define COORD_OF_PTR(coord, ptr) \
   { coord.x=ptr.car; coord.y=ptr.cdr; }
 #define INTEGER_APP(where, msg)                 \
