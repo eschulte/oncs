@@ -13,6 +13,9 @@ This could be a symptom
 : ((*2 ((#L0 (= #S0 0 1 (* #S0 (-1 #S0)))) 1)))
 : ((*2 )))
 
+To see this up close run gdb overtop of primopt with
+: break app_abs if place.x == 8 && place.y == 7
+
 * DONE might consider de-nesting
 So that =((1))= -> =1=.
 

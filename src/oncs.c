@@ -324,7 +324,7 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
 void app_abs(coord place){
   ptr ptr;
   msg msg;
-  coord c_car, c_cdr;
+  coord c_car, c_cdr, c_tmp;
   /* setup */
   if(AT(place).car.hdr != LOCAL)
     ERROR("malformed app_abs");
@@ -354,19 +354,19 @@ void app_abs(coord place){
       msg.mcdr = copy_ptr(AT(place).cdr);
     /* 4. replace (1,2) with (9,10) */
     if(AT(c_car).cdr.hdr == LOCAL){
-      COORD_OF_PTR(c_car, AT(c_car).cdr);
+      COORD_OF_PTR(c_tmp, AT(c_car).cdr); /* BUG */
       DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)"
              "-replace (1,2) with (9,10)\n",
              place.x, place.y,
              AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr,
-             AT(c_car).car.hdr, AT(c_car).car.car, AT(c_car).car.cdr);
-      AT(place).car = replace_ptr(AT(place).car, AT(c_car).car);
+             AT(c_tmp).car.hdr, AT(c_tmp).car.car, AT(c_tmp).car.cdr);
+      AT(place).car = replace_ptr(AT(place).car, AT(c_tmp).car);
       DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)"
              "-replace (1,2) with (9,10)\n",
              place.x, place.y,
              AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr,
-             AT(c_car).cdr.hdr, AT(c_car).cdr.car, AT(c_car).cdr.cdr);
-      AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_car).cdr);
+             AT(c_tmp).cdr.hdr, AT(c_tmp).cdr.car, AT(c_tmp).cdr.cdr);
+      AT(place).cdr = replace_ptr(AT(place).cdr, AT(c_tmp).cdr);
     } else {
       DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)"
              "-replace (1,2) with (9,10)\n",
