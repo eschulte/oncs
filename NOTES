@@ -1,6 +1,10 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* sssoooooooooo slooooowwwww
+: $ time ./test/y-comb-2.test
+: ./test/y-comb-2.test  51.51s user 0.00s system 99% cpu 51.583 total
+
 * probably prim-opts need similar pre-exec checks to lambdas
 Distill into a =safe_arg= or =safe_to_apply= function.
 
