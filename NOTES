@@ -1,6 +1,11 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* probably prim-opts need same checks as lambda applications
+Distill into a =safe_arg= or =safe_to_apply= function.
+
+Maybe this is needed for EXTEND as well?
+
 * might consider implementing promotion
 So that =((1))= -> =1=.
 

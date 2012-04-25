@@ -113,13 +113,23 @@ int run_queue(){
   }
 }
 
-int num_lambda_messages_for(int x, int y){
+int num_lambda_messages_for(coord place){
+  coord temp;
   int i, counter;
   counter = 0;
   for(i=qbeg;i!=qend;i=QWRAP(i+1))
     if(queue[i].mcar.hdr == LAMBDA &&
-       queue[i].coord.x  == x && queue[i].coord.y  == y)
+       queue[i].coord.x  == place.x &&
+       queue[i].coord.y  == place.y)
       counter++;
+  if(AT(place).car.hdr == LOCAL){
+    COORD_OF_PTR(temp, AT(place).car);
+    counter += num_lambda_messages_for(temp);
+  }
+  if(AT(place).cdr.hdr == LOCAL){
+    COORD_OF_PTR(temp, AT(place).cdr);
+    counter += num_lambda_messages_for(temp);
+  }
   return counter;
 }
 
@@ -329,14 +339,11 @@ void app_abs(coord place){
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
   DEBUG3("num_lambda_messages_for(%d,%d) == %d\n",
-         c_car.x, c_car.y, num_lambda_messages_for(c_car.x, c_car.y));
+         place.x, place.y, num_lambda_messages_for(place));
   if(/* don't apply to non values -- call-by-value */
      value_p(AT(place).cdr) &&
      /* only apply when body has 0 incoming λ-messages */
-     num_lambda_messages_for(c_car.x, c_car.y) == 0 &&
-     !(AT(c_car).cdr.hdr == LOCAL &&
-       num_lambda_messages_for(AT(c_car).cdr.car,
-                               AT(c_car).cdr.cdr) > 0)){
+     num_lambda_messages_for(place) == 0){
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */

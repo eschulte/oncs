@@ -119,7 +119,7 @@ coord open_space(coord place);
 int run_queue();
 
 /* return the number of lambda messages directed at PLACE */
-int num_lambda_messages_for(int x, int y);
+int num_lambda_messages_for(coord place);
 
 /* send a message to PLACE to change its ref counter by DIFF */
 void update_ref_msg(coord place, int diff);

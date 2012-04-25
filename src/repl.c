@@ -13,6 +13,7 @@
 #define STEP    7
 #define PRINT   8
 #define QUEUE   9
+#define SHOWQ   10
 static struct lookup_table { char *string; int code; char *doc;
 } codes[] = {
   {"quit", QUIT, "quit the repl"},
@@ -23,7 +24,8 @@ static struct lookup_table { char *string; int code; char *doc;
   {"help", HELP, "show this help message"},
   {"step", STEP, "run a single step"},
   {"print", PRINT, "print a point in the world"},
-  {"queue", QUEUE, "run down the queue"}
+  {"queue", QUEUE, "run down the queue"},
+  {"showq", SHOWQ, "show the queue"}
 };
 
 int code(char *string);
@@ -38,6 +40,7 @@ int main(int argc, char *argv[]){
   static char* y_prompt = "y: ";
   int running=1;
   int i;
+  int holder;
   do{
     input = readline(shell_prompt);
     if(input) add_history(input);
@@ -52,9 +55,10 @@ int main(int argc, char *argv[]){
       printf("%s\n", input);
       break;
     case SHOW:
+      holder=verbose;
       verbose=1;
       show_world();
-      verbose=0;
+      verbose=holder;
       break;
     case CLEAR:
       clear_world();
@@ -111,6 +115,12 @@ int main(int argc, char *argv[]){
       break;
     case QUEUE:
       while(queue_population() > 0) run_queue();
+      break;
+    case SHOWQ:
+      holder=verbose;
+      verbose=1;      
+      show_queue();
+      verbose=holder;
       break;
     case OTHER:
       string_to_onc(place, FALSE, input);
