@@ -37,10 +37,9 @@
     DEBUG("enqueue from INTEGER_APP\n");        \
     enqueue(msg);                               \
   }
-#define BOOLEAN_APP(place, ptr, c1, c2, i1) {           \
+#define BOOLEAN_APP(place, ptr, c1, c2, val) {          \
     c1 = open_space(place);                             \
     AT(c1).refs = 1;                                    \
-    i1 = ptr.car;                                       \
     ptr.hdr = LOCAL;                                    \
     ptr.car = c1.x;                                     \
     ptr.cdr = c1.y;                                     \
@@ -65,7 +64,7 @@
     AT(c1).cdr.car = c2.x;                              \
     AT(c1).cdr.cdr = c2.y;                              \
     AT(c2).car.hdr = SYMBOL;                            \
-    AT(c2).car.car = i1;                                \
+    AT(c2).car.car = val;                               \
     AT(c2).cdr.hdr = NIL;                               \
   }
 

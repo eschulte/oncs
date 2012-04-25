@@ -120,6 +120,7 @@ void show_world(){
 }
 
 int string_to_onc(coord place, int locked, char *buf){
+  coord c1, c2;
   debug(2, "string_to_onc[%d]((%d,%d), %s)\n",
         locked, place.x, place.y, buf);
   int i, car_p, parend, index, lock_child;
@@ -147,14 +148,14 @@ int string_to_onc(coord place, int locked, char *buf){
         string_to_onc(t1, locked, interum);
         index = parend+1;
       } else {
-        CHAR_TO_PTR(place, AT(place).car, buf[index]);
+        CHAR_TO_PTR(place, AT(place).car, buf[index], c1, c2);
       }
       car_p = FALSE;
     } else {
       if(buf[index] == '.'){
         index++;
         while((buf[index] == '#') || (buf[index] == ' ')) index++;
-        CHAR_TO_PTR(place, AT(place).cdr, buf[index]);
+        CHAR_TO_PTR(place, AT(place).cdr, buf[index], c1, c2);
       } else {
         t1 = open_space(place);
         AT(place).cdr.hdr = LOCAL;

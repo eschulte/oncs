@@ -431,7 +431,12 @@ void run(coord place){
       if(AT(place).cdr.hdr != LOCAL)
         ERROR("curried application must point to something");
       COORD_OF_PTR(c2, AT(place).cdr);
-      if(AT(c2).car.hdr == INTEGER){
+      if(/* don't apply to non values -- call-by-value */
+         value_p(AT(place).cdr) &&
+         /* only apply when body has 0 incoming λ-messages */
+         num_lambda_messages_for(place) == 0 &&
+         /* only apply to integers */
+         AT(c2).car.hdr == INTEGER){
         i1 = AT(place).car.cdr; i2 = AT(c2).car.car;
         switch(AT(place).car.car){
         case PLUS:   i1 = i2 + i1; break;
@@ -455,7 +460,7 @@ void run(coord place){
     if(AT(place).car.hdr == BOOLEAN)
       BOOLEAN_APP(place, AT(place).car, c1, c2, i1);
     if(AT(place).cdr.hdr == BOOLEAN)
-      BOOLEAN_APP(place, AT(place).cdr, c1, c2, i1);
+      BOOLEAN_APP(place, AT(place).cdr, c1, c2, i2);
     break;
   case INTEGER:                 /* update number of references */
     AT(place).refs += AT(place).mcar.car;

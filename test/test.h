@@ -54,7 +54,7 @@ void step(coord place);
 #define LAMBDA_SET(place, variable)      \
   AT(place).car.hdr = LAMBDA;            \
   AT(place).car.car = variable;
-#define CHAR_TO_PTR(place, where, char)                         \
+#define CHAR_TO_PTR(place, where, char, c1, c2)                 \
   debug(2, "char_to_ptr((%d,%d), %c)\n",                        \
         place.x, place.y, char);                                \
   switch(char){                                                 \
@@ -110,6 +110,16 @@ void step(coord place);
     debug(2, "\tLESS:(%d,%d)\n", place.x, place.y);             \
     where.hdr = PRIMOPT;                                        \
     where.car = LESS;                                           \
+    index++;                                                    \
+    break;                                                      \
+  case 't':                                                     \
+    debug(2, "\tTRUE:(%d,%d)\n", place.x, place.y);             \
+    BOOLEAN_APP(place, where, c1, c2, TRUE);                    \
+    index++;                                                    \
+    break;                                                      \
+  case 'f':                                                     \
+    debug(2, "\tFALSE:(%d,%d)\n", place.x, place.y);            \
+    BOOLEAN_APP(place, where, c1, c2, FALSE);                   \
     index++;                                                    \
     break;                                                      \
   default: /* INTEGER */                                        \
