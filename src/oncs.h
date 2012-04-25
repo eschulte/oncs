@@ -24,7 +24,7 @@
 #define FALSE  0
 
 /* world size and access */
-#define SIZE 16
+#define SIZE 32
 #define QLENGTH 10000
 #define AT(point) world[point.x][point.y]
 #define WRAP(x) (SIZE+x)%SIZE
