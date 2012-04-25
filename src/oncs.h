@@ -96,6 +96,7 @@
 #define DEBUG1(fmt, x) if(DEBUG_P) printf(fmt, x);
 #define DEBUG2(fmt, x, y) if(DEBUG_P) printf(fmt, x, y);
 #define DEBUG3(fmt, x, y, z) if(DEBUG_P) printf(fmt, x, y, z);
+#define DEBUG4(fmt, x, y, z, a) if(DEBUG_P) printf(fmt, x, y, z, a);
 #define DEBUG5(fmt, x, y, z, a, b) if(DEBUG_P) printf(fmt, x, y, z, a, b);
 #define DEBUG8(fmt, x, y, z, a, b, c, d, e) \
   if(DEBUG_P) printf(fmt, x, y, z, a, b, c, d, e);
@@ -137,6 +138,9 @@ coord open_space(coord place);
 
 /* try to apply a message from the queue */
 int run_queue();
+
+/* return the number of lambda messages directed at PLACE */
+int num_lambda_messages_for(int x, int y);
 
 /* send a message to PLACE to change its ref counter by DIFF */
 void update_ref_msg(coord place, int diff);

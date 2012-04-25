@@ -113,6 +113,16 @@ int run_queue(){
   }
 }
 
+int num_lambda_messages_for(int x, int y){
+  int i, counter;
+  counter = 0;
+  for(i=qbeg;i!=qend;i=QWRAP(i+1))
+    if(queue[i].mcar.hdr == LAMBDA &&
+       queue[i].coord.x  == x && queue[i].coord.y  == y)
+      counter++;
+  return counter;
+}
+
 void update_ref_msg(coord place, int diff){
   msg msg;
   msg.coord = place;
@@ -311,14 +321,23 @@ void app_abs(coord place){
   if(AT(place).car.hdr != LOCAL)
     ERROR("malformed app_abs");
   COORD_OF_PTR(c_car, AT(place).car);
+  DEBUG4("app_abs(%d,%d)<-body-(%d,%d)\n",
+         place.x, place.y, c_car.x, c_car.y);
   if(AT(c_car).car.hdr != LAMBDA ||
      (AT(c_car).cdr.hdr != LOCAL &&
       AT(c_car).cdr.hdr != NIL))
     ERROR("malformed app_abs.car");
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
-  /* don't apply to non values -- call-by-value */
-  if(value_p(AT(place).cdr)){
+  DEBUG3("num_lambda_messages_for(%d,%d) == %d\n",
+         c_car.x, c_car.y, num_lambda_messages_for(c_car.x, c_car.y));
+  if(/* don't apply to non values -- call-by-value */
+     value_p(AT(place).cdr) &&
+     /* only apply when body has 0 incoming λ-messages */
+     num_lambda_messages_for(c_car.x, c_car.y) == 0 &&
+     !(AT(c_car).cdr.hdr == LOCAL &&
+       num_lambda_messages_for(AT(c_car).cdr.car,
+                               AT(c_car).cdr.cdr) > 0)){
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */

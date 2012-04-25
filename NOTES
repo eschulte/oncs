@@ -1,13 +1,13 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* inbound messages for ONCS which are moved in app_abs
+* consider inbound messages for ONCS which are moved in app_abs
 =app_abs= will now /move/ linked ONCS into the place of a lambda
 abstraction when it is applied.  This causes problems when those ONC
 structures have inbound message.
 
 ** Ideas -- may need to revisit this on different architectures
-*** delay λ-application or app_abs when argument has λ-messages
+*** DONE delay λ-application or app_abs when argument has λ-messages
 The only time this happens over a distance is λ-application, so maybe
 we can just deal with this at =lambda_app= and =app_abs=.
 
