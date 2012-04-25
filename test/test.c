@@ -322,9 +322,11 @@ void step(coord place){
     if((queue_population() == 0) ||
        (! run_queue()))
       for(i=0;i<SIZE;i++)
-        for(j=0;j<SIZE;j++)
-          if(world[i][j].refs > 0)
-            run_at(i, j);
+        for(j=0;j<SIZE;j++){
+          onc_to_string(place, buf_comp, 0);
+          if(strcmp(buf_strt, buf_comp) != 0) break;
+          if(world[i][j].refs > 0) run_at(i, j);
+        }
     show_both();
     onc_to_string(place, buf_comp, 0);
     debug(1, "expr(%d,%d):%s\n",
