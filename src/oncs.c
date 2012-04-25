@@ -354,7 +354,7 @@ void app_abs(coord place){
       msg.mcdr = copy_ptr(AT(place).cdr);
     /* 4. replace (1,2) with (9,10) */
     if(AT(c_car).cdr.hdr == LOCAL){
-      COORD_OF_PTR(c_tmp, AT(c_car).cdr); /* BUG */
+      COORD_OF_PTR(c_tmp, AT(c_car).cdr);
       DEBUG8("(%d,%d) replace_ptr(%d,%d,%d,)(%d,%d,%d)"
              "-replace (1,2) with (9,10)\n",
              place.x, place.y,
