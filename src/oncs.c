@@ -7,16 +7,10 @@ msg queue[QLENGTH];
 int qbeg, qend = 0;
 
 void enqueue(msg msg){
-  int i;
-  /* participate in tracking of λ-messages */
-  if(msg.mcar.hdr == LAMBDA) AT(msg.coord).l_msgs++;
-  for(i=0;i<QLENGTH;i++)
-    if(queue[QWRAP(qend + i)].mcar.hdr == NIL)
-      break;
-  if(i == (QLENGTH - 1))
-    ERROR("queue overflow");
-  queue[QWRAP(qend + i)] = msg;
+  queue[qend]=msg;
   qend = QWRAP(qend+1);
+  if(qend == qbeg) ERROR("queue overflow");
+  if(msg.mcar.hdr == LAMBDA) AT(msg.coord).l_msgs++;
 }
 
 msg dequeue(){
