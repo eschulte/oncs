@@ -244,7 +244,7 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
     }
     break;
   case PRIMOPT:
-    if(ptr.cdr) buf[index] = '_'; index++;
+    /* if(ptr.cdr) buf[index] = '_'; index++; */
     switch(ptr.car){
     case PLUS:   buf[index] = '+'; break;
     case MINUS:  buf[index] = '-'; break;
@@ -256,7 +256,7 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
     index++;
     break;
   case LCURRIED:
-    buf[index] = '_'; index++;
+    /* buf[index] = '_'; index++; */
   case CURRIED:
     switch(ptr.car){
     case PLUS:   c = '+'; break;
