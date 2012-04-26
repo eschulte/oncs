@@ -15,6 +15,14 @@ Track this in bits of state
 - value-p bit could track if an ONC is value and update itself in
   response to lambda messages
 
+Called from:
+| func                    | for                                   |
+|-------------------------+---------------------------------------|
+| num_lambda_messages_for | recursion                             |
+| app_abs                 | for the bodies of lambda applications |
+| run                     | elimination of duplicate nesting      |
+
+** TODO keep a counter of incoming lambda messages for each onc
 ** assuming we add a backwards link
 Tracking value-p of each ONC becomes the ∧ of the value-p of its car
 and cdr, which are either immediately calculated by their type, or if

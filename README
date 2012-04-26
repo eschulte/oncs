@@ -25,7 +25,7 @@ The main design goals of this effort are
 Composed of an integer reference counter and four pointers.
 :         an ONC
 : +-------------------+
-: |       #refs       |
+: |  #refs  | #λ-msgs |
 : +---------+---------+
 : |  mcar   |  car    |
 : |         |         |
