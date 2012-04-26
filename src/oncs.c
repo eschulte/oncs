@@ -7,23 +7,9 @@ msg queue[QLENGTH];
 int qbeg, qend = 0;
 
 void enqueue(msg msg){
-  DEBUG2("enqueue(%d,%d) ", msg.coord.x, msg.coord.y);
-  switch(msg.mcar.hdr){
-  case LOCAL:
-    DEBUG2("LOCAL:(%d,%d)", msg.mcar.car, msg.mcar.cdr);
-    break;
-  case INTEGER:
-    DEBUG1("INTEGER:(%d)", msg.mcar.car);
-    break;
-  case LAMBDA:
-    DEBUG1("LAMBDA:(%d)", msg.mcar.car);
-    break;
-  default:
-    DEBUG("OTHER");
-    break;
-  }
-  DEBUG("\n");
   int i;
+  /* participate in tracking of λ-messages */
+  if(msg.mcar.hdr == LAMBDA) AT(msg.coord).l_msgs++;
   for(i=0;i<QLENGTH;i++)
     if(queue[QWRAP(qend + i)].mcar.hdr == NIL)
       break;
@@ -34,9 +20,12 @@ void enqueue(msg msg){
 }
 
 msg dequeue(){
+  msg msg;
   if(queue[qbeg].mcar.hdr != NIL){
     qbeg = QWRAP(qbeg+1);
-    return queue[QWRAP(qbeg-1)];
+    msg = queue[QWRAP(qbeg-1)];
+    if(msg.mcar.hdr == LAMBDA) AT(msg.coord).l_msgs--;
+    return msg;
   } else ERROR("queue underflow");
 }
 
@@ -114,13 +103,8 @@ int run_queue(){
 
 int num_lambda_messages_for(coord place){
   coord temp;
-  int i, counter;
-  counter = 0;
-  for(i=qbeg;i!=qend;i=QWRAP(i+1))
-    if(queue[i].mcar.hdr == LAMBDA &&
-       queue[i].coord.x  == place.x &&
-       queue[i].coord.y  == place.y)
-      counter++;
+  int counter;
+  counter = AT(place).l_msgs;
   if(AT(place).car.hdr == LOCAL){
     COORD_OF_PTR(temp, AT(place).car);
     counter += num_lambda_messages_for(temp);

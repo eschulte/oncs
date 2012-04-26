@@ -22,7 +22,10 @@ Called from:
 | app_abs                 | for the bodies of lambda applications |
 | run                     | elimination of duplicate nesting      |
 
-** TODO keep a counter of incoming lambda messages for each onc
+** DONE keep a counter of incoming lambda messages for each onc
+After this change the time for running file:test/fact-o-2.c goes from
+48 seconds to 5 seconds.
+
 ** assuming we add a backwards link
 Tracking value-p of each ONC becomes the ∧ of the value-p of its car
 and cdr, which are either immediately calculated by their type, or if
@@ -34,7 +37,7 @@ links then changes in value-p can be propagated back up the chain.
 : ./test/y-comb-2.test  51.51s user 0.00s system 99% cpu 51.583 total
 
 ** the culprit is obvious
-gprof output
+gprof output for test/fact-o-2.test
 : Each sample counts as 0.01 seconds.
 :   %   cumulative   self              self     total           
 :  time   seconds   seconds    calls   s/call   s/call  name    
