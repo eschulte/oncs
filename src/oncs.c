@@ -433,8 +433,6 @@ void run(coord place){
       COORD_OF_PTR(c2, AT(place).cdr);
       if(/* don't apply to non values -- call-by-value */
          value_p(AT(place).cdr) &&
-         /* only apply when body has 0 incoming λ-messages */
-         num_lambda_messages_for(place) == 0 &&
          /* only apply to integers */
          AT(c2).car.hdr == INTEGER){
         i1 = AT(place).car.cdr; i2 = AT(c2).car.car;
