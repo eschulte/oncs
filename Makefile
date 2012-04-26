@@ -48,6 +48,11 @@ repl: $(LIB) $(TEST_LIB) src/repl.c
 test/%.test: $(LIB) $(TEST_LIB) test/%.c
 	$(CC) $(CFLAGS) -Itest/ -Isrc/ -o test/$*.test $^
 
+test/%.prof: $(LIB) $(TEST_LIB) test/%.c
+	$(CC) $(CFLAGS) -pg -Itest/ -Isrc/ -o test/$*.test $^ && \
+	./test/$*.test && \
+	gprof ./test/$*.test > ./test/$*.prof
+
 check: $(TESTS:=.test)
 	for test in $(TESTS:=.test);do \
 		./$$test 2>/dev/null; \
@@ -60,4 +65,4 @@ etags: $(LIB) $(TESTS:=.c) $(TEST_LIB)
 	etags $^
 
 clean:
-	rm -f vm repl test/*.test
+	rm -f vm repl gmon.out test/*.test
