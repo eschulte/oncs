@@ -80,36 +80,42 @@ void step(coord place);
     debug(2, "\tPLUS:(%d,%d)\n", place.x, place.y);             \
     where.hdr = PRIMOPT;                                        \
     where.car = PLUS;                                           \
+    where.cdr = locked;                                         \
     index++;                                                    \
     break;                                                      \
   case '-':                                                     \
     debug(2, "\tMINUS:(%d,%d)\n", place.x, place.y);            \
     where.hdr = PRIMOPT;                                        \
     where.car = MINUS;                                          \
+    where.cdr = locked;                                         \
     index++;                                                    \
     break;                                                      \
   case '*':                                                     \
     debug(2, "\tTIMES:(%d,%d)\n", place.x, place.y);            \
     where.hdr = PRIMOPT;                                        \
     where.car = TIMES;                                          \
+    where.cdr = locked;                                         \
     index++;                                                    \
     break;                                                      \
   case '/':                                                     \
     debug(2, "\tDIVIDE:(%d,%d)\n", place.x, place.y);           \
     where.hdr = PRIMOPT;                                        \
     where.car = DIVIDE;                                         \
+    where.cdr = locked;                                         \
     index++;                                                    \
     break;                                                      \
   case '=':                                                     \
     debug(2, "\tEQUAL:(%d,%d)\n", place.x, place.y);            \
     where.hdr = PRIMOPT;                                        \
     where.car = EQUAL;                                          \
+    where.cdr = locked;                                         \
     index++;                                                    \
     break;                                                      \
   case '<':                                                     \
     debug(2, "\tLESS:(%d,%d)\n", place.x, place.y);             \
     where.hdr = PRIMOPT;                                        \
     where.car = LESS;                                           \
+    where.cdr = locked;                                         \
     index++;                                                    \
     break;                                                      \
   case 't':                                                     \

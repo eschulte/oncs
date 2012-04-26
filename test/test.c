@@ -60,8 +60,13 @@ void show_ptr(ptr ptr){
     if(ptr.cdr) printf("l");
     else        printf("L");
     break;
-  case PRIMOPT: printf("#"); break;
-  case CURRIED: printf("@"); break;
+  case PRIMOPT: /* show lock status for primopt */
+    if(ptr.cdr) printf("p");
+    else        printf("P");
+    break;
+  /* show lock status for curried */
+  case CURRIED: printf("C"); break;
+  case LCURRIED: printf("c"); break;
   case BOOLEAN: printf("b"); break;
   case EXTEND:  printf("e"); break;
   default:      printf("?"); break;

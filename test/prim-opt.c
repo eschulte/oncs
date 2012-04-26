@@ -22,6 +22,7 @@ int main(int argc, char *argv[]){
   single_int_left();
   if(fail_p) ERROR("failed expr1");
 
+  
   char expr2[] = "* + 1 2 - 8 32";
   run_expr(expr2, place);
   fix(place);

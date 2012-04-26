@@ -237,6 +237,7 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
     index++;
     break;
   case CURRIED:
+  case LCURRIED:
     switch(ptr.car){
     case PLUS:   c = '+'; break;
     case MINUS:  c = '-'; break;
@@ -276,8 +277,15 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
   case NIL:
   case INTEGER:
   case BOOLEAN: break;
+  /* lock lambda primopt or curried if message is locked */
+  case PRIMOPT:
+    ptr.cdr = l_msg.mcar.cdr; break;
+  case CURRIED:
+  case LCURRIED:
+    if (l_msg.mcar.cdr) ptr.hdr = LCURRIED;
+    else                ptr.hdr = CURRIED;
+    break;
   case LAMBDA:
-    /* lock lambda if message is locked */
     DEBUG3("L%d locking %d->%d\n",
            ptr.car, ptr.cdr, l_msg.mcar.cdr);
     ptr.cdr = l_msg.mcar.cdr;
@@ -386,25 +394,28 @@ void run(coord place){
         AT(place).car = replace_ptr(AT(place).car, AT(c1).car);
       break;
     case PRIMOPT:
-      switch(AT(place).cdr.hdr){
-      case INTEGER:
-        AT(place).car.cdr = AT(place).cdr.car;
-        AT(place).car.hdr = CURRIED;
-        break;
-      case LOCAL:
-        COORD_OF_PTR(c2, AT(place).cdr);
-        if(AT(c2).car.hdr == INTEGER){
-          AT(place).car.cdr = AT(c2).car.car;
+      if(AT(place).car.cdr == FALSE){ /* only PRIMOPT if unlocked */
+        switch(AT(place).cdr.hdr){
+        case INTEGER:
+          AT(place).car.cdr = AT(place).cdr.car;
           AT(place).car.hdr = CURRIED;
-          DEBUG8("(%d,%d) run->replace_ptr(%d,%d,%d,)(%d,%d,%d) c2\n",
-                 place.x, place.y,
-                 AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr,
-                 AT(c2).cdr.hdr, AT(c2).cdr.car, AT(c2).cdr.cdr);
-          AT(place).cdr = replace_ptr(AT(place).cdr, AT(c2).cdr);
-        } else run(c2);
+          break;
+        case LOCAL:
+          COORD_OF_PTR(c2, AT(place).cdr);
+          if(AT(c2).car.hdr == INTEGER){
+            AT(place).car.cdr = AT(c2).car.car;
+            AT(place).car.hdr = CURRIED;
+            DEBUG8("(%d,%d) run->replace_ptr(%d,%d,%d,)(%d,%d,%d) c2\n",
+                   place.x, place.y,
+                   AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr,
+                   AT(c2).cdr.hdr, AT(c2).cdr.car, AT(c2).cdr.cdr);
+            AT(place).cdr = replace_ptr(AT(place).cdr, AT(c2).cdr);
+          } else run(c2);
+        }
         break;
       }
       break;
+    case LCURRIED: break; /* don't act upon locked curried messages */
     case CURRIED:
       if(AT(place).cdr.hdr != LOCAL)
         ERROR("curried application must point to something");

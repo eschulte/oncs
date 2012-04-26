@@ -1,6 +1,17 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* need to lock curried operations and primitive operations
+They are after all both just optimized versions of lambdas.
+
+Storage of the lock
+| lambda  | ptr.cdr |
+| primopt | ptr.cdr |
+| curried | ??????? |
+
+Ugh, this is sort of ugly, but I may just stick this into the
+header...
+
 * order of operations to primitive operations matters
 : (< #S1 1)
 is different from

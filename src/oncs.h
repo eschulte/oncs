@@ -3,15 +3,16 @@
 #include <stdio.h>
 
 /* types of pointers */
-#define NIL     0
-#define LOCAL   1
-#define INTEGER 2
-#define SYMBOL  3
-#define LAMBDA  4
-#define PRIMOPT 5
-#define CURRIED 6
-#define BOOLEAN 7
-#define EXTEND  9
+#define NIL      0
+#define LOCAL    1
+#define INTEGER  2
+#define SYMBOL   3
+#define LAMBDA   4
+#define PRIMOPT  5
+#define CURRIED  6
+#define LCURRIED 7
+#define BOOLEAN  8
+#define EXTEND   9
 
 /* types of primitive operations */
 #define PLUS   0
