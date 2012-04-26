@@ -95,19 +95,23 @@ int run_queue(){
   }
 }
 
-int num_lambda_messages_for(coord place){
+int has_incoming_lambda(coord place){
   coord temp;
-  int counter;
-  counter = AT(place).l_msgs;
-  if(AT(place).car.hdr == LOCAL){
-    COORD_OF_PTR(temp, AT(place).car);
-    counter += num_lambda_messages_for(temp);
+  if(AT(place).l_msgs){
+    return TRUE;
+  } else {
+    if(AT(place).car.hdr == LOCAL){
+      COORD_OF_PTR(temp, AT(place).car);
+      if(has_incoming_lambda(temp))
+        return TRUE;
+    }
+    if(AT(place).cdr.hdr == LOCAL){
+      COORD_OF_PTR(temp, AT(place).cdr);
+      if(has_incoming_lambda(temp))
+        return TRUE;
+    }
   }
-  if(AT(place).cdr.hdr == LOCAL){
-    COORD_OF_PTR(temp, AT(place).cdr);
-    counter += num_lambda_messages_for(temp);
-  }
-  return counter;
+  return FALSE;
 }
 
 void update_ref_msg(coord place, int diff){
@@ -343,12 +347,12 @@ void app_abs(coord place){
     ERROR("malformed app_abs.car");
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
-  DEBUG3("num_lambda_messages_for(%d,%d) == %d\n",
-         place.x, place.y, num_lambda_messages_for(place));
+  DEBUG3("has_incoming_lambda(%d,%d) == %d\n",
+         place.x, place.y, has_incoming_lambda(place));
   if(/* don't apply to non values -- call-by-value */
      value_p(AT(place).cdr) &&
      /* only apply when body has 0 incoming λ-messages */
-     num_lambda_messages_for(place) == 0){
+     has_incoming_lambda(place) == 0){
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */
@@ -410,7 +414,7 @@ void run(coord place){
       if(AT(c1).car.hdr == LAMBDA && AT(c1).car.cdr == FALSE)
         app_abs(place);
       /* eliminate redundant nested parenthesis */
-      else if(AT(c1).cdr.hdr == NIL && num_lambda_messages_for(c1) == 0)
+      else if(AT(c1).cdr.hdr == NIL && has_incoming_lambda(c1) == 0)
         AT(place).car = replace_ptr(AT(place).car, AT(c1).car);
       break;
     case PRIMOPT:
