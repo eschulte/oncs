@@ -1,4 +1,5 @@
-CC=gcc -g
+CC=gcc
+CFLAGS=
 READLINE_LIB=-lreadline
 LIB = src/oncs.c src/oncs.h
 TEST_LIB= test/test.c test/test.h
@@ -39,13 +40,13 @@ TESTS = \
 all: vm repl
 
 vm: $(LIB) $(TEST_LIB) src/vm.c
-	$(CC) -Isrc/ -Itest/ -o vm $^
+	$(CC) $(CFLAGS) -Isrc/ -Itest/ -o vm $^
 
 repl: $(LIB) $(TEST_LIB) src/repl.c
-	$(CC) -Isrc/ -Itest/ $(READLINE_LIB) -o repl $^
+	$(CC) $(CFLAGS) -Isrc/ -Itest/ $(READLINE_LIB) -o repl $^
 
 test/%.test: $(LIB) $(TEST_LIB) test/%.c
-	$(CC) -Itest/ -Isrc/ -o test/$*.test $^
+	$(CC) $(CFLAGS) -Itest/ -Isrc/ -o test/$*.test $^
 
 check: $(TESTS:=.test)
 	for test in $(TESTS:=.test);do \

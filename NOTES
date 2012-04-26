@@ -1,9 +1,28 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* sssoooooooooo slooooowwwww
+* why so slow
 : $ time ./test/y-comb-2.test
 : ./test/y-comb-2.test  51.51s user 0.00s system 99% cpu 51.583 total
+
+** the culprit is obvious
+gprof output
+: Each sample counts as 0.01 seconds.
+:   %   cumulative   self              self     total           
+:  time   seconds   seconds    calls   s/call   s/call  name    
+:  90.55     44.75    44.75   640473     0.00     0.00  num_lambda_messages_for
+:   4.96     47.20     2.45 34767872     0.00     0.00  coord_hash
+:   2.53     48.45     1.25    33951     0.00     0.00  enqueue
+:   0.51     48.70     0.25    33953     0.00     0.00  queue_hash
+:   0.50     48.94     0.25    33953     0.00     0.00  run_all
+:   0.45     49.16     0.22  5718842     0.00     0.00  run
+:   0.18     49.25     0.09  5684891     0.00     0.00  run_at
+:   0.16     49.33     0.08    67908     0.00     0.00  ptr_to_string
+:   0.08     49.37     0.04   680828     0.00     0.00  value_p
+:   0.06     49.40     0.03    33953     0.00     0.00  world_hash
+:   0.02     49.41     0.01  5752890     0.00     0.00  debug
+:   0.02     49.42     0.01   262687     0.00     0.00  app_abs
+:   0.01     49.43     0.01        1     0.01    49.43  fix
 
 ** fact 2
 : $ time test/fact-o-1.test

@@ -1,13 +1,16 @@
-**/*.txt
-**/*.html
-**/*.tex
-**/*.pdf
-**/*.fasl
-**/*.o
+**.txt
+**.html
+**.tex
+**.pdf
+**.fasl
+**.o
+**.prof
 
 ## compiled files
 vm
 repl
+gmon.out
+
 
 ## etags file
 TAGS
