@@ -419,8 +419,8 @@ void run(coord place){
         case MINUS:  i1 = i2 - i1; break;
         case TIMES:  i1 = i2 * i1; break;
         case DIVIDE: i1 = i2 / i1; break;
-        case EQUAL: if(i1 == i2) i1 = TRUE; else i1 = FALSE; break;
-        case LESS:  if(i1  < i2) i1 = TRUE; else i1 = FALSE; break;
+        case EQUAL: if(i2 == i1) i1 = TRUE; else i1 = FALSE; break;
+        case LESS:  if(i2  < i1) i1 = TRUE; else i1 = FALSE; break;
         default: ERROR("unsupported CURRIED AT(place).car"); break;
         }
         if(AT(place).car.car <= DIVIDE) AT(place).car.hdr = INTEGER;

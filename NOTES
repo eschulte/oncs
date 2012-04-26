@@ -1,6 +1,31 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* order of operations to primitive operations matters
+: (< #S1 1)
+is different from
+: (> 1 #S1)
+
+Because the second form will curry sometimes resulting in different
+convergence behavior.
+
+a pernicious expansion of this second case is shown
+: (#L3 ((<1 #S3) 89
+:       ((#l2 (((#L3 ((<1 #S3) 89
+:                     ((#l2 (((#L3 ((<1 #S3) 89
+:                                   ...)))
+:                            #S2))
+:                      (-1 #S3)))))
+:              #S2))
+:        (-1 #S3))))
+: 2
+in which the top-level application of #L3 to 2 will never be performed
+because the inner portion of the Y-combinator continue to expand ad
+infinitum.
+
+This means that we're not quite cbv, in the case of primitive
+operations and curried primitive functions.
+
 * replace =num_lambda_messages_for= with something faster (state?)
 Any solution will require that the result for a particular ONC will
 require interrogation of the value for all sub-oncs in the entire
