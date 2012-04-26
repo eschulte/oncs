@@ -1,6 +1,26 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* replace =num_lambda_messages_for= with something faster (state?)
+Any solution will require that the result for a particular ONC will
+require interrogation of the value for all sub-oncs in the entire
+structure.  If this will be maintained rather than calculated on the
+fly (which is slow), then we'll need a way for ONCs to link /back/ up
+to their parents...  This would be a fairly major change.
+
+Track this in bits of state
+- lambda-msg counter could count the number of lambda messages
+  directed towards an ONC.  This could easily be maintained per ONC as
+  messages are enqueued and dequeued.
+- value-p bit could track if an ONC is value and update itself in
+  response to lambda messages
+
+** assuming we add a backwards link
+Tracking value-p of each ONC becomes the ∧ of the value-p of its car
+and cdr, which are either immediately calculated by their type, or if
+LOCAL are the result of the pointed-to ONC.  With backwards-facing
+links then changes in value-p can be propagated back up the chain.
+
 * why so slow
 : $ time ./test/y-comb-2.test
 : ./test/y-comb-2.test  51.51s user 0.00s system 99% cpu 51.583 total
