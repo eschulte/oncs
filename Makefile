@@ -51,7 +51,7 @@ test/%.test: $(LIB) $(TEST_LIB) test/%.c
 test/%.prof: $(LIB) $(TEST_LIB) test/%.c
 	$(CC) $(CFLAGS) -pg -Itest/ -Isrc/ -o test/$*.test $^ && \
 	./test/$*.test && \
-	gprof ./test/$*.test > ./test/$*.prof
+	gprof ./test/$*.test > test/$*.prof
 
 check: $(TESTS:=.test)
 	for test in $(TESTS:=.test);do \
