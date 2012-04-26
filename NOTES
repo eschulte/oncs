@@ -1,7 +1,8 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* need to lock curried operations and primitive operations
+* need to lock lambdas as they are inserted into bodies of lambda expressions
+* DONE need to lock curried operations and primitive operations
 They are after all both just optimized versions of lambdas.
 
 Storage of the lock

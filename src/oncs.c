@@ -147,17 +147,35 @@ ptr replace_ptr(ptr old, ptr new){
   return new;
 }
 
-ptr duplicate_ptr(ptr ptr, int refs){
+ptr duplicate_ptr(ptr old_p, int refs, int locked){
   coord orig, new;
-  if(ptr.hdr == LOCAL){
-    COORD_OF_PTR(orig, ptr);
+  ptr new_p;
+  new_p = old_p;
+  if(new_p.hdr == LOCAL){
+    COORD_OF_PTR(orig, new_p);
     new = open_space(orig);
     AT(new).refs = refs;
-    ptr.car = new.x; ptr.cdr = new.y;
-    AT(new).car = duplicate_ptr(AT(orig).car, refs);
-    AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs);
+    new_p.car = new.x; new_p.cdr = new.y;
+    AT(new).car = duplicate_ptr(AT(orig).car, refs, locked);
+    /* the bodies of lambdas should be locked after insertion */
+    if(AT(orig).car.hdr == LAMBDA) locked = TRUE;
+    AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked);
+  } else {
+    switch(new_p.hdr){
+    case LCURRIED:
+    case CURRIED:
+      if(locked) new_p.hdr = LCURRIED;
+      else       new_p.hdr = CURRIED;
+      return new_p;
+      break;
+    case LAMBDA:
+    case PRIMOPT:
+      new_p.cdr = locked;
+    default:
+      break;
+    }
   }
-  return ptr;
+  return new_p;
 }
 
 int value_p(ptr ptr){
@@ -292,7 +310,7 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
     break;
   case SYMBOL:
     if(l_msg.mcar.car == ptr.car)
-      ptr = duplicate_ptr(l_msg.mcdr, refs);
+      ptr = duplicate_ptr(l_msg.mcdr, refs, l_msg.mcar.cdr);
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.coord, ptr);

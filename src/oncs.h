@@ -25,8 +25,8 @@
 #define FALSE  0
 
 /* world size and access */
-#define SIZE 32
-#define QLENGTH 10000
+#define SIZE 10
+#define QLENGTH 1000
 #define AT(point) world[point.x][point.y]
 #define WRAP(x) (SIZE+x)%SIZE
 #define QWRAP(x) (QLENGTH+x)%QLENGTH
@@ -128,7 +128,7 @@ void update_ref_msg(coord place, int diff);
 ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
-ptr duplicate_ptr(ptr ptr, int refs);
+ptr duplicate_ptr(ptr ptr, int refs, int locked);
 int value_p(ptr ptr);
 
 /* read strings out from onc world */
