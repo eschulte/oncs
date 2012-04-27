@@ -331,7 +331,9 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
   return ptr;
 }
 
-void app_abs(coord place){
+int app_abs(coord place){
+  int ran;
+  ran = FALSE;
   ptr ptr;
   msg msg;
   coord c_car, c_cdr, c_tmp;
@@ -398,10 +400,14 @@ void app_abs(coord place){
     msg.mcar.hdr = EXTEND;
     msg.mcdr = copy_ptr(AT(c_cdr).cdr);
     enqueue(msg);
+    ran = TRUE;
   }
+  return ran;
 }
 
-void run(coord place){
+int run(coord place){
+  int ran;
+  ran = FALSE;
   msg msg;
   coord c1, c2;
   int i1, i2;
@@ -412,13 +418,16 @@ void run(coord place){
       COORD_OF_PTR(c1, AT(place).car);
       /* apply unlocked λ's */
       if(AT(c1).car.hdr == LAMBDA && AT(c1).car.cdr == FALSE)
-        app_abs(place);
+        ran = app_abs(place);
       /* eliminate redundant nested parenthesis */
-      else if(AT(c1).cdr.hdr == NIL && has_incoming_lambda(c1) == 0)
+      else if(AT(c1).cdr.hdr == NIL && has_incoming_lambda(c1) == 0){
         AT(place).car = replace_ptr(AT(place).car, AT(c1).car);
+        ran = TRUE;
+      }
       break;
     case PRIMOPT:
       if(AT(place).car.cdr == FALSE){ /* only PRIMOPT if unlocked */
+        ran = TRUE;
         switch(AT(place).cdr.hdr){
         case INTEGER:
           AT(place).car.cdr = AT(place).cdr.car;
@@ -434,7 +443,9 @@ void run(coord place){
                    AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr,
                    AT(c2).cdr.hdr, AT(c2).cdr.car, AT(c2).cdr.cdr);
             AT(place).cdr = replace_ptr(AT(place).cdr, AT(c2).cdr);
-          } else run(c2);
+          }
+          break;
+        default: ran = FALSE;
         }
         break;
       }
@@ -465,19 +476,25 @@ void run(coord place){
         DEBUG2("update_ref_msg(%d,%d) from curried function\n",
                c2.x, c2.y);
         update_ref_msg(c2, -1);
-      } else run(c2);
+        ran = TRUE;
+      }
       break;
     }
-    if(AT(place).car.hdr == BOOLEAN)
+    if(AT(place).car.hdr == BOOLEAN){
       BOOLEAN_APP(place, AT(place).car, c1, c2, i1);
-    if(AT(place).cdr.hdr == BOOLEAN)
+      ran = TRUE;
+    }
+    if(AT(place).cdr.hdr == BOOLEAN){
       BOOLEAN_APP(place, AT(place).cdr, c1, c2, i2);
+      ran = TRUE;
+    }
     break;
   case INTEGER:                 /* update number of references */
     AT(place).refs += AT(place).mcar.car;
     msg.mcar = AT(place).mcar;
     INTEGER_APP(AT(place).car, msg);
     INTEGER_APP(AT(place).cdr, msg);
+    ran = TRUE;
     break;
   case LAMBDA:                  /* perform lambda application */
     msg.mcar = AT(place).mcar; msg.mcdr = AT(place).mcdr;
@@ -493,6 +510,7 @@ void run(coord place){
       copy_ptr(msg.mcdr);
       AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
     }
+    ran = TRUE;
     break;
   case EXTEND:
     switch(AT(place).cdr.hdr){
@@ -519,7 +537,10 @@ void run(coord place){
       delete_ptr(AT(place).mcdr);
       break;
     }
+    ran = TRUE;
     break;
   }
-  AT(place).mcar.hdr = NIL;
+  /* TODO: don't nullify message if we haven't ran? */
+  if(ran) AT(place).mcar.hdr = NIL;
+  return ran;
 }

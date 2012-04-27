@@ -137,7 +137,7 @@ int onc_to_string(coord place, char *buf, int index);
 ptr lambda_app(msg l_msg, ptr ptr, int refs);
 
 /* perform lambda application at PLACE */
-void app_abs(coord place);
+int app_abs(coord place);
 
 /* run the onc at PLACE according to its contents and message */
-void run(coord place);
+int run(coord place);
