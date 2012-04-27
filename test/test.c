@@ -306,8 +306,7 @@ void fix(coord place){
       }
       /* run destination either way */
       run(msg.coord);
-    }
-    run_all();
+    } else { run_all(); }
     show_both();
     onc_to_string(place, buf, 0);
     debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
