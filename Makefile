@@ -1,5 +1,8 @@
 CC=gcc
 CFLAGS=
+SIZE=16
+QLENGTH=1024
+BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) -D QLENGTH=$(QLENGTH)
 READLINE_LIB=-lreadline
 LIB = src/oncs.c src/oncs.h
 TEST_LIB= test/test.c test/test.h
@@ -43,16 +46,16 @@ TESTS = \
 all: vm repl
 
 vm: $(LIB) $(TEST_LIB) src/vm.c
-	$(CC) $(CFLAGS) -Isrc/ -Itest/ -o vm $^
+	$(BUILD) -Isrc/ -Itest/ -o vm $^
 
 repl: $(LIB) $(TEST_LIB) src/repl.c
-	$(CC) $(CFLAGS) -Isrc/ -Itest/ $(READLINE_LIB) -o repl $^
+	$(BUILD) -Isrc/ -Itest/ $(READLINE_LIB) -o repl $^
 
 test/%.test: $(LIB) $(TEST_LIB) test/%.c
-	$(CC) $(CFLAGS) -Itest/ -Isrc/ -o test/$*.test $^
+	$(BUILD) -Itest/ -Isrc/ -o test/$*.test $^
 
 test/%.prof: $(LIB) $(TEST_LIB) test/%.c
-	$(CC) $(CFLAGS) -pg -Itest/ -Isrc/ -o test/$*.test $^ && \
+	$(BUILD) -pg -Itest/ -Isrc/ -o test/$*.test $^ && \
 	./test/$*.test && \
 	gprof ./test/$*.test > test/$*.prof
 
