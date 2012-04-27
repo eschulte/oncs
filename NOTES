@@ -1,7 +1,16 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* need to lock lambdas as they are inserted into bodies of lambda expressions
+* lambda applications are faster than lambda replacement messages
+In y-comb-2 the =(< 1 #S3)= should not have been inserted because
+the #S3 should have already been replaced by 0.  We have to propagate
+lambda messages faster, as it is they are being "lapped" by the
+process of lambda application.
+
+This causes problems when part of an expression is consumed by app_abs
+when it still has lambda-messages which haven't yet reached it.
+
+* DONE need to lock lambdas as they are inserted into bodies of lambda expressions
 * DONE need to lock curried operations and primitive operations
 They are after all both just optimized versions of lambdas.
 
