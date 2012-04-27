@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
     " (#L4 (#L3 ((= #S3 0) 1 (* #S3 (#S4 (- 1 #S3)))))))"
     "3";
   expr_to_expr(expr);
-  SHOULD(strcmp(expr, "3") == 0);
+  SHOULD(strcmp(expr, "6") == 0);
 
   /* return indicates success or failure */
   return fail_p;
