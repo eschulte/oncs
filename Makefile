@@ -28,13 +28,16 @@ TESTS = \
 	test/de-nest	\
 	test/fact-2	\
 	test/fact-3	\
-	test/fact-4	\
-	test/y-comb-1
+	test/y-comb-1	\
+	test/examp-3	\
+	test/examp-4	\
+	test/y-comb-2	\
+	test/fact-o-1	\
+	test/fact-o-2
 # too slow
-#	test/fact-o-1
-#	test/fact-o-2
+#	test/fact-o-3
+#	test/fact-4
 #	test/fact
-#	test/y-comb-2
 #	test/y-comb
 
 all: vm repl
