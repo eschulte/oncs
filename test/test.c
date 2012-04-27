@@ -274,19 +274,19 @@ unsigned long world_hash(){
   return hash;
 }
 
-void run_at(int x, int y){
+int run_at(int x, int y){
   debug(2, "running at (%d,%d)\n", x, y);
   coord coord;
   coord.x = x; coord.y = y;
-  run(coord);
+  return run(coord);
 }
 
-void run_all(){
+void run_one(){
   int i, j;
   for(i=0;i<SIZE;i++)
     for(j=0;j<SIZE;j++)
       if(world[i][j].refs > 0)
-        run_at(i, j);
+        if(run_at(i, j)) break;
 }
 
 void fix(coord place){
@@ -306,7 +306,7 @@ void fix(coord place){
       }
       /* run destination either way */
       run(msg.coord);
-    } else { run_all(); }
+    } else { run_one(); }
     show_both();
     onc_to_string(place, buf, 0);
     debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
@@ -330,7 +330,8 @@ void step(coord place){
         for(j=0;j<SIZE;j++){
           onc_to_string(place, buf_comp, 0);
           if(strcmp(buf_strt, buf_comp) != 0) break;
-          if(world[i][j].refs > 0) run_at(i, j);
+          if(world[i][j].refs > 0)
+            if(run_at(i, j)) break;;
         }
     show_both();
     onc_to_string(place, buf_comp, 0);

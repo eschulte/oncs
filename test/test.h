@@ -35,6 +35,8 @@ void simple_app(coord place);
 /* hashing functions from http://www.cse.yorku.ca/~oz/hash.html */
 unsigned long coord_hash();
 unsigned long world_hash();
+int run_at(int x, int y);
+void run_one();
 void fix(coord place);
 void step(coord place);
 
