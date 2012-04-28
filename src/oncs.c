@@ -174,22 +174,12 @@ void duplicate_msgs(coord from, coord to){
 
 /* TODO: maybe pass through original location for co-location */
 ptr duplicate_ptr(ptr old_p, int refs, int locked){
-  coord orig, new, debug;
+  coord orig, new;
   ptr new_p;
   new_p = old_p;
   switch(new_p.hdr){
   case LOCAL:
     COORD_OF_PTR(orig, new_p);
-    /* TODO: this overwrites AT(orig).cdr which may have refs=0 */
-    if(AT(orig).cdr.hdr == LOCAL){
-      COORD_OF_PTR(debug, AT(orig).cdr);
-      printf("expr-dup: (%d,%d)-> [%d](%d,%d,%d)(%d,%d,%d)\n",
-             debug.x, debug.y,
-             AT(debug).refs,
-             AT(debug).car.hdr, AT(debug).car.car, AT(debug).car.cdr,
-             AT(debug).cdr.hdr, AT(debug).cdr.car, AT(debug).cdr.cdr);
-      if(AT(debug).refs == 0) AT(debug).refs++;
-    }
     new = open_space(orig);
     AT(new).refs = refs;
     new_p.car = new.x; new_p.cdr = new.y;
@@ -198,9 +188,6 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
     /* the bodies of lambdas should be locked after insertion */
     if(AT(orig).car.hdr == LAMBDA) locked = TRUE;
     AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked);
-    /* TODO: need to copy over the contents of messages? */
-    /* AT(new).mcar = AT(orig).mcar; */
-    /* AT(new).mcdr = AT(orig).mcdr; */
     break;
   case LCURRIED:
   case CURRIED:
