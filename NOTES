@@ -1,7 +1,7 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* TODO when argument of lambda_app is also lambda_app, it can be truncated
+* when argument of lambda_app is also lambda_app, it can be truncated
 The =duplicate_ptr= function can sometimes take a pointer to a large
 structure, and return a pointer to only the car of that structure.  To
 see this view the output of the following.

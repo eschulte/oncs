@@ -83,7 +83,7 @@
 typedef struct { int x, y; } coord;
 typedef struct { int hdr, car, cdr; } ptr;
 typedef struct { ptr mcar, mcdr; coord coord; } msg;
-typedef struct { ptr car, cdr, mcar, mcdr; int refs, l_msgs; } onc;
+typedef struct { ptr car, cdr, mcar, mcdr; int refs, num_msgs; } onc;
 
 /* global state */
 extern onc world[SIZE][SIZE];
@@ -118,7 +118,7 @@ coord open_space(coord place);
 int run_queue();
 
 /* return the number of lambda messages directed at PLACE */
-int has_incoming_lambda(coord place);
+int has_incoming_msgs(coord place);
 
 /* send a message to PLACE to change its ref counter by DIFF */
 void update_ref_msg(coord place, int diff);

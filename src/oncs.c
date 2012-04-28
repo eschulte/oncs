@@ -10,7 +10,7 @@ void enqueue(msg msg){
   queue[qend]=msg;
   qend = QWRAP(qend+1);
   if(qend == qbeg) ERROR("queue overflow");
-  if(msg.mcar.hdr == LAMBDA) AT(msg.coord).l_msgs++;
+  AT(msg.coord).num_msgs++;
 }
 
 msg dequeue(){
@@ -18,7 +18,7 @@ msg dequeue(){
   if(queue[qbeg].mcar.hdr != NIL){
     qbeg = QWRAP(qbeg+1);
     msg = queue[QWRAP(qbeg-1)];
-    if(msg.mcar.hdr == LAMBDA) AT(msg.coord).l_msgs--;
+    AT(msg.coord).num_msgs--;
     return msg;
   } else ERROR("queue underflow");
 }
@@ -58,7 +58,7 @@ void clear_queue(){
 
 int free_p(coord place){
   return (AT(place).refs == 0 &&
-          ! has_incoming_lambda(place));
+          ! has_incoming_msgs(place));
 }
 
 coord open_space(coord place){
@@ -100,19 +100,19 @@ int run_queue(){
   }
 }
 
-int has_incoming_lambda(coord place){
+int has_incoming_msgs(coord place){
   coord temp;
-  if(AT(place).l_msgs){
+  if(AT(place).num_msgs){
     return TRUE;
   } else {
     if(AT(place).car.hdr == LOCAL){
       COORD_OF_PTR(temp, AT(place).car);
-      if(has_incoming_lambda(temp))
+      if(has_incoming_msgs(temp))
         return TRUE;
     }
     if(AT(place).cdr.hdr == LOCAL){
       COORD_OF_PTR(temp, AT(place).cdr);
-      if(has_incoming_lambda(temp))
+      if(has_incoming_msgs(temp))
         return TRUE;
     }
   }
@@ -383,12 +383,12 @@ int app_abs(coord place){
     ERROR("malformed app_abs.car");
   if(AT(place).cdr.hdr == LOCAL)
     COORD_OF_PTR(c_cdr, AT(place).cdr);
-  DEBUG3("has_incoming_lambda(%d,%d) == %d\n",
-         place.x, place.y, has_incoming_lambda(place));
+  DEBUG3("has_incoming_msgs(%d,%d) == %d\n",
+         place.x, place.y, has_incoming_msgs(place));
   if(/* don't apply to non values -- call-by-value */
      value_p(AT(place).cdr) &&
      /* only apply when body has 0 incoming λ-messages */
-     has_incoming_lambda(place) == 0){
+     has_incoming_msgs(place) == 0){
     /* 1. make new message */
     msg.mcar.hdr = LAMBDA;
     /* 2. copy λ1 to msg.car */
@@ -456,7 +456,7 @@ int run(coord place){
       if(AT(c1).car.hdr == LAMBDA && AT(c1).car.cdr == FALSE)
         ran = app_abs(place);
       /* eliminate redundant nested parenthesis */
-      else if(AT(c1).cdr.hdr == NIL && has_incoming_lambda(c1) == 0){
+      else if(AT(c1).cdr.hdr == NIL && has_incoming_msgs(c1) == 0){
         AT(place).car = replace_ptr(AT(place).car, AT(c1).car);
         ran = TRUE;
       }
