@@ -11,6 +11,11 @@ make ./test/fact-o-10.test && ./test/fact-o-10.test -v|grep expr|uniq|tail -20
 
 see [[file:src/oncs.c::/*%20TODO:%20the%20cdr%20of%20in%20this%20place%20is%20not%20set%20correctly!%20*/][file:src/oncs.c::/* TODO: the cdr of in this place is not set correctly! */]]
 
+Could be that we have places returned as free which have messages
+heading their way.  So either don't return anything as free which has
+incoming messages, or clear out the messages when it is made free.
+Lets do the former.
+
 * the undesirable fallback is always to lock the targets of λ-msgs
 * somehow failures are related to the SIZE
 | SIZE | failures            |

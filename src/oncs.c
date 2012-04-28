@@ -56,6 +56,11 @@ void clear_queue(){
   qbeg = qend = 0;
 }
 
+int free_p(coord place){
+  return (AT(place).refs == 0 &&
+          ! has_incoming_lambda(place));
+}
+
 coord open_space(coord place){
   int index, cntrl, tried;
   index = cntrl = tried = 0;
@@ -73,7 +78,7 @@ coord open_space(coord place){
       case 3: place.x = WRAP(place.x + (SIZE - 1)); break;
       }
     }
-    if (AT(place).refs == 0) break;
+    if (free_p(place)) break;
   } while (tried <= SIZE*SIZE);
   if (tried >= SIZE*SIZE) { ERROR("exhausted world"); }
   else { clear_place(place); return place; }

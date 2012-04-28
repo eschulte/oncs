@@ -111,6 +111,7 @@ void clear_queue();
  *        | <------- v
  *               2
  */
+int free_p(coord place);
 coord open_space(coord place);
 
 /* try to apply a message from the queue */
