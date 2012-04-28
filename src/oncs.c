@@ -415,9 +415,11 @@ int app_abs(coord place){
     msg.coord = place;
     enqueue(msg);
     /* 6. replace end of 10 with 4 */
-    msg.mcar.hdr = EXTEND;
-    msg.mcdr = copy_ptr(AT(c_cdr).cdr);
-    enqueue(msg);
+    if(AT(c_cdr).cdr.hdr != NIL){
+      msg.mcar.hdr = EXTEND;
+      msg.mcdr = copy_ptr(AT(c_cdr).cdr);
+      enqueue(msg);
+    }
     ran = TRUE;
   }
   return ran;
