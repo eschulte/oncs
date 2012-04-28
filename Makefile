@@ -40,7 +40,8 @@ TESTS = \
 	test/fact-4	\
 	test/fact-o-3	\
 	test/fact-o-4	\
-	test/fact-o-6
+	test/fact-o-6	\
+	test/fact-o-10
 
 all: vm repl
 
