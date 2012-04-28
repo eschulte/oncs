@@ -170,6 +170,9 @@ void duplicate_msgs(coord from, coord to){
 /* TODO: maybe pass through original location for co-location */
 ptr duplicate_ptr(ptr old_p, int refs, int locked){
   coord orig, new, debug, debug_car, debug_cdr;
+  char buf[1000];
+  char buf_car[1000];
+  char buf_cdr[1000];
   ptr new_p;
   new_p = old_p;
   switch(new_p.hdr){
@@ -178,13 +181,50 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
     /* debugging: (*3 ...) where ... is wrongly NIL */
     if(AT(orig).car.hdr == LOCAL){
       COORD_OF_PTR(debug, AT(orig).car);
-      printf("expr-dup: (%d,%d,%d) (%d,%d,%d)\n",
-             AT(debug).car.hdr,
-             AT(debug).car.car,
-             AT(debug).car.cdr,
-             AT(debug).cdr.hdr,
-             AT(debug).cdr.car,
-             AT(debug).cdr.cdr);
+      if(AT(debug).car.hdr == LOCAL &&
+         AT(debug).cdr.hdr == LOCAL){
+        COORD_OF_PTR(debug_car, AT(debug).car);
+        COORD_OF_PTR(debug_cdr, AT(debug).cdr);
+        onc_to_string(orig, buf, 0);
+        onc_to_string(debug_car, buf_car, 0);
+        onc_to_string(debug_cdr, buf_cdr, 0);
+        printf("expr-dup: %s\n"
+               "expr-dup: +-(%d,%d,%d) (%d,%d,%d)\n"
+               "expr-dup: |\n"
+               "expr-dup: +-(%d,%d,%d) (%d,%d,%d)\n"
+               "expr-dup: |\n"
+               "expr-dup: %s\n"
+               "expr-dup: +-(%d,%d,%d) (%d,%d,%d)\n"
+               "expr-dup: %s\n"
+               "expr-dup:  \\(%d,%d,%d) (%d,%d,%d)\n",
+               buf,
+               AT(orig).car.hdr,
+               AT(orig).car.car,
+               AT(orig).car.cdr,
+               AT(orig).cdr.hdr,
+               AT(orig).cdr.car,
+               AT(orig).cdr.cdr,
+               AT(debug).car.hdr,
+               AT(debug).car.car,
+               AT(debug).car.cdr,
+               AT(debug).cdr.hdr,
+               AT(debug).cdr.car,
+               AT(debug).cdr.cdr,
+               buf_car,
+               AT(debug_car).car.hdr,
+               AT(debug_car).car.car,
+               AT(debug_car).car.cdr,
+               AT(debug_car).cdr.hdr,
+               AT(debug_car).cdr.car,
+               AT(debug_car).cdr.cdr,
+               buf_cdr,
+               AT(debug_cdr).car.hdr,
+               AT(debug_cdr).car.car,
+               AT(debug_cdr).car.cdr,
+               AT(debug_cdr).cdr.hdr,
+               AT(debug_cdr).cdr.car,
+               AT(debug_cdr).cdr.cdr); 
+      }
     }
     new = open_space(orig);
     AT(new).refs = refs;
@@ -193,6 +233,7 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
     AT(new).car = duplicate_ptr(AT(orig).car, refs, locked);
     /* the bodies of lambdas should be locked after insertion */
     if(AT(orig).car.hdr == LAMBDA) locked = TRUE;
+    /* TODO: the cdr of in this place is not set correctly!  */
     AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked);
     /* TODO: need to copy over the contents of messages? */
     /* AT(new).mcar = AT(orig).mcar; */
@@ -327,7 +368,8 @@ int onc_to_string(coord place, char *buf, int index){
 }
 
 ptr lambda_app(msg l_msg, ptr ptr, int refs){
-  coord coord;
+  coord coord;                  /* <- this can be deleted post debug*/
+  char buf[1000];
   switch(ptr.hdr){
   case NIL:
   case INTEGER:
@@ -346,8 +388,24 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
     ptr.cdr = l_msg.mcar.cdr;
     break;
   case SYMBOL:
-    if(l_msg.mcar.car == ptr.car)
+    if(l_msg.mcar.car == ptr.car){
+      printf("expr-λ-app: #S%d->(%d,%d,%d)\n",
+             ptr.car,
+             l_msg.mcdr.hdr, l_msg.mcdr.car, l_msg.mcdr.cdr);
+      if(l_msg.mcdr.hdr == LOCAL){
+        COORD_OF_PTR(coord, l_msg.mcdr);
+        onc_to_string(coord, buf, 0);
+        printf("expr-λ-app: l_msg.mcdr->%s\n", buf);  
+      }
       ptr = duplicate_ptr(l_msg.mcdr, refs, l_msg.mcar.cdr);
+      if(ptr.hdr == LOCAL){
+        COORD_OF_PTR(coord, ptr);
+        onc_to_string(coord, buf, 0);
+        printf("expr-λ-app: ptr->%s\n", buf);  
+      }
+      printf("expr-λ-app: ptr->(%d,%d,%d)\n",
+             ptr.hdr, ptr.car, ptr.cdr);
+    }
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.coord, ptr);
