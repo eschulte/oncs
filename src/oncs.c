@@ -169,86 +169,30 @@ void duplicate_msgs(coord from, coord to){
 
 /* TODO: maybe pass through original location for co-location */
 ptr duplicate_ptr(ptr old_p, int refs, int locked){
-  coord orig, new, debug, debug_car, debug_cdr;
-  char buf[1000];
-  char buf_car[1000];
-  char buf_cdr[1000];
+  coord orig, new, debug;
   ptr new_p;
   new_p = old_p;
   switch(new_p.hdr){
   case LOCAL:
     COORD_OF_PTR(orig, new_p);
-    /* debugging: (*3 ...) where ... is wrongly NIL */
-    if(AT(orig).car.hdr == LOCAL){
-      COORD_OF_PTR(debug, AT(orig).car);
-      if(AT(debug).car.hdr == LOCAL &&
-         AT(debug).cdr.hdr == LOCAL){
-        COORD_OF_PTR(debug_car, AT(debug).car);
-        COORD_OF_PTR(debug_cdr, AT(debug).cdr);
-        onc_to_string(orig, buf, 0);
-        onc_to_string(debug_car, buf_car, 0);
-        onc_to_string(debug_cdr, buf_cdr, 0);
-        printf("expr-dup: %s\n"
-               "expr-dup: %d-(%d,%d,%d) (%d,%d,%d)\n"
-               "expr-dup: |\n"
-               "expr-dup: %d-(%d,%d,%d) (%d,%d,%d)\n"
-               "expr-dup: |\n"
-               "expr-dup: %s\n"
-               "expr-dup: %d-(%d,%d,%d) (%d,%d,%d)\n"
-               "expr-dup: %s\n"
-               "expr-dup: %d\\(%d,%d,%d) (%d,%d,%d)\n",
-               buf,
-               AT(orig).refs,
-               AT(orig).car.hdr,
-               AT(orig).car.car,
-               AT(orig).car.cdr,
-               AT(orig).cdr.hdr,
-               AT(orig).cdr.car,
-               AT(orig).cdr.cdr,
-               AT(debug).refs,
-               AT(debug).car.hdr,
-               AT(debug).car.car,
-               AT(debug).car.cdr,
-               AT(debug).cdr.hdr,
-               AT(debug).cdr.car,
-               AT(debug).cdr.cdr,
-               buf_car,
-               AT(debug_car).refs,
-               AT(debug_car).car.hdr,
-               AT(debug_car).car.car,
-               AT(debug_car).car.cdr,
-               AT(debug_car).cdr.hdr,
-               AT(debug_car).cdr.car,
-               AT(debug_car).cdr.cdr,
-               buf_cdr,
-               AT(debug_cdr).refs,
-               AT(debug_cdr).car.hdr,
-               AT(debug_cdr).car.car,
-               AT(debug_cdr).car.cdr,
-               AT(debug_cdr).cdr.hdr,
-               AT(debug_cdr).cdr.car,
-               AT(debug_cdr).cdr.cdr); 
-      }
+    /* TODO: this overwrites AT(orig).cdr which may have refs=0 */
+    if(AT(orig).cdr.hdr == LOCAL){
+      COORD_OF_PTR(debug, AT(orig).cdr);
+      printf("expr-dup: (%d,%d)-> [%d](%d,%d,%d)(%d,%d,%d)\n",
+             debug.x, debug.y,
+             AT(debug).refs,
+             AT(debug).car.hdr, AT(debug).car.car, AT(debug).car.cdr,
+             AT(debug).cdr.hdr, AT(debug).cdr.car, AT(debug).cdr.cdr);
+      if(AT(debug).refs == 0) AT(debug).refs++;
     }
     new = open_space(orig);
-    printf("expr-dup: new-space->(%d,%d)\n", new.x, new.y);
     AT(new).refs = refs;
     new_p.car = new.x; new_p.cdr = new.y;
     duplicate_msgs(orig, new);
-    if(AT(orig).car.hdr == LOCAL){
-      /* TODO: print out orig.car as a string */
-    }
     AT(new).car = duplicate_ptr(AT(orig).car, refs, locked);
-    if(AT(orig).cdr.hdr == LOCAL){
-      /* TODO: print out orig.cdr as a string */
-    }
     /* the bodies of lambdas should be locked after insertion */
     if(AT(orig).car.hdr == LAMBDA) locked = TRUE;
-    printf("expr-dup: old.cdr->(%d,%d,%d)\n",
-           AT(orig).cdr.hdr, AT(orig).cdr.car, AT(orig).cdr.cdr);
     AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked);
-    printf("expr-dup: new.cdr->(%d,%d,%d)\n",
-           AT(new).cdr.hdr, AT(new).cdr.car, AT(new).cdr.cdr);
     /* TODO: need to copy over the contents of messages? */
     /* AT(new).mcar = AT(orig).mcar; */
     /* AT(new).mcdr = AT(orig).mcdr; */
@@ -382,8 +326,6 @@ int onc_to_string(coord place, char *buf, int index){
 }
 
 ptr lambda_app(msg l_msg, ptr ptr, int refs){
-  coord coord;                  /* <- this can be deleted post debug*/
-  char buf[1000];
   switch(ptr.hdr){
   case NIL:
   case INTEGER:
@@ -402,26 +344,8 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
     ptr.cdr = l_msg.mcar.cdr;
     break;
   case SYMBOL:
-    if(l_msg.mcar.car == ptr.car){
-      printf("expr-λ-app: #S%d->(%d,%d,%d)\n",
-             ptr.car,
-             l_msg.mcdr.hdr, l_msg.mcdr.car, l_msg.mcdr.cdr);
-      if(l_msg.mcdr.hdr == LOCAL){
-        COORD_OF_PTR(coord, l_msg.mcdr);
-        onc_to_string(coord, buf, 0);
-        printf("expr-λ-app: l_msg.mcdr.refs->%d l_msg.mcdr->%s\n",
-               AT(coord).refs, buf);  
-      }
+    if(l_msg.mcar.car == ptr.car)
       ptr = duplicate_ptr(l_msg.mcdr, refs, l_msg.mcar.cdr);
-      if(ptr.hdr == LOCAL){
-        COORD_OF_PTR(coord, ptr);
-        onc_to_string(coord, buf, 0);
-        printf("expr-λ-app: ptr.refs->%d ptr->%s\n",
-               AT(coord).refs, buf);  
-      }
-      printf("expr-λ-app: ptr->(%d,%d,%d)\n",
-             ptr.hdr, ptr.car, ptr.cdr);
-    }
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.coord, ptr);
