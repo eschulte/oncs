@@ -1,6 +1,7 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* the undesirable fallback is always to lock the targets of λ-msgs
 * somehow failures are related to the SIZE
 | SIZE | failures            |
 |------+---------------------|
