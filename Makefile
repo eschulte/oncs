@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=
-SIZE=16
+SIZE=24
 QLENGTH=1024
 BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) -D QLENGTH=$(QLENGTH)
 READLINE_LIB=-lreadline
@@ -39,14 +39,14 @@ TESTS = \
 	test/fact-o-2	\
 	test/fact-4	\
 	test/fact-o-3	\
-	test/fact-o-4	\
-	test/fact-o-6
-# Although this test is passing it is commented out because it takes
-# up too much space in the world (requires SIZE=64), and once the
+	test/fact-o-4
+# Although these tests are passing they are commented out because they
+# take up too much space in the world (require SIZE>32), and once the
 # world grows larger than the CPU L1 (or L2 maybe) cache, this whole
 # things slows down considerably.
 #
-#	test/fact-o-10
+#	test/fact-o-6	\
+	test/fact-o-10
 
 all: vm repl
 
@@ -66,7 +66,7 @@ test/%.prof: $(LIB) $(TEST_LIB) test/%.c
 
 check: $(TESTS:=.test)
 	for test in $(TESTS:=.test);do \
-		./$$test 2>/dev/null; \
+		./$$test 1>/dev/null; \
 		if [[ "$$?" -eq "0" ]];then result=PASS; \
 		else result=FAIL;fi; \
 		echo "$$result $$test"; \
