@@ -40,8 +40,13 @@ TESTS = \
 	test/fact-4	\
 	test/fact-o-3	\
 	test/fact-o-4	\
-	test/fact-o-6	\
-	test/fact-o-10
+	test/fact-o-6
+# Although this test is passing it is commented out because it takes
+# up too much space in the world (requires SIZE=64), and once the
+# world grows larger than the CPU L1 (or L2 maybe) cache, this whole
+# things slows down considerably.
+#
+#	test/fact-o-10
 
 all: vm repl
 
