@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=
-SIZE=24
+SIZE=32
 QLENGTH=1024
 BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) -D QLENGTH=$(QLENGTH)
 READLINE_LIB=-lreadline
@@ -35,10 +35,6 @@ TESTS = \
 	test/examp-3	\
 	test/examp-4	\
 	test/y-comb-2	\
-	test/fact-o-1	\
-	test/fact-o-2	\
-	test/fact-4	\
-	test/fact-o-3	\
 	test/fact-o-4
 # Although these tests are passing they are commented out because they
 # take up too much space in the world (require SIZE>32), and once the
