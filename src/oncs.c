@@ -151,6 +151,21 @@ ptr replace_ptr(ptr old, ptr new){
   return new;
 }
 
+void duplicate_msgs(coord from, coord to){
+  int i, end;
+  end = qend;
+  msg msg;
+  for(i=qbeg;i<end;i=QWRAP(i+1)){
+    msg = queue[i];
+    if(msg.mcar.hdr != INTEGER &&
+       msg.coord.x == from.x &&
+       msg.coord.y == from.y){
+      msg.coord = to;
+      enqueue(msg);
+    }
+  }
+}
+
 ptr duplicate_ptr(ptr old_p, int refs, int locked){
   coord orig, new;
   ptr new_p;
@@ -160,6 +175,7 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
     new = open_space(orig);
     AT(new).refs = refs;
     new_p.car = new.x; new_p.cdr = new.y;
+    duplicate_msgs(orig, new);
     AT(new).car = duplicate_ptr(AT(orig).car, refs, locked);
     /* the bodies of lambdas should be locked after insertion */
     if(AT(orig).car.hdr == LAMBDA) locked = TRUE;

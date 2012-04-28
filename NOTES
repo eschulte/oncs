@@ -4,7 +4,7 @@
 * allow λ-messages in the tail of a lambda application
 Otherwise, something simple like =(T 89 ...)= will never resolve.
 
-* TODO when argument of lambda_app is also lambda_app, it can be mangled
+* DONE when argument of lambda_app is also lambda_app, it can be mangled
 ok, so, when a λ-application is the argument to an a app_abs, there is
 nothing to stop it from evaluating /while/ the corresponding
 λ-messages are propagating from the body of the λ-application.
@@ -13,6 +13,14 @@ either
 1. don't allow execution of structures which are the /arguments/ (not
    the targets) of λ-expressions, or more easily,
 2. when copying a pointer, copy it's message queue as well
+
+** implementation
+copy_ptr is called from
+- lambda_app of a LOCAL
+- app_abs into the λ-msg and into the EXTEND-msg
+- run.CURRIED application into place.cdr
+- run.LAMBDA to propagate lambda messages (already in a message)
+- run.EXTEND messages when applied
 
 ** BS
 Like the cadr of the argument of the app may simply be lost.

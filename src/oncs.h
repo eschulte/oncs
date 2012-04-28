@@ -126,6 +126,7 @@ void update_ref_msg(coord place, int diff);
 ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
+void duplicate_msgs(coord from, coord to);
 ptr duplicate_ptr(ptr ptr, int refs, int locked);
 int value_p(ptr ptr);
 
