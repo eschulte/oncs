@@ -1,6 +1,16 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* TODO when argument of lambda_app is also lambda_app, it can be truncated
+The =duplicate_ptr= function can sometimes take a pointer to a large
+structure, and return a pointer to only the car of that structure.  To
+see this view the output of the following.
+#+begin_src sh
+make ./test/fact-o-10.test && ./test/fact-o-10.test -v|grep expr|uniq|tail -20
+#+end_src
+
+see [[file:src/oncs.c::/*%20TODO:%20the%20cdr%20of%20in%20this%20place%20is%20not%20set%20correctly!%20*/][file:src/oncs.c::/* TODO: the cdr of in this place is not set correctly! */]]
+
 * the undesirable fallback is always to lock the targets of λ-msgs
 * somehow failures are related to the SIZE
 | SIZE | failures            |
@@ -17,7 +27,7 @@ tests are passing with SIZE=16.
 * allow λ-messages in the tail of a lambda application
 Otherwise, something simple like =(T 89 ...)= will never resolve.
 
-* DONE when argument of lambda_app is also lambda_app, it can be mangled
+* DONE when copying a pointer, copy its message queue as well
 ok, so, when a λ-application is the argument to an a app_abs, there is
 nothing to stop it from evaluating /while/ the corresponding
 λ-messages are propagating from the body of the λ-application.
