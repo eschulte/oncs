@@ -184,6 +184,9 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
     /* the bodies of lambdas should be locked after insertion */
     if(AT(orig).car.hdr == LAMBDA) locked = TRUE;
     AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked);
+    /* TODO: need to copy over the contents of messages? */
+    /* AT(new).mcar = AT(orig).mcar; */
+    /* AT(new).mcdr = AT(orig).mcdr; */
     break;
   case LCURRIED:
   case CURRIED:
