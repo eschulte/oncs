@@ -2,13 +2,16 @@
 #+Options: ^:nil
 
 * somehow failures are related to the SIZE
-When SIZE=32 the only failure is file:test/fact-4.c, however when
-size=16 fact-4 runs successfully and the only failures are
-file:test/fact-o-4.c and file:test/fact-o-6.c.
+| SIZE | failures            |
+|------+---------------------|
+|   16 | (fact-o-4 fact-o-6) |
+|   32 | (fact-4)            |
+|   64 | ()                  |
 
 This could be due to overwriting of referenced ONCS, which could be
 due to a need to increment refs when an ONC is duplicated onto the
-queue by =duplicate_msgs=.
+queue by =duplicate_msgs=.  and.... yes, this fixes things, now all
+tests are passing with SIZE=16.
 
 * allow λ-messages in the tail of a lambda application
 Otherwise, something simple like =(T 89 ...)= will never resolve.

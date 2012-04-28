@@ -161,6 +161,7 @@ void duplicate_msgs(coord from, coord to){
        msg.coord.x == from.x &&
        msg.coord.y == from.y){
       msg.coord = to;
+      copy_ptr(msg.mcdr);
       enqueue(msg);
     }
   }
