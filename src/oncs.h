@@ -77,7 +77,7 @@
 #define DEBUG5(fmt, x, y, z, a, b) if(DEBUG_P) printf(fmt, x, y, z, a, b);
 #define DEBUG8(fmt, x, y, z, a, b, c, d, e) \
   if(DEBUG_P) printf(fmt, x, y, z, a, b, c, d, e);
-#define ERROR(message) { printf("ERROR: %s\n", message); exit(1); }
+#define ERROR(message) { fprintf(stderr, "ERROR: %s\n", message); exit(1); }
 
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
