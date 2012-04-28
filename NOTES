@@ -4,8 +4,51 @@
 * allow λ-messages in the tail of a lambda application
 Otherwise, something simple like =(T 89 ...)= will never resolve.
 
-* when argument of lambda_app is also lambda_app, it can be mangled
+* TODO when argument of lambda_app is also lambda_app, it can be mangled
+ok, so, when a λ-application is the argument to an a app_abs, there is
+nothing to stop it from evaluating /while/ the corresponding
+λ-messages are propagating from the body of the λ-application.
+
+either
+1. don't allow execution of structures which are the /arguments/ (not
+   the targets) of λ-expressions, or more easily,
+2. when copying a pointer, copy it's message queue as well
+
+** BS
 Like the cadr of the argument of the app may simply be lost.
+
+to find the bad part of fact-o-2 break app_abs when
+- place.car.car == #L0
+- palce.cdr.car == #S0
+- value_p(place.cdr)
+- no incoming lambdas
+
+break here
+: (gdb) p world[4][15].car
+: $12 = {hdr = 1, car = 4, cdr = 11}
+: (gdb) p world[4][11].car
+: $13 = {hdr = 4, car = 0, cdr = 0}
+: (gdb) p world[4][11].cdr
+: $14 = {hdr = 1, car = 4, cdr = 10}
+: (gdb) p world[4][10].car
+: $15 = {hdr = 3, car = 0, cdr = 0}
+: (gdb) p place
+: $16 = {x = 4, y = 15}
+: (gdb) p place
+:       {x = 8, y = 8}
+
+: break app_abs if (place.x == 8 && place.y == 8 && world[4][15].car.hdr = 1 && world[4][15].car.car == 4 && world[4][15].car.cdr == 11 && world[4][11].car.hdr == 4 && world[4][11].car.car == 0 && world[4][10].car.hdr == 3 && world[4][10].car.car == 0)
+
+#+begin_src C
+break app_abs if (has_incoming_lambda(place) == 0 &&
+                    world[place.x][place.y].car.hdr == 1 &&
+                    world[world[place.x][place.y].car.car][world[place.x][place.y].car.cdr].car.hdr == 4 &&
+                    world[world[place.x][place.y].car.car][world[place.x][place.y].car.cdr].car.car == 0 &&
+                    world[world[place.x][place.y].car.car][world[place.x][place.y].car.cdr].car.cdr == 0 &&
+                    world[world[place.x][place.y].car.car][world[place.x][place.y].car.cdr].cdr.hdr == 1 &&
+                    world[world[world[place.x][place.y].car.car][world[place.x][place.y].car.cdr].cdr.car][world[world[place.x][place.y].car][world[place.x][place.y].cdr].cdr.cdr].car.hdr == 3 &&
+                    world[world[world[place.x][place.y].car.car][world[place.x][place.y].car.cdr].cdr.car][world[world[place.x][place.y].car][world[place.x][place.y].cdr].cdr.cdr].car.car == 0)
+#+end_src
 
 * lambda applications are faster than lambda replacement messages
 In y-comb-2 the =(< 1 #S3)= should not have been inserted because
