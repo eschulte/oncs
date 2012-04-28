@@ -189,21 +189,23 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
         onc_to_string(debug_car, buf_car, 0);
         onc_to_string(debug_cdr, buf_cdr, 0);
         printf("expr-dup: %s\n"
-               "expr-dup: +-(%d,%d,%d) (%d,%d,%d)\n"
+               "expr-dup: %d-(%d,%d,%d) (%d,%d,%d)\n"
                "expr-dup: |\n"
-               "expr-dup: +-(%d,%d,%d) (%d,%d,%d)\n"
+               "expr-dup: %d-(%d,%d,%d) (%d,%d,%d)\n"
                "expr-dup: |\n"
                "expr-dup: %s\n"
-               "expr-dup: +-(%d,%d,%d) (%d,%d,%d)\n"
+               "expr-dup: %d-(%d,%d,%d) (%d,%d,%d)\n"
                "expr-dup: %s\n"
-               "expr-dup:  \\(%d,%d,%d) (%d,%d,%d)\n",
+               "expr-dup: %d\\(%d,%d,%d) (%d,%d,%d)\n",
                buf,
+               AT(orig).refs,
                AT(orig).car.hdr,
                AT(orig).car.car,
                AT(orig).car.cdr,
                AT(orig).cdr.hdr,
                AT(orig).cdr.car,
                AT(orig).cdr.cdr,
+               AT(debug).refs,
                AT(debug).car.hdr,
                AT(debug).car.car,
                AT(debug).car.cdr,
@@ -211,6 +213,7 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
                AT(debug).cdr.car,
                AT(debug).cdr.cdr,
                buf_car,
+               AT(debug_car).refs,
                AT(debug_car).car.hdr,
                AT(debug_car).car.car,
                AT(debug_car).car.cdr,
@@ -218,6 +221,7 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
                AT(debug_car).cdr.car,
                AT(debug_car).cdr.cdr,
                buf_cdr,
+               AT(debug_cdr).refs,
                AT(debug_cdr).car.hdr,
                AT(debug_cdr).car.car,
                AT(debug_cdr).car.cdr,
@@ -227,14 +231,24 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
       }
     }
     new = open_space(orig);
+    printf("expr-dup: new-space->(%d,%d)\n", new.x, new.y);
     AT(new).refs = refs;
     new_p.car = new.x; new_p.cdr = new.y;
     duplicate_msgs(orig, new);
+    if(AT(orig).car.hdr == LOCAL){
+      /* TODO: print out orig.car as a string */
+    }
     AT(new).car = duplicate_ptr(AT(orig).car, refs, locked);
+    if(AT(orig).cdr.hdr == LOCAL){
+      /* TODO: print out orig.cdr as a string */
+    }
     /* the bodies of lambdas should be locked after insertion */
     if(AT(orig).car.hdr == LAMBDA) locked = TRUE;
-    /* TODO: the cdr of in this place is not set correctly!  */
+    printf("expr-dup: old.cdr->(%d,%d,%d)\n",
+           AT(orig).cdr.hdr, AT(orig).cdr.car, AT(orig).cdr.cdr);
     AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked);
+    printf("expr-dup: new.cdr->(%d,%d,%d)\n",
+           AT(new).cdr.hdr, AT(new).cdr.car, AT(new).cdr.cdr);
     /* TODO: need to copy over the contents of messages? */
     /* AT(new).mcar = AT(orig).mcar; */
     /* AT(new).mcdr = AT(orig).mcdr; */
@@ -395,13 +409,15 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
       if(l_msg.mcdr.hdr == LOCAL){
         COORD_OF_PTR(coord, l_msg.mcdr);
         onc_to_string(coord, buf, 0);
-        printf("expr-λ-app: l_msg.mcdr->%s\n", buf);  
+        printf("expr-λ-app: l_msg.mcdr.refs->%d l_msg.mcdr->%s\n",
+               AT(coord).refs, buf);  
       }
       ptr = duplicate_ptr(l_msg.mcdr, refs, l_msg.mcar.cdr);
       if(ptr.hdr == LOCAL){
         COORD_OF_PTR(coord, ptr);
         onc_to_string(coord, buf, 0);
-        printf("expr-λ-app: ptr->%s\n", buf);  
+        printf("expr-λ-app: ptr.refs->%d ptr->%s\n",
+               AT(coord).refs, buf);  
       }
       printf("expr-λ-app: ptr->(%d,%d,%d)\n",
              ptr.hdr, ptr.car, ptr.cdr);
