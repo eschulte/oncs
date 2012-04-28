@@ -38,12 +38,9 @@ TESTS = \
 	test/fact-o-1	\
 	test/fact-o-2	\
 	test/fact-4	\
-	test/fact-o-3
-# too slow
-#	test/fact-o-3
-#	test/fact-4
-#	test/fact
-#	test/y-comb
+	test/fact-o-3	\
+	test/fact-o-4	\
+	test/fact-o-6
 
 all: vm repl
 

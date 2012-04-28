@@ -1,6 +1,15 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* somehow failures are related to the SIZE
+When SIZE=32 the only failure is file:test/fact-4.c, however when
+size=16 fact-4 runs successfully and the only failures are
+file:test/fact-o-4.c and file:test/fact-o-6.c.
+
+This could be due to overwriting of referenced ONCS, which could be
+due to a need to increment refs when an ONC is duplicated onto the
+queue by =duplicate_msgs=.
+
 * allow λ-messages in the tail of a lambda application
 Otherwise, something simple like =(T 89 ...)= will never resolve.
 
