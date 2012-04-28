@@ -169,13 +169,23 @@ void duplicate_msgs(coord from, coord to){
 
 /* TODO: maybe pass through original location for co-location */
 ptr duplicate_ptr(ptr old_p, int refs, int locked){
-  coord orig, new;
+  coord orig, new, debug, debug_car, debug_cdr;
   ptr new_p;
   new_p = old_p;
-  /* debugging: (*3 ...) where ... is wrongly NIL */
   switch(new_p.hdr){
   case LOCAL:
     COORD_OF_PTR(orig, new_p);
+    /* debugging: (*3 ...) where ... is wrongly NIL */
+    if(AT(orig).car.hdr == LOCAL){
+      COORD_OF_PTR(debug, AT(orig).car);
+      printf("expr-dup: (%d,%d,%d) (%d,%d,%d)\n",
+             AT(debug).car.hdr,
+             AT(debug).car.car,
+             AT(debug).car.cdr,
+             AT(debug).cdr.hdr,
+             AT(debug).cdr.car,
+             AT(debug).cdr.cdr);
+    }
     new = open_space(orig);
     AT(new).refs = refs;
     new_p.car = new.x; new_p.cdr = new.y;
