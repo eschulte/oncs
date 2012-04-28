@@ -25,7 +25,7 @@ The main design goals of this effort are
 Composed of an integer reference counter and four pointers.
 :         an ONC
 : +-------------------+
-: |  #refs  | #λ-msgs |
+: |  #refs  |  #msgs  |
 : +---------+---------+
 : |  mcar   |  car    |
 : |         |         |
@@ -88,7 +88,9 @@ The message values and their meanings are.
 
    To run a particular test with verbose output do the following and
    press SPACEBAR to step through stages of evaluation.
-   : oncs$ ./test/fact-0.test -v|more -c
+   : oncs$ ./test/fact-o-4.test -v|more -c
+   Or, to just see the sequence of unique expressions.
+   : oncs$ ./test/fact-o-4.test -v|grep expr|uniq
 
 3. Run a REPL
    : oncs$ ./repl
@@ -99,7 +101,11 @@ The message values and their meanings are.
    :    clear -- clear the ONC world
    :  verbose -- toggle verbose execution
    :     help -- show this help message
-   :
+   :     step -- run a single step
+   :    print -- print a point in the world
+   :    queue -- run down the queue
+   :    showq -- show the queue
+   : 
    : All other inputs should be lambda calculus
    : expressions.  Allowed atoms include...
    : #Ln -- λn, `n' is an integer symbol identifier
@@ -108,37 +114,46 @@ The message values and their meanings are.
    :  op -- where `op' is a primitive integer operation
    :        and op is one of (+ - * / = <)
    : > (#L1 (= #S1 0) 1 (* #S1 2)) 0
-   : ((#L1 (= #S1 0 ) 1 (* #S1 2 ) ) 0 )
+   : (#L1 (= #S1 0) 1 (* #S1 2)) 0
    : > show
-   :     0   1   2   3   4   5   6   7   8   9
-   : 0                  #1^ i1_
-   : 1                  ^1_ s1^
-   : 2                  i1^ #1^
-   : 3                      ^1^
-   : 4                  i1_ l1^
-   : 5                      ^1^
-   : 6
-   : 7
-   : 8                  i1_
-   : 9                  s1^
+   :      0   1   2   3   4   5   6   7   8   9
+   :  0                  p1^ i1_                
+   :  1                  ^1_ s1^                
+   :  2                  i1^ p1^                
+   :  3                      ^1^                
+   :  4                  i1_ L1^                
+   :  5                      ^1^                
+   :  6                                         
+   :  7                                         
+   :  8                  i1_                    
+   :  9                  s1^                    
    : > fix
-   : (((1 ) ) )
+   : 1
    : > show
-   :     0   1   2   3   4   5   6   7   8   9
-   : 0
-   : 1              i1_
-   : 2
-   : 3                      ^1_
-   : 4
-   : 5                      ^1_
-   : 6
-   : 7
-   : 8
-   : 9
+   :      0   1   2   3   4   5   6   7   8   9
+   :  0                                         
+   :  1                                         
+   :  2                                         
+   :  3                                         
+   :  4                                         
+   :  5                      i1_                
+   :  6                                         
+   :  7                                         
+   :  8                                         
+   :  9                                         
+   : > clear
    : > (#L1 (= #S1 0) 1 (* #S1 2)) 8
-   : ((#L1 (= #S1 0 ) 1 (* #S1 2 ) ) 8 )
+   : (#L1 (= #S1 0) 1 (* #S1 2)) 8
    : > fix
-   : (((16 ) ) )
+   : 16
    : > quit
    : bye
-   : oncs$
+
+* Platforms
+1. Single threaded C.
+
+2. Distributed across a tribe of IXM.
+   http://www.liquidware.com/shop/show/ixm/illuminato+x+machina
+
+3. Distributed across multiple GPU units with OpenCL.
+   http://www.khronos.org/opencl/
