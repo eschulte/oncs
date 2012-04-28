@@ -127,7 +127,7 @@ ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old, ptr new);
 void duplicate_msgs(coord from, coord to);
-ptr duplicate_ptr(ptr ptr, int refs, int locked);
+ptr duplicate_ptr(ptr old_p, int refs, int locked);
 int value_p(ptr ptr);
 
 /* read strings out from onc world */

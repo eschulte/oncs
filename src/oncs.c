@@ -167,11 +167,14 @@ void duplicate_msgs(coord from, coord to){
   }
 }
 
+/* TODO: maybe pass through original location for co-location */
 ptr duplicate_ptr(ptr old_p, int refs, int locked){
   coord orig, new;
   ptr new_p;
   new_p = old_p;
-  if(new_p.hdr == LOCAL){
+  /* debugging: (*3 ...) where ... is wrongly NIL */
+  switch(new_p.hdr){
+  case LOCAL:
     COORD_OF_PTR(orig, new_p);
     new = open_space(orig);
     AT(new).refs = refs;
@@ -181,20 +184,18 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
     /* the bodies of lambdas should be locked after insertion */
     if(AT(orig).car.hdr == LAMBDA) locked = TRUE;
     AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked);
-  } else {
-    switch(new_p.hdr){
-    case LCURRIED:
-    case CURRIED:
-      if(locked) new_p.hdr = LCURRIED;
-      else       new_p.hdr = CURRIED;
-      return new_p;
-      break;
-    case LAMBDA:
-    case PRIMOPT:
-      new_p.cdr = locked;
-    default:
-      break;
-    }
+    break;
+  case LCURRIED:
+  case CURRIED:
+    if(locked) new_p.hdr = LCURRIED;
+    else       new_p.hdr = CURRIED;
+    return new_p;
+    break;
+  case LAMBDA:
+  case PRIMOPT:
+    new_p.cdr = locked;
+  default:
+    break;
   }
   return new_p;
 }
