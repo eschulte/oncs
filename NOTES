@@ -1,6 +1,9 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* TODO show_queue has an error in the for loop
+switch to other loop cycling for loops found elsewhere in the code
+
 * openCL
 - this is the [[http://opencl.codeplex.com/wikipage?title=OpenCL%20Tutorials%20-%201][most promising tutorial]].
 
