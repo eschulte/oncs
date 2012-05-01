@@ -74,6 +74,8 @@ play: $(TEST:=.test)
 		echo "must specify a test executable"; \
 	else if [[ -z "$$WINDOW" ]];then \
 		echo "must be run from within a screen session"; \
+	else if ps aux|grep more|grep -v grep >/dev/null;then \
+		echo "something matching 'ps aux|grep more' is already running"; \
 	else \
 		PID=""; \
 		(while [[ -z "$$PID" ]];do \
@@ -83,8 +85,7 @@ play: $(TEST:=.test)
 			screen -X -p "$$WINDOW" stuff " "; sleep 0.0005; \
 		done) & \
 		./$(TEST:=.test) -v|more -c; \
-	fi \
-	fi
+	fi; fi; fi
 
 etags: $(LIB) $(TESTS:=.c) $(TEST_LIB)
 	etags $^
