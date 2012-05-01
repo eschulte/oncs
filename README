@@ -149,6 +149,13 @@ The message values and their meanings are.
    : > quit
    : bye
 
+4. To view the progression of world states over the course of a test
+   run execute the following.  Note, this will only run if called from
+   withing a gnu screen session as some screen scripting magic is used
+   to turn the =more= command into a movie player.  This *will* eat up
+   your CPU and may well cause slower single-core computers to freeze.
+   : make play TEST=test/y-comb-2
+
 * Platforms
 1. Single threaded C.
 
