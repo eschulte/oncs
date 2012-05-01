@@ -6,6 +6,7 @@ BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) -D QLENGTH=$(QLENGTH)
 READLINE_LIB=-lreadline
 LIB = src/oncs.c src/oncs.h
 TEST_LIB= test/test.c test/test.h
+TEST =
 TESTS = \
 	test/open_space	\
 	test/queue	\
@@ -61,12 +62,29 @@ test/%.prof: $(LIB) $(TEST_LIB) test/%.c
 	gprof ./test/$*.test > test/$*.prof
 
 check: $(TESTS:=.test)
-	for test in $(TESTS:=.test);do \
+	@for test in $(TESTS:=.test);do \
 		./$$test 1>/dev/null; \
 		if [[ "$$?" -eq "0" ]];then result=PASS; \
 		else result=FAIL;fi; \
 		echo "$$result $$test"; \
 	done
+
+play: $(TEST:=.test)
+	@if [[ -z "$(TEST)" ]]; then \
+		echo "must specify a test executable"; \
+	else if [[ -z "$$WINDOW" ]];then \
+		echo "must be run from within a screen session"; \
+	else \
+		PID=""; \
+		(while [[ -z "$$PID" ]];do \
+			PID=$$(ps aux|grep more|grep -v grep|awk '{print $$2}'); \
+		done; \
+		while kill -0 $$PID 2>/dev/null;do \
+			screen -X -p "$$WINDOW" stuff " "; sleep 0.0005; \
+		done) & \
+		./$(TEST:=.test) -v|more -c; \
+	fi \
+	fi
 
 etags: $(LIB) $(TESTS:=.c) $(TEST_LIB)
 	etags $^
