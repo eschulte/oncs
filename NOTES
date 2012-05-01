@@ -1,6 +1,19 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* openCL
+- this is the [[http://opencl.codeplex.com/wikipage?title=OpenCL%20Tutorials%20-%201][most promising tutorial]].
+
+Installed
+: pacman -S libcl opencl-headers
+
+the following now compiles and runs
+#+begin_src C
+#include <CL/opencl.h>
+
+void main(){ puts("opencl"); }
+#+end_src
+
 * when argument of lambda_app is also lambda_app, it can be truncated
 The =duplicate_ptr= function can sometimes take a pointer to a large
 structure, and return a pointer to only the car of that structure.  To
