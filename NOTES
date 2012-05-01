@@ -1,6 +1,16 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* try out call by need rather than call by value
+Rather than copying arguments into the bodies of λ-expressions, just
+copy in a link to the original.  Then when it is updated in place, it
+will be updated for all.  This will allow for more efficient
+execution.
+
+Also, need to check how this variant of call-by-name will be different
+from call-by-value... how will laziness affect the semantics, e.g., do
+I need a different Y-combinator?
+
 * TODO show_queue has an error in the for loop
 switch to other loop cycling for loops found elsewhere in the code
 
