@@ -14,7 +14,9 @@ I need a different Y-combinator?
 * TODO show_queue has an error in the for loop
 switch to other loop cycling for loops found elsewhere in the code
 
-* openCL
+* HOLD openCL
+  - State "HOLD"       from ""           [2012-05-01 Tue 17:01] \\
+    do this *after* IXM, as it will be more difficult, and my intel GPU does not support
 - this is the [[http://opencl.codeplex.com/wikipage?title=OpenCL%20Tutorials%20-%201][most promising tutorial]].
 
 Installed
