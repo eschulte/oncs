@@ -75,12 +75,13 @@ void show_ptr(ptr ptr){
 
 void show_queue(){
   if(!verbose) return;
-  int i;
+  int i, end;
+  end = qend;
   msg msg;
   char c;
   printf("Q[%d]:", queue_population());
-  for(i=0;i<(qend-qbeg);i++){
-    msg = queue[(qbeg+i)];
+  for(i=qbeg;i!=end;i=QWRAP(i+1)){
+    msg = queue[i];
     switch(msg.mcar.hdr){
     case NIL:     c='_'; break;
     case LOCAL:   c='^'; break;

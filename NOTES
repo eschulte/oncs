@@ -11,7 +11,7 @@ Also, need to check how this variant of call-by-name will be different
 from call-by-value... how will laziness affect the semantics, e.g., do
 I need a different Y-combinator?
 
-* TODO show_queue has an error in the for loop
+* DONE show_queue has an error in the for loop
 switch to other loop cycling for loops found elsewhere in the code
 
 * HOLD openCL

@@ -160,7 +160,7 @@ void duplicate_msgs(coord from, coord to){
   int i, end;
   end = qend;
   msg msg;
-  for(i=qbeg;i<end;i=QWRAP(i+1)){
+  for(i=qbeg;i!=end;i=QWRAP(i+1)){
     msg = queue[i];
     if(msg.mcar.hdr != INTEGER &&
        msg.coord.x == from.x &&
