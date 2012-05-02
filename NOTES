@@ -22,7 +22,7 @@ asynchronous and message based.
    (like maybe =-Wall=) or the fact that we're now using a C++
    compiler are causing errors.
 
-* try out call by need rather than call by value
+* try out call by need rather than call by value [0/4]
 Rather than copying arguments into the bodies of λ-expressions, just
 copy in a link to the original.  Then when it is updated in place, it
 will be updated for all.  This will allow for more efficient
@@ -31,6 +31,23 @@ execution.
 Also, need to check how this variant of call-by-name will be different
 from call-by-value... how will laziness affect the semantics, e.g., do
 I need a different Y-combinator?
+
+Actions for call-by-name
+1. the outermost λ-application is always applied first, arguments are
+   *not* evaluated
+2. when arguments are substituted into the body of a λ-app, we'll just
+   drop links to the original location of the argument, and unlock any
+   λ's contained therein
+
+will have to
+- [ ] add in some =#ifdef= declarations to compile out different
+  evaluation strategies
+- [ ] update the =value_p= function to allow un-applied λ-apps to be
+  counted as value arguments (rename to =argument_p=).
+- [ ] update mechanism used in =lambda_app= to insert arguments, so
+  that links are used rather than =duplicate_ptr=.
+- [ ] update all tests which currently rely on call-by-value
+  evaluation order.
 
 * DONE show_queue has an error in the for loop
 switch to other loop cycling for loops found elsewhere in the code
