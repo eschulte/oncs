@@ -4,6 +4,51 @@
 * no longer safe to assume all neighboring ONCs are immediately accessible
 On both the IXM and the GPU, *all* access to other ONCs must be made
 asynchronous and message based.
+:              Inter-world Communication
+:                            +--------------+
+:   coord={X,Y,x,y}          |              |
+:     where                  |  grid world  |
+:       X=rel-inter          |              |
+:       Y=rel-inter          |              |
+:       x=absolute-intra     |              |
+:       y=absolute-intra     +--------------+
+:                                          
+:       +--------------+     +--------------+
+:       |              |     |              |
+:       |  grid world  |     |  grid world  |
+:       |              | <=> |              |
+:       |              |     |              |
+:       |              |     |              |
+:       +--------------+     +--------------+
+
+Mechanisms
+- sending, receiving and propagating messages with adjustments to the
+  global X,Y relative parameters
+
+Messages
+- require a message to access the contents of an ONC.
+
+Actions that require the state of remove ONCS
+- =duplicate_ptr= on a LOCAL pointer requires one remote ONC at a
+  time, maybe many over recursive calls
+- checking if a location satisfies =argument_p= or =value_p=, again
+  with possible recursive calls
+- =ptr_to_string= may link off-world
+  (should be able to run recursive calls off-world)
+- =onc_to_string= may link off-world
+- =app_abs= may need to read values from
+  - AT(place).car
+  - AT(place).cdr
+  - AT(place).car.cdr
+- =run= may need values from
+  - AT(place).car
+  - AT(place).cdr
+
+Maybe before running an action such as checking for λ-application, a
+series of messages can be sent out holding functions to run on linked
+ONCS (e.g., value_p of coord), and the results can then be saved
+locally to the acting ONC.  Only when all required values are saved
+locally will the action actually be run.
 
 * IXM
 1. Install the cross-compilation suite using software and instructions
