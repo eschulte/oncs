@@ -1,5 +1,5 @@
 CC:=gcc
-CFLAGS:=
+CFLAGS:=-Wall -pedantic -Werror -Wundef -Winline -Wextra
 SIZE:=32
 QLENGTH:=1024
 BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) -D QLENGTH=$(QLENGTH)
