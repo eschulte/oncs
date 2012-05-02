@@ -1,6 +1,10 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* no longer safe to assume all neighboring ONCs are immediately accessible
+On both the IXM and the GPU, *all* access to other ONCs must be made
+asynchronous and message based.
+
 * IXM
 1. Install the cross-compilation suite using software and instructions
    from http://robust.cs.unm.edu/wiki/SFB/Minimal_Linux_Install
