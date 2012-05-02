@@ -1,11 +1,12 @@
-CC=gcc
-CFLAGS=
-SIZE=32
-QLENGTH=1024
+CC:=gcc
+CFLAGS:=
+SIZE:=32
+QLENGTH:=1024
 BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) -D QLENGTH=$(QLENGTH)
-READLINE_LIB=-lreadline
-LIB = src/oncs.c src/oncs.h
-TEST_LIB= test/test.c test/test.h
+READLINE_LIB:=-lreadline
+LIB=src/oncs.c src/oncs.h
+TEST_LIB=test/test.c test/test.h
+IXM_BASEDIR:=/usr/local/src/ixm/sfb/src/template/../..
 TEST =
 TESTS = \
 	test/open_space	\
@@ -37,13 +38,6 @@ TESTS = \
 	test/examp-4	\
 	test/y-comb-2	\
 	test/fact-o-4
-# Although these tests are passing they are commented out because they
-# take up too much space in the world (require SIZE>32), and once the
-# world grows larger than the CPU L1 (or L2 maybe) cache, this whole
-# things slows down considerably.
-#
-#	test/fact-o-6	\
-	test/fact-o-10
 
 all: vm repl
 
@@ -86,6 +80,14 @@ play: $(TEST:=.test)
 		done) & \
 		./$(TEST:=.test) -v|more -c; \
 	fi; fi; fi
+
+ixm/Makefile:
+	SKETCH_DIR="$$(pwd)/ixm"; \
+	pushd $(IXM_BASEDIR); \
+	make SKETCH_DIR=$$SKETCH_DIR sketchinit; \
+
+ixm/sketch: ixm/Makefile
+	pushd ixm/; make
 
 etags: $(LIB) $(TESTS:=.c) $(TEST_LIB)
 	etags $^

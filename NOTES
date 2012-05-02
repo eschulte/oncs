@@ -1,6 +1,23 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* IXM
+1. Install the cross-compilation suite using software and instructions
+   from http://robust.cs.unm.edu/wiki/SFB/Minimal_Linux_Install
+   (had to remove =-Wall= from the compilation flags)
+
+2. Build a test sketch with the instructions from
+   http://robust.cs.unm.edu/wiki/SFB/Compiling_Your_First_Sketch_With_Make
+   (working, relatively painless)
+
+3. Stub out the shell of a sketch for ONC evaluation, including
+   loading the file:src/oncs.h header file and write the Makefile
+   rules to compile and burn the sketch.
+   
+   Alright, it is at least trying to compile, but either some options
+   (like maybe =-Wall=) or the fact that we're now using a C++
+   compiler are causing errors.
+
 * try out call by need rather than call by value
 Rather than copying arguments into the bodies of λ-expressions, just
 copy in a link to the original.  Then when it is updated in place, it
