@@ -100,4 +100,4 @@ etags: $(LIB) $(TESTS:=.c) $(TEST_LIB)
 
 clean:
 	rm -f vm repl gmon.out test/*.test \
-	ixm/sketch-wrapper.cpp ixm/sketch-wrapper.o ixm/sketch ixm/sketch.hex
+	ixm/sketch-wrapper.cpp ixm/sketch-wrapper.o ixm/sketch ixm/sketch.hex ixm/Makefile
