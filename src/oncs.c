@@ -202,7 +202,10 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
   return new_p;
 }
 
-int value_p(ptr ptr){
+int argument_p(ptr ptr){
+  #if EVALUATION_STRATEGY == CALL_BY_NAME
+  return !(ptr.hdr == NIL);
+  #elif EVALUATION_STRATEGY == CALL_BY_VALUE
   coord place, place2;
   switch(ptr.hdr){
   case NIL: return FALSE; break;
@@ -214,7 +217,7 @@ int value_p(ptr ptr){
     case LAMBDA:
       DEBUG3(".cdr(%d,%d,%d) ",
              AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr);
-      return ! value_p(AT(place).cdr);
+      return ! argument_p(AT(place).cdr);
       break;
     case LOCAL:
       /* if lambda pointing to nil return TRUE */
@@ -227,12 +230,13 @@ int value_p(ptr ptr){
     default:
       DEBUG3(".car(%d,%d,%d) ",
              AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr);
-      return value_p(AT(place).car);
+      return argument_p(AT(place).car);
       break;
     }
     break;
   default: return TRUE; break;
   }
+  #endif
 }
 
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
@@ -371,7 +375,7 @@ int app_abs(coord place){
   DEBUG3("has_incoming_msgs(%d,%d) == %d\n",
          place.x, place.y, has_incoming_msgs(place));
   if(/* don't apply to non values -- call-by-value */
-     value_p(AT(place).cdr) &&
+     argument_p(AT(place).cdr) &&
      /* only apply when body has 0 incoming λ-messages */
      has_incoming_msgs(place) == 0){
     /* 1. make new message */
@@ -476,7 +480,7 @@ int run(coord place){
         ERROR("curried application must point to something");
       COORD_OF_PTR(c2, AT(place).cdr);
       if(/* don't apply to non values -- call-by-value */
-         value_p(AT(place).cdr) &&
+         argument_p(AT(place).cdr) &&
          /* only apply to integers */
          AT(c2).car.hdr == INTEGER){
         i1 = AT(place).car.cdr; i2 = AT(c2).car.car;

@@ -22,7 +22,7 @@ asynchronous and message based.
    (like maybe =-Wall=) or the fact that we're now using a C++
    compiler are causing errors.
 
-* try out call by need rather than call by value [0/4]
+* try out call by need rather than call by value [2/4]
 Rather than copying arguments into the bodies of λ-expressions, just
 copy in a link to the original.  Then when it is updated in place, it
 will be updated for all.  This will allow for more efficient
@@ -40,9 +40,9 @@ Actions for call-by-name
    λ's contained therein
 
 will have to
-- [ ] add in some =#ifdef= declarations to compile out different
+- [X] add in some =#ifdef= declarations to compile out different
   evaluation strategies
-- [ ] update the =value_p= function to allow un-applied λ-apps to be
+- [X] update the =value_p= function to allow un-applied λ-apps to be
   counted as value arguments (rename to =argument_p=).
 - [ ] update mechanism used in =lambda_app= to insert arguments, so
   that links are used rather than =duplicate_ptr=.

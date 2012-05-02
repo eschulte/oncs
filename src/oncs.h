@@ -2,6 +2,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* evaluation strategies */
+#define CALL_BY_VALUE 0
+#define CALL_BY_NAME  1
+
+/* customization parameters -- world size and behavior */
+#ifndef SIZE
+#define SIZE 32
+#endif
+#ifndef QLENGTH
+#define QLENGTH 1024
+#endif
+#ifndef EVALUATION_STRATEGY
+#define EVALUATION_STRATEGY CALL_BY_VALUE
+#endif
+
 /* types of pointers */
 #define NIL      0
 #define LOCAL    1
@@ -24,13 +39,7 @@
 #define TRUE   1
 #define FALSE  0
 
-/* world size and access */
-#ifndef SIZE
-#define SIZE 32
-#endif
-#ifndef QLENGTH
-#define QLENGTH 1024
-#endif
+/* world access */
 #define AT(point) world[point.x][point.y]
 #define WRAP(x) (SIZE+x)%SIZE
 #define QWRAP(x) (QLENGTH+x)%QLENGTH
@@ -135,7 +144,7 @@ ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old_p, ptr new_p);
 void duplicate_msgs(coord from, coord to);
 ptr duplicate_ptr(ptr old_p, int refs, int locked);
-int value_p(ptr ptr);
+int argument_p(ptr ptr);
 
 /* read strings out from onc world */
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
