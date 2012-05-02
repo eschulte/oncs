@@ -10,7 +10,7 @@ void enqueue(msg msg){
   queue[qend]=msg;
   qend = QWRAP(qend+1);
   if(qend == qbeg) ERROR("queue overflow");
-  AT(msg.coord).num_msgs++;
+  AT(msg.place).num_msgs++;
 }
 
 msg dequeue(){
@@ -18,7 +18,7 @@ msg dequeue(){
   if(queue[qbeg].mcar.hdr != NIL){
     qbeg = QWRAP(qbeg+1);
     msg = queue[QWRAP(qbeg-1)];
-    AT(msg.coord).num_msgs--;
+    AT(msg.place).num_msgs--;
     return msg;
   } else ERROR("queue underflow");
 }
@@ -84,13 +84,13 @@ coord open_space(coord place){
 int run_queue(){
   if(queue[qbeg].mcar.hdr != NIL){
     msg msg = dequeue();
-    if(AT(msg.coord).mcar.hdr == NIL){
-      AT(msg.coord).mcar = msg.mcar;
-      AT(msg.coord).mcdr = msg.mcdr;
+    if(AT(msg.place).mcar.hdr == NIL){
+      AT(msg.place).mcar = msg.mcar;
+      AT(msg.place).mcdr = msg.mcdr;
       return 1;
     } else {
-      run(msg.coord);
-      DEBUG2("message requeue: (%d,%d)\n", msg.coord.x, msg.coord.y);
+      run(msg.place);
+      DEBUG2("message requeue: (%d,%d)\n", msg.place.x, msg.place.y);
       enqueue(msg);
       return 0;
     }
@@ -119,7 +119,7 @@ int has_incoming_msgs(coord place){
 
 void update_ref_msg(coord place, int diff){
   msg msg;
-  msg.coord = place;
+  msg.place = place;
   msg.mcar.hdr = INTEGER;
   msg.mcar.car = diff;
   DEBUG2("enqueue from update ref (%d,%d)\n", place.x, place.y);
@@ -148,10 +148,10 @@ ptr delete_ptr(ptr ptr){
   return ptr;
 }
 
-ptr replace_ptr(ptr old, ptr new){
-  new = copy_ptr(new);
-  delete_ptr(old);
-  return new;
+ptr replace_ptr(ptr old_p, ptr new_p){
+  new_p = copy_ptr(new_p);
+  delete_ptr(old_p);
+  return new_p;
 }
 
 void duplicate_msgs(coord from, coord to){
@@ -161,9 +161,9 @@ void duplicate_msgs(coord from, coord to){
   for(i=qbeg;i!=end;i=QWRAP(i+1)){
     msg = queue[i];
     if(msg.mcar.hdr != INTEGER &&
-       msg.coord.x == from.x &&
-       msg.coord.y == from.y){
-      msg.coord = to;
+       msg.place.x == from.x &&
+       msg.place.y == from.y){
+      msg.place = to;
       copy_ptr(msg.mcdr);
       enqueue(msg);
     }
@@ -338,7 +338,7 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
       ptr = duplicate_ptr(l_msg.mcdr, refs, l_msg.mcar.cdr);
     break;
   case LOCAL:
-    COORD_OF_PTR(l_msg.coord, ptr);
+    COORD_OF_PTR(l_msg.place, ptr);
     DEBUG2("copy_ptr(%d,%d) from lambda_app\n",
            l_msg.mcdr.car, l_msg.mcdr.cdr);
     l_msg.mcdr = copy_ptr(l_msg.mcdr);
@@ -413,7 +413,7 @@ int app_abs(coord place){
       AT(place).cdr = replace_ptr(AT(place).cdr, ptr);
     }
     /* 6. msg goes to 1 */
-    msg.coord = place;
+    msg.place = place;
     enqueue(msg);
     /* 6. replace end of 10 with 4 */
     if(AT(c_cdr).cdr.hdr != NIL){
@@ -536,7 +536,7 @@ int run(coord place){
     switch(AT(place).cdr.hdr){
     case LOCAL:
       COORD_OF_PTR(c2, AT(place).cdr);
-      msg.coord = c2;
+      msg.place = c2;
       msg.mcar = AT(place).mcar;
       msg.mcdr = AT(place).mcdr;
       enqueue(msg);

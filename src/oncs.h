@@ -32,7 +32,7 @@
   { coord.x=ptr.car; coord.y=ptr.cdr; }
 #define INTEGER_APP(where, msg)                 \
   if(where.hdr == LOCAL){                       \
-    COORD_OF_PTR(msg.coord, where);             \
+    COORD_OF_PTR(msg.place, where);             \
     DEBUG("enqueue from INTEGER_APP\n");        \
     enqueue(msg);                               \
   }
@@ -82,7 +82,7 @@
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
 typedef struct { int hdr, car, cdr; } ptr;
-typedef struct { ptr mcar, mcdr; coord coord; } msg;
+typedef struct { ptr mcar, mcdr; coord place; } msg;
 typedef struct { ptr car, cdr, mcar, mcdr; int refs, num_msgs; } onc;
 
 /* global state */
@@ -126,7 +126,7 @@ void update_ref_msg(coord place, int diff);
 /* pointer maintenance */
 ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
-ptr replace_ptr(ptr old, ptr new);
+ptr replace_ptr(ptr old_p, ptr new_p);
 void duplicate_msgs(coord from, coord to);
 ptr duplicate_ptr(ptr old_p, int refs, int locked);
 int value_p(ptr ptr);

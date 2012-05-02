@@ -91,7 +91,7 @@ void show_queue(){
     case EXTEND:  c='e'; break;
     default:      c='?'; break;
     }
-    printf("(%d,%d)%c", msg.coord.x, msg.coord.y, c);
+    printf("(%d,%d)%c", msg.place.x, msg.place.y, c);
   }
   printf("\n");
 }
@@ -217,7 +217,7 @@ void run_down(coord place){
   debug(2, "run_down (%d, %d)\n", place.x, place.y);
   run(place); show_all(place);
   while(queue_population() > 0){
-    tmp = queue[qbeg].coord;
+    tmp = queue[qbeg].place;
     debug(2, "run queue to (%d,%d)\n", tmp.x, tmp.y);
     run_queue(); show_all(place);
     debug(2, "run (%d,%d)\n", tmp.x, tmp.y);
@@ -253,8 +253,8 @@ unsigned long queue_hash(){
   unsigned long hash = 5381;
   i = qbeg;
   while(i != qend){
-    msg_ints[0] = queue[i].coord.x;
-    msg_ints[1] = queue[i].coord.y;
+    msg_ints[0] = queue[i].place.x;
+    msg_ints[1] = queue[i].place.y;
     msg_ints[2] = queue[i].mcar.hdr;
     msg_ints[3] = queue[i].mcar.car;
     msg_ints[4] = queue[i].mcar.cdr;
@@ -302,13 +302,13 @@ void fix(coord place){
     if(queue_population() > 0){
       msg = queue[qbeg];
       /* only pop from queue if dest. is empty */
-      if(AT(msg.coord).mcar.hdr == NIL){
+      if(AT(msg.place).mcar.hdr == NIL){
         msg = dequeue();
-        AT(msg.coord).mcar = msg.mcar;
-        AT(msg.coord).mcdr = msg.mcdr;
+        AT(msg.place).mcar = msg.mcar;
+        AT(msg.place).mcdr = msg.mcdr;
       }
       /* run destination either way */
-      run(msg.coord);
+      run(msg.place);
     } else { run_one(); }
     printf("\n");
     show_world();
