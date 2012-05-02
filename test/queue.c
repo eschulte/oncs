@@ -5,7 +5,7 @@ int main(int argc, char *argv[]){
   init(argc, argv);
   debug(2, "starting queue test\n");
 
-  msg.coord.x = msg.coord.y = 0;
+  msg.place.x = msg.place.y = 0;
   msg.mcar.hdr = SYMBOL;
   msg.mcar.car = 1;
 

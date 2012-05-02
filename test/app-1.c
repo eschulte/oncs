@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
   app_1(place); show_all(holder);
   run(place);        show_all(holder);
   do{
-    place = queue[qbeg].coord;
+    place = queue[qbeg].place;
     run_queue(); show_all(holder);
     run(place);  show_all(holder);
   } while(queue_population() > 0);

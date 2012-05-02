@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
   duplicate_ptr(AT(place).car, 1, FALSE);
   show_all(place);
   do{
-    place = queue[qbeg].coord;
+    place = queue[qbeg].place;
     run_queue(); show_all(holder);
     run(place);  show_all(holder);
   } while(queue_population() > 0);
