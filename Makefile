@@ -7,6 +7,7 @@ READLINE_LIB:=-lreadline
 LIB=src/oncs.c src/oncs.h
 TEST_LIB=test/test.c test/test.h
 IXM_BASEDIR:=/usr/local/src/ixm/sfb/src/template/../..
+USB_DEVICE:=/dev/ttyUSB0
 TEST =
 TESTS = \
 	test/open_space	\
@@ -86,11 +87,17 @@ ixm/Makefile:
 	pushd $(IXM_BASEDIR); \
 	make SKETCH_DIR=$$SKETCH_DIR sketchinit; \
 
-ixm/sketch: ixm/Makefile
+ixm/sketch.hex: ixm/Makefile ixm/sketch.pde
 	pushd ixm/; make
+
+burn: ixm/sketch.hex
+	SKETCH_DIR="$$(pwd)/ixm"; \
+	pushd $(IXM_BASEDIR); \
+	./targets/host/bin/sfbdl -f $$SKETCH_DIR/sketch.hex -d $(USB_DEVICE)
 
 etags: $(LIB) $(TESTS:=.c) $(TEST_LIB)
 	etags $^
 
 clean:
-	rm -f vm repl gmon.out test/*.test
+	rm -f vm repl gmon.out test/*.test \
+	ixm/sketch-wrapper.cpp ixm/sketch-wrapper.o ixm/sketch ixm/sketch.hex
