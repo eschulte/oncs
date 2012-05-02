@@ -7,11 +7,13 @@
 #include "../src/oncs.h"
 
 int loop_delay = 1000;
+
+void setup(){ QLED.begin(); }
+
 void loop() {
   delay(loop_delay);
-  // blink green if seen this before
-  QLED.on(BODY_RGB_GREEN_PIN, 500);
-  QLED.off(BODY_RGB_GREEN_PIN, 500);
+  QLED.on(BODY_RGB_BLUE_PIN, 500);
+  QLED.off(BODY_RGB_BLUE_PIN, 500);
 }
 
 #define SFB_SKETCH_CREATOR_ID B36_3(e,m,s)
