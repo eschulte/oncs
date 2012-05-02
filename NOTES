@@ -33,11 +33,18 @@ from call-by-value... how will laziness affect the semantics, e.g., do
 I need a different Y-combinator?
 
 Actions for call-by-name
-1. the outermost λ-application is always applied first, arguments are
-   *not* evaluated
-2. when arguments are substituted into the body of a λ-app, we'll just
+1. The outermost λ-application is always applied first, arguments are
+   *not* evaluated.  The locking here may have to be /more/
+   restrictive than in call-by-value, as we want to enforce laziness.
+
+2. When arguments are substituted into the body of a λ-app, we'll just
    drop links to the original location of the argument, and unlock any
-   λ's contained therein
+   λ's contained therein.
+
+   There will however have to be some duplication, e.g., if an
+   argument evaluates to a λ-app, after it is evaluated and copied in,
+   the result must be duplicated for each insertion... as they may be
+   passed different argument.
 
 will have to
 - [X] add in some =#ifdef= declarations to compile out different

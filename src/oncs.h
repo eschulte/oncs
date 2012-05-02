@@ -145,6 +145,7 @@ ptr replace_ptr(ptr old_p, ptr new_p);
 void duplicate_msgs(coord from, coord to);
 ptr duplicate_ptr(ptr old_p, int refs, int locked);
 int argument_p(ptr ptr);
+int value_p(ptr ptr);
 
 /* read strings out from onc world */
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p);

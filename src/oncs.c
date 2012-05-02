@@ -206,6 +206,11 @@ int argument_p(ptr ptr){
   #if EVALUATION_STRATEGY == CALL_BY_NAME
   return !(ptr.hdr == NIL);
   #elif EVALUATION_STRATEGY == CALL_BY_VALUE
+  return value_p(ptr);
+  #endif
+}
+
+int value_p(ptr ptr){
   coord place, place2;
   switch(ptr.hdr){
   case NIL: return FALSE; break;
@@ -236,7 +241,6 @@ int argument_p(ptr ptr){
     break;
   default: return TRUE; break;
   }
-  #endif
 }
 
 int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
