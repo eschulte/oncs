@@ -13,7 +13,7 @@ extern int fail_p;
 void init(int argc, char *argv[]);
 
 /* logging */
-int debug(int level, const char *format, ...);
+void debug(int level, const char *format, ...);
 
 /* world queries and actions */
 int queue_population();
@@ -23,12 +23,12 @@ void show_ptr(ptr ptr);
 void show_queue();
 void show_world();
 void get_expr(coord place, char *buf, int index);
-int string_to_onc(coord place, int locked, char *buf);
+void string_to_onc(coord place, int locked, char *buf);
 int close_paren(char *buf, int index);
 void show_all(coord place);
 void run_down(coord place);
 void run_expr(char *expr, coord place);
-int read_int(char *buf, int *index);
+int read_int(char *buf, unsigned int *index);
 void expr_to_expr(char *expr);
 void simple_app(coord place);
 

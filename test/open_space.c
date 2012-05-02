@@ -1,11 +1,12 @@
 #include "test.h"
 
 int main(int argc, char *argv[]){
+  int i, j;
+  coord place, new;
+
   init(argc, argv);
 
   /* setup */
-  int i, j;
-  coord place, new;
   new.x = 3;
   new.y = place.x = place.y = 2;
   AT(place).refs++;

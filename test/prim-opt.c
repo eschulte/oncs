@@ -3,11 +3,13 @@
 void single_int_left();
 
 int main(int argc, char *argv[]){
-  init(argc, argv);
   coord place;
+  char expr0[] = "+ 2 4";
+  char expr1[] = "/ 8 2";
+  char expr2[] = "* + 1 2 - 8 32";
+  init(argc, argv);
   place.x = 4; place.y = 4;
 
-  char expr0[] = "+ 2 4";
   run_expr(expr0, place);
   run_down(place);
   SHOULD(AT(place).car.hdr == INTEGER);
@@ -16,14 +18,11 @@ int main(int argc, char *argv[]){
   single_int_left();
   if(fail_p) ERROR("failed expr0");
 
-  char expr1[] = "/ 8 2";
   run_expr(expr1, place);
   run_down(place);
   single_int_left();
   if(fail_p) ERROR("failed expr1");
 
-  
-  char expr2[] = "* + 1 2 - 8 32";
   run_expr(expr2, place);
   fix(place);
   SHOULD(AT(place).car.hdr == INTEGER);

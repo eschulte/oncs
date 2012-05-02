@@ -2,12 +2,10 @@
 #define BUF_SIZE 1024
 
 int main(int argc, char *argv[]){
-  init(argc, argv);
-
   char buf1[] = "(1234)";
-  SHOULD(close_paren(buf1, 0) == 5);
-
   char buf2[] = "(a (b c) d (()))";
+  init(argc, argv);
+  SHOULD(close_paren(buf1, 0) == 5);
   SHOULD(close_paren(buf2, 0) == 15);
   SHOULD(close_paren(buf2, 3) == 7);
   

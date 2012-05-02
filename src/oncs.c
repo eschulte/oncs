@@ -41,12 +41,9 @@ void clear_place(coord place){
 
 void clear_world(){
   int i,j;
-  coord place;
   for(i=0;i<SIZE;i++)
-    for(j=0;j<SIZE;j++) {
-      place.x = i; place.y = j;
+    for(j=0;j<SIZE;j++)
       world[i][j].refs = 0;
-    }
 }
 
 void clear_queue(){
@@ -98,6 +95,7 @@ int run_queue(){
       return 0;
     }
   }
+  return 0;
 }
 
 int has_incoming_msgs(coord place){
@@ -157,9 +155,9 @@ ptr replace_ptr(ptr old, ptr new){
 }
 
 void duplicate_msgs(coord from, coord to){
+  msg msg;
   int i, end;
   end = qend;
-  msg msg;
   for(i=qbeg;i!=end;i=QWRAP(i+1)){
     msg = queue[i];
     if(msg.mcar.hdr != INTEGER &&
@@ -353,11 +351,11 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
 }
 
 int app_abs(coord place){
-  int ran;
-  ran = FALSE;
-  ptr ptr;
   msg msg;
+  ptr ptr;
+  int ran;
   coord c_car, c_cdr, c_tmp;
+  ran = FALSE;
   /* setup */
   if(AT(place).car.hdr != LOCAL)
     ERROR("malformed app_abs");
@@ -429,11 +427,10 @@ int app_abs(coord place){
 }
 
 int run(coord place){
-  int ran;
-  ran = FALSE;
   msg msg;
   coord c1, c2;
-  int i1, i2;
+  int ran, i1, i2;
+  ran = FALSE;
   switch(AT(place).mcar.hdr){
   case NIL:                     /* waiting loop */
     switch(AT(place).car.hdr){

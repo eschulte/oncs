@@ -30,17 +30,17 @@ static struct lookup_table { char *string; int code; char *doc;
 
 int code(char *string);
 
-int main(int argc, char *argv[]){
-  int mid=SIZE/2;
+int main(){
+  int mid, running, holder;
+  unsigned int i;
   coord place, print;
-  place.x = mid; place.y = mid;
   char* input;
   static char* shell_prompt = "> ";
   static char* x_prompt = "x: ";
   static char* y_prompt = "y: ";
-  int running=1;
-  int i;
-  int holder;
+  running=TRUE;
+  mid=SIZE/2;
+  place.x = mid; place.y = mid;
   do{
     input = readline(shell_prompt);
     if(input) add_history(input);
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]){
 }
 
 int code(char *string){
-  int i;
+  unsigned int i;
   if(!string) return QUIT;
   for(i = 0; i < sizeof(codes) / sizeof(codes[0]); i++)
     if(strcmp(codes[i].string, string) == 0)

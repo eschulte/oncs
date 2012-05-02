@@ -17,7 +17,7 @@ void init(int argc, char *argv[]){
   debug(1, "");
 }
 
-int debug(int level, const char *format, ...){
+void debug(int level, const char *format, ...){
   if(verbose >= level){
     va_list args;
     va_start(args, format);
@@ -74,11 +74,11 @@ void show_ptr(ptr ptr){
 }
 
 void show_queue(){
-  if(!verbose) return;
-  int i, end;
-  end = qend;
   msg msg;
   char c;
+  int i, end;
+  end = qend;
+  if(!verbose) return;
   printf("Q[%d]:", queue_population());
   for(i=qbeg;i!=end;i=QWRAP(i+1)){
     msg = queue[i];
@@ -97,9 +97,9 @@ void show_queue(){
 }
 
 void show_world(){
-  if(!verbose) return;
   onc tmp;
   int i, j;
+  if(!verbose) return;
   for(i=-1;i<SIZE;i++) {
     for(j=-1;j<SIZE;j++) {
       /* index labels */
@@ -125,16 +125,18 @@ void show_world(){
   }
 }
 
-int string_to_onc(coord place, int locked, char *buf){
+void string_to_onc(coord place, int locked, char *buf){
+  coord t1;
+  char *interum;
   coord c1, c2;
+  int i, car_p, parend, lock_child;
+  unsigned int index;
   debug(2, "string_to_onc[%d]((%d,%d), %s)\n",
         locked, place.x, place.y, buf);
-  int i, car_p, parend, index, lock_child;
   index = 0;
   lock_child = FALSE;
   car_p = TRUE;
-  coord t1;
-  char *interum = buf;
+  interum = buf;
   while(buf[index] != '\0') {
     if(lock_child) locked = TRUE;
     while((buf[index] == '#') || (buf[index] == ' ')) index++;
@@ -192,8 +194,8 @@ int close_paren(char *buf, int index){
 }
 
 void show_all(coord place){
-  if(!verbose) return;
   char buf[EXPR_BUF_SIZE];
+  if(!verbose) return;
   printf("\n");
   fflush(stdout);
   show_queue();
@@ -211,8 +213,8 @@ void show_both(){
 }
 
 void run_down(coord place){
-  debug(2, "run_down (%d, %d)\n", place.x, place.y);
   coord tmp;
+  debug(2, "run_down (%d, %d)\n", place.x, place.y);
   run(place); show_all(place);
   while(queue_population() > 0){
     tmp = queue[qbeg].coord;
@@ -276,8 +278,8 @@ unsigned long world_hash(){
 }
 
 int run_at(int x, int y){
-  debug(2, "running at (%d,%d)\n", x, y);
   coord coord;
+  debug(2, "running at (%d,%d)\n", x, y);
   coord.x = x; coord.y = y;
   return run(coord);
 }
@@ -356,7 +358,7 @@ void run_expr(char *expr, coord place){
   debug(2, "leaving full_run\n");
 }
 
-int read_int(char *buf, int *index){
+int read_int(char *buf, unsigned int *index){
   int result, tmp;
   result = 0;
   while(buf[(*index)] &&

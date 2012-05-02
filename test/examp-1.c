@@ -12,9 +12,9 @@
  */
 
 int main(int argc, char *argv[]){
-  init(argc, argv);
-
   char expr[] = "(#L1 (#L2 (#L3 #S1))) (#L4 #S4)";
+
+  init(argc, argv);
   expr_to_expr(expr);
   SHOULD(strcmp(expr, "(#L2 (#l3 (#l4 #S4)))") == 0);
 

@@ -1,10 +1,10 @@
 #include "test.h"
 
 int main(int argc, char *argv[]){
+  msg msg;
   init(argc, argv);
   debug(2, "starting queue test\n");
 
-  msg msg;
   msg.coord.x = msg.coord.y = 0;
   msg.mcar.hdr = SYMBOL;
   msg.mcar.car = 1;

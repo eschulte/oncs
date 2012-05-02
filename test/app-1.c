@@ -4,10 +4,9 @@
 void app_1(coord place);
 
 int main(int argc, char *argv[]){
-  init(argc, argv);
-  int i, j;
   char buf[BUF_SIZE];
   coord place, holder;
+  init(argc, argv);
   holder.x = holder.y = place.x = place.y = 4;
 
   app_1(place); show_all(holder);

@@ -2,10 +2,9 @@
 #define BUF_SIZE 1024
 
 int main(int argc, char *argv[]){
-  init(argc, argv);
-
   char buf[BUF_SIZE];
   coord place;
+  init(argc, argv);
   place.x = place.y = 4;
 
   simple_app(place);
