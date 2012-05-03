@@ -1,6 +1,12 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* would it be possible to limit the number of variable
+∀ n∈N ∃ a λ-expression l s.t. l requires >n symbols.
+
+Is there a way to make this not true, e.g., use something /spatial/ to
+represent symbols.
+
 * no longer safe to assume all neighboring ONCs are immediately accessible
 On both the IXM and the GPU, *all* access to other ONCs must be made
 asynchronous and message based.
