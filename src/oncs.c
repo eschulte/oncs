@@ -90,7 +90,8 @@ int run_queue(){
       return 1;
     } else {
       run(msg.place);
-      DEBUG2("message requeue: (%d,%d)\n", msg.place.x, msg.place.y);
+      DEBUG2("message requeue: (%d,%d)\n",
+             msg.place.x, msg.place.y);
       enqueue(msg);
       return 0;
     }
@@ -466,9 +467,10 @@ int run(coord place){
           if(AT(c2).car.hdr == INTEGER){
             AT(place).car.cdr = AT(c2).car.car;
             AT(place).car.hdr = CURRIED;
-            DEBUG8("(%d,%d) run->replace_ptr(%d,%d,%d,)(%d,%d,%d) c2\n",
+            DEBUG8("(%d,%d) run->rep_ptr(%d,%d,%d,)(%d,%d,%d) c2\n",
                    place.x, place.y,
-                   AT(place).cdr.hdr, AT(place).cdr.car, AT(place).cdr.cdr,
+                   AT(place).cdr.hdr,
+                   AT(place).cdr.car, AT(place).cdr.cdr,
                    AT(c2).cdr.hdr, AT(c2).cdr.car, AT(c2).cdr.cdr);
             AT(place).cdr = replace_ptr(AT(place).cdr, AT(c2).cdr);
           }
@@ -553,7 +555,8 @@ int run(coord place){
       DEBUG8("(%d,%d) run->replace_ptr(%d,%d,%d,)(%d,%d,%d) mcdr\n",
              place.x, place.y,
              AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr,
-             AT(place).mcdr.hdr, AT(place).mcdr.car, AT(place).mcdr.cdr);
+             AT(place).mcdr.hdr,
+             AT(place).mcdr.car, AT(place).mcdr.cdr);
       AT(place).cdr = replace_ptr(AT(place).cdr, AT(place).mcdr);
       delete_ptr(AT(place).mcdr);
       break;
@@ -568,7 +571,7 @@ int run(coord place){
     ran = TRUE;
     break;
   }
-  /* TODO: don't nullify message if we haven't ran? */
+  /* TODO: don't nullify message if we haven't run? */
   if(ran) AT(place).mcar.hdr = NIL;
   return ran;
 }

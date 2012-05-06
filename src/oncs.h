@@ -89,10 +89,12 @@
 #define DEBUG2(fmt, x, y) if(DEBUG_P) printf(fmt, x, y);
 #define DEBUG3(fmt, x, y, z) if(DEBUG_P) printf(fmt, x, y, z);
 #define DEBUG4(fmt, x, y, z, a) if(DEBUG_P) printf(fmt, x, y, z, a);
-#define DEBUG5(fmt, x, y, z, a, b) if(DEBUG_P) printf(fmt, x, y, z, a, b);
+#define DEBUG5(fmt, x, y, z, a, b) \
+  if(DEBUG_P) printf(fmt, x, y, z, a, b);
 #define DEBUG8(fmt, x, y, z, a, b, c, d, e) \
   if(DEBUG_P) printf(fmt, x, y, z, a, b, c, d, e);
-#define ERROR(message) { fprintf(stderr, "ERROR: %s\n", message); exit(1); }
+#define ERROR(message) \
+  { fprintf(stderr, "ERROR: %s\n", message); exit(1); }
 
 /* structures inhabiting the world */
 typedef struct { int x, y; } coord;
