@@ -60,6 +60,18 @@ follows...
    - B,X has two pointers → consume the first byte off the binary
      string, if 0 forward the message to car if 1 to cdr
 
+So these messages would have to hold,
+- hdr
+- long-coord (X,Y,x,y,int)
+- two pointers
+
+Questions:
+- should there be a new message type, or should all messages bloat?
+- should all coords be replaced with long coords?
+- should long coords include these integer-size binary offsets in all cases?
+- if ONCS will keep the same two-message slots for normal messages can
+  Dup messages fit?
+
 * would it be possible to limit the number of variable
 ∀ n∈N ∃ a λ-expression l s.t. l requires >n symbols.
 
