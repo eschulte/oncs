@@ -1,6 +1,65 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* make ONC duplication message based
+So =duplicate_ptr= should not set a value directly, but should rather
+dispatch messages out to the argument to then carry it's contents to
+the location.
+
+Here's how we can stream onc structures across boards.  A structure on
+Board B wants to replace one of its symbols at location X with the
+structure based at location Y on board A.  The series of actions is as
+follows...
+: +--------------+          +--------------+
+: |   Board A    |   Dup    |   Board B    |
+: |      <-------+----------+---           |
+: |              |          |              |
+: |      --------+----------+-->           |
+: |              |   Rep    |              |
+: +--------------+          +--------------+
+
+1. A Dup message is sent from X on Board B to Y on Board A
+   :     +-------+-----+
+   :     | Dup   | A,Y |
+   :     +-------+-----+
+   :     | From: |     |
+   :     | B,X   |     |
+   :     +-----+-------+
+2. When this message is received at Y, a return message is sent
+   holding the contents of Y.  The contents of links are left empty,
+   and are filled at the destination site with the output of the
+   =open_space= function.
+   :     +-----+-------+
+   :     | Rep | B,X   |
+   :     +-----+-------+
+   :     | A,Y | A,y   |
+   :     | car | cdr   |
+   :     +-----+-------+
+3. In addition, Dup messages are propagated down through the local
+   refs in Y traversing the whole ONC structure.
+   :     +-----+-------+   +-----+-------+
+   :     | Dup | A,Y.0 |   | Dep | A,Y.1 |
+   :     +-----+-+-----+   +-----+-+-----+
+   :     | From: |     |   | From: |     |
+   :     | B,X.0 |     |   | B,X.1 |     |
+   :     +-------+-----+   +-------+-----+
+4. These children send back Rep message to B,X
+   :     +-----+-------+   +-----+-------+
+   :     | Rep | B,X.0 |   | Rep | B,X.1 |
+   :     +-----+-------+   +-----+-------+
+   :     |A,Y.0| A,Y.0 |   |A,Y.1| A,Y.1 |
+   :     | car | cdr   |   | car | cdr   |
+   :     +-----+-------+   +-----+-------+
+   Where the binary string at the end of the address (e.g., =B,X.010=)
+   is used to indicate which paths to take at forks in the binary tree
+   structure of the receiving ONC.  The following cases are used to
+   consume the binary routing instructions.
+   - B,X is empty → place contents in B,X
+   - B,X is full and only has 1 pointer → set address to that pointer
+     and forward the message there
+   - B,X has two pointers → consume the first byte off the binary
+     string, if 0 forward the message to car if 1 to cdr
+
 * would it be possible to limit the number of variable
 ∀ n∈N ∃ a λ-expression l s.t. l requires >n symbols.
 
@@ -34,7 +93,7 @@ Mechanisms
 Messages
 - require a message to access the contents of an ONC.
 
-Actions that require the state of remove ONCS
+Actions that require the state of remote ONCS
 - =duplicate_ptr= on a LOCAL pointer requires one remote ONC at a
   time, maybe many over recursive calls
 - checking if a location satisfies =argument_p= or =value_p=, again
