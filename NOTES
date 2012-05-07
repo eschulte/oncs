@@ -6,10 +6,8 @@ So =duplicate_ptr= should not set a value directly, but should rather
 dispatch messages out to the argument to then carry it's contents to
 the location.
 
-Here's how we can stream onc structures across boards.  A structure on
-Board B wants to replace one of its symbols at location X with the
-structure based at location Y on board A.  The series of actions is as
-follows...
+We can stream onc structures across boards requested with a single
+=Dup= message and streamed with many =Rep= messages.
 : +--------------+          +--------------+
 : |   Board A    |   Dup    |   Board B    |
 : |      <-------+----------+---           |
@@ -18,6 +16,43 @@ follows...
 : |              |   Rep    |              |
 : +--------------+          +--------------+
 
+- *all* messages (both intra- and inter-board) will have the same form
+- this form will use long-form coordinates, specifically =[X,Y,x,y:bin-array]=
+- once received at an ONC these messages will fit into the mcar and
+  mcdr pointers
+
+Example messages with contents:
+- request duplication of E,F,g,h to A,B,c,d:01001
+  | coord    | E,F,g,h:0 |
+  | mcar.hdr | Dup       |
+  | mcar.car | A         |
+  | mcar.cdr | B         |
+  | mcar.hdr | 01001     |
+  | mcdr.car | c         |
+  | mcdr.cdr | d         |
+- duplication to A,B,c,d:01001 as stored in the ONC at E,F,g,h
+  | mcar.hdr | Dup       |
+  | mcar.car | A         |
+  | mcar.cdr | B         |
+  | mcar.hdr | 01001     |
+  | mcdr.car | c         |
+  | mcdr.cdr | d         |
+- in-flight ONC data from E,F,g,h to A,B,c,d:01001
+  | coord    | A,B,c,d:01001       |
+  | mcar.hdr | AT(E,F,g,h).car.hdr |
+  | mcar.car | AT(E,F,g,h).car.car |
+  | mcar.cdr | AT(E,F,g,h).car.cdr |
+  | mcdr.hdr | AT(E,F,g,h).cdr.hdr |
+  | mcdr.car | AT(E,F,g,h).cdr.car |
+  | mcdr.cdr | AT(E,F,g,h).cdr.cdr |
+  if the =AT(E,F,g,h).cdr.hdr==LOCAL= then that portion will be
+  | mcdr.hdr | NEW |
+  | mcdr.car |     |
+  | mcdr.cdr |     |
+  where =NEW= will be a header indicating that a new empty ONC should
+  be created and pointed to using =open_space=.
+
+** thoughts
 1. A Dup message is sent from X on Board B to Y on Board A
    :     +-------+-----+
    :     | Dup   | A,Y |
@@ -71,6 +106,43 @@ Questions:
 - should long coords include these integer-size binary offsets in all cases?
 - if ONCS will keep the same two-message slots for normal messages can
   Dup messages fit?
+
+Solution:
+- *all* messages will have the same form
+- this form will use long-form coordinates, specifically =[X,Y,x,y:bin-array]=
+- once received at an ONC these messages will fit into the mcar and
+  mcdr pointers
+
+Examples:
+- request duplication of E,F,g,h to A,B,c,d:01001
+  | coord    | E,F,g,h:0 |
+  | mcar.hdr | Dup       |
+  | mcar.car | A         |
+  | mcar.cdr | B         |
+  | mcar.hdr | 01001     |
+  | mcdr.car | c         |
+  | mcdr.cdr | d         |
+- duplication to A,B,c,d:01001 as stored in the ONC at E,F,g,h
+  | mcar.hdr | Dup       |
+  | mcar.car | A         |
+  | mcar.cdr | B         |
+  | mcar.hdr | 01001     |
+  | mcdr.car | c         |
+  | mcdr.cdr | d         |
+- in-flight ONC data from E,F,g,h to A,B,c,d:01001
+  | coord    | A,B,c,d:01001       |
+  | mcar.hdr | AT(E,F,g,h).car.hdr |
+  | mcar.car | AT(E,F,g,h).car.car |
+  | mcar.cdr | AT(E,F,g,h).car.cdr |
+  | mcdr.hdr | AT(E,F,g,h).cdr.hdr |
+  | mcdr.car | AT(E,F,g,h).cdr.car |
+  | mcdr.cdr | AT(E,F,g,h).cdr.cdr |
+  if the =AT(E,F,g,h).cdr.hdr==LOCAL= then that portion will be
+  | mcdr.hdr | NEW |
+  | mcdr.car |     |
+  | mcdr.cdr |     |
+  where =NEW= will be a header indicating that a new empty ONC should
+  be created and pointed to using =open_space=.
 
 * would it be possible to limit the number of variable
 ∀ n∈N ∃ a λ-expression l s.t. l requires >n symbols.
