@@ -14,22 +14,22 @@ int main(int argc, char *argv[]){
   PTR_OF_COORD(ptr, coord);
 
   SHOULD(ptr.car == 513);
-  debug("ptr.car %d == 513\n", ptr.car);
+  debug(1, "ptr.car %d == 513\n", ptr.car);
   SHOULD(ptr.cdr == 1027);
-  debug("ptr.cdr %d == 1027\n", ptr.cdr);
+  debug(1, "ptr.cdr %d == 1027\n", ptr.cdr);
   
   coord.X = coord.Y = coord.x = coord.y = 0;
 
   COORD_OF_PTR(coord, ptr);
   
   SHOULD(coord.X == 1);
-  debug("coord.X %d == 1\n", coord.X);
+  debug(1, "coord.X %d == 1\n", coord.X);
   SHOULD(coord.Y == 2);
-  debug("coord.Y %d == 2\n", coord.Y);
+  debug(1, "coord.Y %d == 2\n", coord.Y);
   SHOULD(coord.x == 3);
-  debug("coord.x %d == 3\n", coord.x);
+  debug(1, "coord.x %d == 3\n", coord.x);
   SHOULD(coord.y == 4);
-  debug("coord.y %d == 4\n", coord.y);
+  debug(1, "coord.y %d == 4\n", coord.y);
 
   /* return indicates success or failure */
   return fail_p;

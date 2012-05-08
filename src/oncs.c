@@ -480,7 +480,7 @@ int run(coord place){
         break;
       }
       break;
-    case LCURRIED: break; /* don't act upon locked curried messages */
+    case LCURRIED: break; /* don't touch locked curried messages */
     case CURRIED:
       if(AT(place).cdr.hdr != LOCAL)
         ERROR("curried application must point to something");
