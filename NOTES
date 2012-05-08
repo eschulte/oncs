@@ -1,6 +1,12 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* Pthreads C implementation
+All threads share the same address space, and each thread has its own
+thread ID.  So the solution would be to make one world and message
+queue per thread, and index those worlds and queues behind the thread
+IDs.
+
 * make ONC duplication message based
 So =duplicate_ptr= should not set a value directly, but should rather
 dispatch messages out to the argument to then carry it's contents to
