@@ -33,17 +33,18 @@ int main(int argc, char *argv[]){
 }
 
 void app_1(coord place){
+  char* bits;
   coord tmp1, tmp2;
   /* setup world: ((lambda x (x)) 1) */
   AT(place).refs++;
   debug(2, "(%d,%d) -- ((lambda x (x)) 1)\n", place.x, place.y);
   tmp1 = open_space(place);
   AT(tmp1).refs++;
-  LOCAL_SET(place, car, tmp1);
+  LOCAL_SET(place, car, bits, tmp1);
   debug(2, "(%d,%d) -- (lambda x (x))\n", tmp1.x, tmp1.y);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, cdr, tmp2);
+  LOCAL_SET(place, cdr, bits, tmp2);
   debug(2, "(%d,%d) -- 1\n", tmp2.x, tmp2.y);
   /* (lambda x (x)) */
   place = tmp1;
@@ -51,7 +52,7 @@ void app_1(coord place){
   tmp1 = open_space(place);
   AT(tmp1).refs++;
   debug(2, "(%d,%d) -- (x)\n", tmp1.x, tmp1.y);
-  LOCAL_SET(place, cdr, tmp1);
+  LOCAL_SET(place, cdr, bits, tmp1);
   /* (x) */
   place = tmp1;
   SYMBOL_SET(place, car, 1);

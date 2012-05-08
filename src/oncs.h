@@ -47,40 +47,48 @@
 #define AT(point) world[point.x][point.y]
 #define WRAP(x) (SIZE+x)%SIZE
 #define QWRAP(x) (QLENGTH+x)%QLENGTH
-#define COORD_OF_PTR(coord, ptr) \
-  { coord.x=ptr.car; coord.y=ptr.cdr; }
+#define PTR_OF_COORD(ptr, bits, coord)          \
+  { bits = (char*)&ptr.car;                     \
+    bits[0]=coord.X;                            \
+    bits[1]=coord.Y;                            \
+    bits = (char*)&ptr.cdr;                     \
+    bits[0]=coord.x;                            \
+    bits[1]=coord.y;                            \
+  }
+#define COORD_OF_PTR(coord, ptr)                \
+  { coord.X=(char)ptr.car;                      \
+    coord.Y=(char)(ptr.car>>8) & 0x7F;          \
+    coord.x=(char)ptr.cdr;                      \
+    coord.y=(char)(ptr.cdr>>8) & 0x7F;          \
+  }
 #define INTEGER_APP(where, msg)                 \
   if(where.hdr == LOCAL){                       \
     COORD_OF_PTR(msg.place, where);             \
     DEBUG("enqueue from INTEGER_APP\n");        \
     enqueue(msg);                               \
   }
-#define BOOLEAN_APP(place, ptr, c1, c2, val) {          \
+#define BOOLEAN_APP(place, ptr, bits, c1, c2, val) {    \
     c1 = open_space(place);                             \
     AT(c1).refs = 1;                                    \
     ptr.hdr = LOCAL;                                    \
-    ptr.car = c1.x;                                     \
-    ptr.cdr = c1.y;                                     \
+    PTR_OF_COORD(ptr, bits, c1);                        \
     c2 = open_space(c1);                                \
     AT(c2).refs = 1;                                    \
     AT(c1).car.hdr = LAMBDA;                            \
     AT(c1).car.car = TRUE;                              \
     AT(c1).cdr.hdr = LOCAL;                             \
-    AT(c1).cdr.car = c2.x;                              \
-    AT(c1).cdr.cdr = c2.y;                              \
+    PTR_OF_COORD(AT(c1).cdr, bits, c2);                 \
     c1 = open_space(c2);                                \
     AT(c1).refs = 1;                                    \
     AT(c2).car.hdr = LOCAL;                             \
-    AT(c2).car.car = c1.x;                              \
-    AT(c2).car.cdr = c1.y;                              \
+    PTR_OF_COORD(AT(c2).car, bits, c2);                 \
     AT(c2).cdr.hdr = NIL;                               \
     c2 = open_space(c1);                                \
     AT(c2).refs = 1;                                    \
     AT(c1).car.hdr = LAMBDA;                            \
     AT(c1).car.car = FALSE;                             \
     AT(c1).cdr.hdr = LOCAL;                             \
-    AT(c1).cdr.car = c2.x;                              \
-    AT(c1).cdr.cdr = c2.y;                              \
+    PTR_OF_COORD(AT(c1).cdr, bits, c2);                 \
     AT(c2).car.hdr = SYMBOL;                            \
     AT(c2).car.car = val;                               \
     AT(c2).cdr.hdr = NIL;                               \
@@ -102,7 +110,7 @@
 
 /* structures inhabiting the world */
 #define BIT(x,n) (x & (1 << n-1) != 0)
-typedef struct { int X, Y, x, y, bits; } coord;
+typedef struct { char X, Y; unsigned char x, y; } coord;
 typedef struct { int hdr, car, cdr; } ptr;
 typedef struct { ptr mcar, mcdr; coord place; } msg;
 typedef struct { ptr car, cdr, mcar, mcdr; int refs, num_msgs; } onc;

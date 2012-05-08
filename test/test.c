@@ -126,9 +126,9 @@ void show_world(){
 }
 
 void string_to_onc(coord place, int locked, char *buf){
-  coord t1;
+  char* bits;
+  coord t1, c1, c2;
   char *interum;
-  coord c1, c2;
   int i, car_p, parend, lock_child;
   unsigned int index;
   debug(2, "string_to_onc[%d]((%d,%d), %s)\n",
@@ -146,8 +146,7 @@ void string_to_onc(coord place, int locked, char *buf){
         /* push the sub-list to another call */
         t1 = open_space(place);
         AT(place).car.hdr = LOCAL;
-        AT(place).car.car = t1.x;
-        AT(place).car.cdr = t1.y;
+        PTR_OF_COORD(AT(place).car, bits, t1);
         parend=close_paren(buf, index);
         index++;
         for(i=index;i<parend;i++) interum[(i-index)] = buf[i];
@@ -156,19 +155,18 @@ void string_to_onc(coord place, int locked, char *buf){
         string_to_onc(t1, locked, interum);
         index = parend+1;
       } else {
-        CHAR_TO_PTR(place, AT(place).car, buf[index], c1, c2);
+        CHAR_TO_PTR(place, AT(place).car, buf[index], bits, c1, c2);
       }
       car_p = FALSE;
     } else {
       if(buf[index] == '.'){
         index++;
         while((buf[index] == '#') || (buf[index] == ' ')) index++;
-        CHAR_TO_PTR(place, AT(place).cdr, buf[index], c1, c2);
+        CHAR_TO_PTR(place, AT(place).cdr, buf[index], bits, c1, c2);
       } else {
         t1 = open_space(place);
         AT(place).cdr.hdr = LOCAL;
-        AT(place).cdr.car = t1.x;
-        AT(place).cdr.cdr = t1.y;
+        PTR_OF_COORD(AT(place).cdr, bits, t1);
         place = t1;
       }
       car_p = TRUE;
@@ -253,8 +251,8 @@ unsigned long queue_hash(){
   unsigned long hash = 5381;
   i = qbeg;
   while(i != qend){
-    msg_ints[0] = queue[i].place.x;
-    msg_ints[1] = queue[i].place.y;
+    msg_ints[0] = (int)queue[i].place.X;
+    msg_ints[1] = (int)queue[i].place.x;
     msg_ints[2] = queue[i].mcar.hdr;
     msg_ints[3] = queue[i].mcar.car;
     msg_ints[4] = queue[i].mcar.cdr;
@@ -277,7 +275,7 @@ unsigned long world_hash(){
   return hash;
 }
 
-int run_at(int x, int y){
+int run_at(unsigned char x, unsigned char y){
   coord coord;
   debug(2, "running at (%d,%d)\n", x, y);
   coord.x = x; coord.y = y;
@@ -382,17 +380,18 @@ void expr_to_expr(char *expr){
 }
 
 void simple_app(coord place){
+  char* bits;
   coord tmp1, tmp2;
   /* setup world: ((lambda x (x x)) (1 2 3)) */
   AT(place).refs++;
   debug(2, "(%d,%d) -- ((lambda x (x x)) (1 2 3))\n", place.x, place.y);
   tmp1 = open_space(place);
   AT(tmp1).refs++;
-  LOCAL_SET(place, car, tmp1);
+  LOCAL_SET(place, car, bits, tmp1);
   debug(2, "(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, cdr, tmp2);
+  LOCAL_SET(place, cdr, bits, tmp2);
   debug(2, "(%d,%d) -- (1 2 3)\n", tmp2.x, tmp2.y);
   /* (lambda x (x x)) */
   place = tmp1;
@@ -400,34 +399,34 @@ void simple_app(coord place){
   tmp1 = open_space(place);
   AT(tmp1).refs++;
   debug(2, "(%d,%d) -- (x x)\n", tmp1.x, tmp1.y);
-  LOCAL_SET(place, cdr, tmp1);
+  LOCAL_SET(place, cdr, bits, tmp1);
   /* (x x) */
   place = tmp1;
   SYMBOL_SET(place, car, 1);
   tmp1 = open_space(place);
   AT(tmp1).refs++;
   debug(2, "(%d,%d) -- (_ x)\n", tmp1.x, tmp1.y);
-  LOCAL_SET(place, cdr, tmp1);
+  LOCAL_SET(place, cdr, bits, tmp1);
   SYMBOL_SET(tmp1, car, 1);
   NIL_SET(tmp1, cdr);
   /* ((1 2 3)) */
   place = tmp2;
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, car, tmp2);
+  LOCAL_SET(place, car, bits, tmp2);
   NIL_SET(place, cdr);
   /* (1 _ _) */
   place = tmp2;
   INTEGER_SET(place, car, 1);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, cdr, tmp2);
+  LOCAL_SET(place, cdr, bits, tmp2);
   /* (_ 2 _) */
   place = tmp2;
   INTEGER_SET(place, car, 2);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, cdr, tmp2);
+  LOCAL_SET(place, cdr, bits, tmp2);
   /* (_ _ 3) */
   place = tmp2;
   INTEGER_SET(place, car, 3);

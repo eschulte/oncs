@@ -7,6 +7,38 @@ thread ID.  So the solution would be to make one world and message
 queue per thread, and index those worlds and queues behind the thread
 IDs.
 
+* fit long coordinates into pointers
+New long coordinates will stretch across multiple worlds.
+
+Will have to fit two integers into one integer with bit-shifting
+magic.
+
+** implementation
+#+begin_src C :results output
+  int x = 1024;
+  char* bits = (char*)&x;
+  printf("%06d -> [%02d][%02d]\n", x, bits[0], bits[1]);
+  bits[0] = 8; bits[1] = 9;
+  printf("%06d -> [%02d][%02d]\n", x, bits[0], bits[1]);
+  char c1, c2;
+  c1 = (char)x;
+  c2 = (x>>8) & 0x7F;
+  printf("%06d -> [%02d][%02d]\n", x, c1, c2);
+  printf("%06d -> [%02d][%02d]\n", x, c1, c2);
+  c1 = 0;
+  c2 = 4;
+  bits[0] = 0;
+  bits[1] = 4;
+  printf("%06d -> [%02d][%02d]\n", x, c1, c2);
+#+end_src
+
+#+RESULTS:
+: 001024 -> [00][04]
+: 002312 -> [08][09]
+: 002312 -> [08][09]
+: 002312 -> [08][09]
+: 001024 -> [00][04]
+
 * make ONC duplication message based
 So =duplicate_ptr= should not set a value directly, but should rather
 dispatch messages out to the argument to then carry it's contents to

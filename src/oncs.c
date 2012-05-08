@@ -173,6 +173,7 @@ void duplicate_msgs(coord from, coord to){
 
 /* TODO: maybe pass through original location for co-location */
 ptr duplicate_ptr(ptr old_p, int refs, int locked){
+  char* bits;
   coord orig, new;
   ptr new_p;
   new_p = old_p;
@@ -181,7 +182,7 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
     COORD_OF_PTR(orig, new_p);
     new = open_space(orig);
     AT(new).refs = refs;
-    new_p.car = new.x; new_p.cdr = new.y;
+    PTR_OF_COORD(new_p, bits, new);
     duplicate_msgs(orig, new);
     AT(new).car = duplicate_ptr(AT(orig).car, refs, locked);
     /* the bodies of lambdas should be locked after insertion */
@@ -252,7 +253,7 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   switch(ptr.hdr){
   case NIL: index--; break;
   case LOCAL:
-    coord.x = ptr.car; coord.y = ptr.cdr;
+    COORD_OF_PTR(coord, ptr);
     if(car_p) { buf[index] = '('; index++; }
     index = ptr_to_string(AT(coord).car, buf, index, 1);
     buf[index] = ' '; index++;
@@ -436,6 +437,7 @@ int app_abs(coord place){
 }
 
 int run(coord place){
+  char* bits;
   msg msg;
   coord c1, c2;
   int ran, i1, i2;
@@ -511,11 +513,11 @@ int run(coord place){
       break;
     }
     if(AT(place).car.hdr == BOOLEAN){
-      BOOLEAN_APP(place, AT(place).car, c1, c2, i1);
+      BOOLEAN_APP(place, AT(place).car, bits, c1, c2, i1);
       ran = TRUE;
     }
     if(AT(place).cdr.hdr == BOOLEAN){
-      BOOLEAN_APP(place, AT(place).cdr, c1, c2, i2);
+      BOOLEAN_APP(place, AT(place).cdr, bits, c1, c2, i2);
       ran = TRUE;
     }
     break;

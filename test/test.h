@@ -35,7 +35,7 @@ void simple_app(coord place);
 /* hashing functions from http://www.cse.yorku.ca/~oz/hash.html */
 unsigned long coord_hash();
 unsigned long world_hash();
-int run_at(int x, int y);
+int run_at(unsigned char x, unsigned char y);
 void run_one();
 void fix(coord place);
 void step(coord place);
@@ -43,10 +43,9 @@ void step(coord place);
 /* state placing macros */
 #define NIL_SET(place, sub)              \
   AT(place).sub.hdr = NIL;
-#define LOCAL_SET(palce, sub, coord)     \
-  AT(place).sub.hdr = LOCAL;             \
-  AT(place).sub.car = coord.x;           \
-  AT(place).sub.cdr = coord.y;
+#define LOCAL_SET(palce, sub, bits, coord)        \
+  AT(place).sub.hdr = LOCAL;                    \
+  PTR_OF_COORD(AT(place).sub, bits, coord);
 #define INTEGER_SET(place, sub, int)     \
   AT(place).sub.hdr = INTEGER;           \
   AT(place).sub.car = int;
@@ -56,7 +55,7 @@ void step(coord place);
 #define LAMBDA_SET(place, variable)      \
   AT(place).car.hdr = LAMBDA;            \
   AT(place).car.car = variable;
-#define CHAR_TO_PTR(place, where, char, c1, c2)                 \
+#define CHAR_TO_PTR(place, where, char, bits, c1, c2)           \
   debug(2, "char_to_ptr((%d,%d), %c)\n",                        \
         place.x, place.y, char);                                \
   switch(char){                                                 \
@@ -122,19 +121,19 @@ void step(coord place);
     break;                                                      \
   case 't':                                                     \
     debug(2, "\tTRUE:(%d,%d)\n", place.x, place.y);             \
-    BOOLEAN_APP(place, where, c1, c2, TRUE);                    \
+    BOOLEAN_APP(place, where, bits, c1, c2, TRUE);              \
     index++;                                                    \
     break;                                                      \
   case 'f':                                                     \
     debug(2, "\tFALSE:(%d,%d)\n", place.x, place.y);            \
-    BOOLEAN_APP(place, where, c1, c2, FALSE);                   \
+    BOOLEAN_APP(place, where, bits, c1, c2, FALSE);             \
     index++;                                                    \
     break;                                                      \
   default: /* INTEGER */                                        \
     if(0 <= (buf[index] - '0') && (buf[index] - '0') <= 9) {    \
       debug(2, "\tINTEGER:(%d,%d)\n", place.x, place.y);        \
-    where.hdr = INTEGER;                                        \
-    where.car = read_int(buf, &index);                          \
+      where.hdr = INTEGER;                                      \
+      where.car = read_int(buf, &index);                        \
     } else { index++; }                                         \
     break;                                                      \
   }
