@@ -84,15 +84,15 @@
 
 /* utility macros */
 #define DEBUG_P 0
-#define DEBUG(fmt) if(DEBUG_P) printf(fmt);
-#define DEBUG1(fmt, x) if(DEBUG_P) printf(fmt, x);
-#define DEBUG2(fmt, x, y) if(DEBUG_P) printf(fmt, x, y);
-#define DEBUG3(fmt, x, y, z) if(DEBUG_P) printf(fmt, x, y, z);
-#define DEBUG4(fmt, x, y, z, a) if(DEBUG_P) printf(fmt, x, y, z, a);
+#define DEBUG(fmt) if(DEBUG_P) printf(fmt)
+#define DEBUG1(fmt, x) if(DEBUG_P) printf(fmt, x)
+#define DEBUG2(fmt, x, y) if(DEBUG_P) printf(fmt, x, y)
+#define DEBUG3(fmt, x, y, z) if(DEBUG_P) printf(fmt, x, y, z)
+#define DEBUG4(fmt, x, y, z, a) if(DEBUG_P) printf(fmt, x, y, z, a)
 #define DEBUG5(fmt, x, y, z, a, b) \
-  if(DEBUG_P) printf(fmt, x, y, z, a, b);
+  if(DEBUG_P) printf(fmt, x, y, z, a, b)
 #define DEBUG8(fmt, x, y, z, a, b, c, d, e) \
-  if(DEBUG_P) printf(fmt, x, y, z, a, b, c, d, e);
+  if(DEBUG_P) printf(fmt, x, y, z, a, b, c, d, e)
 #define ERROR(message) \
   { fprintf(stderr, "ERROR: %s\n", message); exit(1); }
 
