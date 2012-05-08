@@ -2,7 +2,6 @@
 #define BUF_SIZE 1024
 
 int main(int argc, char *argv[]){
-  char* bits;
   coord place, target;
   init(argc, argv);
   place.x = place.y = 4;
@@ -10,7 +9,7 @@ int main(int argc, char *argv[]){
 
   AT(place).refs = 1;
   AT(place).car.hdr = LOCAL;
-  PTR_OF_COORD(AT(place).car, bits, target);
+  PTR_OF_COORD(AT(place).car, target);
   AT(place).car.hdr = NIL;
   AT(target).refs = 1;
   AT(target).car.hdr = INTEGER;

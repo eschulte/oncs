@@ -173,7 +173,6 @@ void duplicate_msgs(coord from, coord to){
 
 /* TODO: maybe pass through original location for co-location */
 ptr duplicate_ptr(ptr old_p, int refs, int locked){
-  char* bits;
   coord orig, new;
   ptr new_p;
   new_p = old_p;
@@ -182,7 +181,7 @@ ptr duplicate_ptr(ptr old_p, int refs, int locked){
     COORD_OF_PTR(orig, new_p);
     new = open_space(orig);
     AT(new).refs = refs;
-    PTR_OF_COORD(new_p, bits, new);
+    PTR_OF_COORD(new_p, new);
     duplicate_msgs(orig, new);
     AT(new).car = duplicate_ptr(AT(orig).car, refs, locked);
     /* the bodies of lambdas should be locked after insertion */
@@ -437,7 +436,6 @@ int app_abs(coord place){
 }
 
 int run(coord place){
-  char* bits;
   msg msg;
   coord c1, c2;
   int ran, i1, i2;
@@ -513,11 +511,11 @@ int run(coord place){
       break;
     }
     if(AT(place).car.hdr == BOOLEAN){
-      BOOLEAN_APP(place, AT(place).car, bits, c1, c2, i1);
+      BOOLEAN_APP(place, AT(place).car, c1, c2, i1);
       ran = TRUE;
     }
     if(AT(place).cdr.hdr == BOOLEAN){
-      BOOLEAN_APP(place, AT(place).cdr, bits, c1, c2, i2);
+      BOOLEAN_APP(place, AT(place).cdr, c1, c2, i2);
       ran = TRUE;
     }
     break;

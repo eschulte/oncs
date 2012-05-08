@@ -27,8 +27,7 @@ magic.
   printf("%06d -> [%02d][%02d]\n", x, c1, c2);
   c1 = 0;
   c2 = 4;
-  bits[0] = 0;
-  bits[1] = 4;
+  x = (c1 | c2 << 8);
   printf("%06d -> [%02d][%02d]\n", x, c1, c2);
 #+end_src
 

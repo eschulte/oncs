@@ -1,10 +1,8 @@
 #include "test.h"
 
 int main(int argc, char *argv[]){
-  char* bits;
   int i, j;
   coord place, new;
-
   init(argc, argv);
 
   /* setup */
@@ -13,7 +11,7 @@ int main(int argc, char *argv[]){
   AT(place).refs++;
   AT(new).refs++;
   LAMBDA_SET(place, 32);
-  LOCAL_SET(place, cdr, bits, new);
+  LOCAL_SET(place, cdr, new);
   SYMBOL_SET(new, car, 32);
 
   /* fill up the world */

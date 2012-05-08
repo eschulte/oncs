@@ -47,13 +47,9 @@
 #define AT(point) world[point.x][point.y]
 #define WRAP(x) (SIZE+x)%SIZE
 #define QWRAP(x) (QLENGTH+x)%QLENGTH
-#define PTR_OF_COORD(ptr, bits, coord)          \
-  { bits = (char*)&ptr.car;                     \
-    bits[0]=coord.X;                            \
-    bits[1]=coord.Y;                            \
-    bits = (char*)&ptr.cdr;                     \
-    bits[0]=coord.x;                            \
-    bits[1]=coord.y;                            \
+#define PTR_OF_COORD(ptr, coord)                \
+  { ptr.car = (coord.X | coord.Y << 8);         \
+    ptr.cdr = (coord.x | coord.y << 8);         \
   }
 #define COORD_OF_PTR(coord, ptr)                \
   { coord.X=(char)ptr.car;                      \
@@ -67,31 +63,31 @@
     DEBUG("enqueue from INTEGER_APP\n");        \
     enqueue(msg);                               \
   }
-#define BOOLEAN_APP(place, ptr, bits, c1, c2, val) {    \
-    c1 = open_space(place);                             \
-    AT(c1).refs = 1;                                    \
-    ptr.hdr = LOCAL;                                    \
-    PTR_OF_COORD(ptr, bits, c1);                        \
-    c2 = open_space(c1);                                \
-    AT(c2).refs = 1;                                    \
-    AT(c1).car.hdr = LAMBDA;                            \
-    AT(c1).car.car = TRUE;                              \
-    AT(c1).cdr.hdr = LOCAL;                             \
-    PTR_OF_COORD(AT(c1).cdr, bits, c2);                 \
-    c1 = open_space(c2);                                \
-    AT(c1).refs = 1;                                    \
-    AT(c2).car.hdr = LOCAL;                             \
-    PTR_OF_COORD(AT(c2).car, bits, c2);                 \
-    AT(c2).cdr.hdr = NIL;                               \
-    c2 = open_space(c1);                                \
-    AT(c2).refs = 1;                                    \
-    AT(c1).car.hdr = LAMBDA;                            \
-    AT(c1).car.car = FALSE;                             \
-    AT(c1).cdr.hdr = LOCAL;                             \
-    PTR_OF_COORD(AT(c1).cdr, bits, c2);                 \
-    AT(c2).car.hdr = SYMBOL;                            \
-    AT(c2).car.car = val;                               \
-    AT(c2).cdr.hdr = NIL;                               \
+#define BOOLEAN_APP(place, ptr, c1, c2, val) {  \
+    c1 = open_space(place);                     \
+    AT(c1).refs = 1;                            \
+    ptr.hdr = LOCAL;                            \
+    PTR_OF_COORD(ptr, c1);                      \
+    c2 = open_space(c1);                        \
+    AT(c2).refs = 1;                            \
+    AT(c1).car.hdr = LAMBDA;                    \
+    AT(c1).car.car = TRUE;                      \
+    AT(c1).cdr.hdr = LOCAL;                     \
+    PTR_OF_COORD(AT(c1).cdr, c2);               \
+    c1 = open_space(c2);                        \
+    AT(c1).refs = 1;                            \
+    AT(c2).car.hdr = LOCAL;                     \
+    PTR_OF_COORD(AT(c2).car, c2);               \
+    AT(c2).cdr.hdr = NIL;                       \
+    c2 = open_space(c1);                        \
+    AT(c2).refs = 1;                            \
+    AT(c1).car.hdr = LAMBDA;                    \
+    AT(c1).car.car = FALSE;                     \
+    AT(c1).cdr.hdr = LOCAL;                     \
+    PTR_OF_COORD(AT(c1).cdr, c2);               \
+    AT(c2).car.hdr = SYMBOL;                    \
+    AT(c2).car.car = val;                       \
+    AT(c2).cdr.hdr = NIL;                       \
   }
 
 /* utility macros */

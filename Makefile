@@ -12,6 +12,7 @@ TEST =
 TESTS = \
 	test/open_space	\
 	test/queue	\
+	test/coords	\
 	test/int-msg	\
 	test/duplicate	\
 	test/app-1	\

@@ -33,18 +33,17 @@ int main(int argc, char *argv[]){
 }
 
 void app(coord place){
-  char* bits;
   coord tmp1, tmp2;
   /* setup world: ((lambda x (x x)) (1 2 3 4)) */
   AT(place).refs++;
   debug(2, "(%d,%d) -- ((lambda x (x x)) (1 2 3))\n", place.x, place.y);
   tmp1 = open_space(place);
   AT(tmp1).refs++;
-  LOCAL_SET(place, car, bits, tmp1);
+  LOCAL_SET(place, car, tmp1);
   debug(2, "(%d,%d) -- (lambda x (x x))\n", tmp1.x, tmp1.y);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, cdr, bits, tmp2);
+  LOCAL_SET(place, cdr, tmp2);
   debug(2, "(%d,%d) -- (1 2 3 4)\n", tmp2.x, tmp2.y);
   /* (lambda x (x x)) */
   place = tmp1;
@@ -52,40 +51,40 @@ void app(coord place){
   tmp1 = open_space(place);
   AT(tmp1).refs++;
   debug(2, "(%d,%d) -- (x x)\n", tmp1.x, tmp1.y);
-  LOCAL_SET(place, cdr, bits, tmp1);
+  LOCAL_SET(place, cdr, tmp1);
   /* (x x) */
   place = tmp1;
   SYMBOL_SET(place, car, 1);
   tmp1 = open_space(place);
   AT(tmp1).refs++;
   debug(2, "(%d,%d) -- (_ x)\n", tmp1.x, tmp1.y);
-  LOCAL_SET(place, cdr, bits, tmp1);
+  LOCAL_SET(place, cdr, tmp1);
   SYMBOL_SET(tmp1, car, 1);
   NIL_SET(tmp1, cdr);
   /* ((1 2 3 4)) */
   place = tmp2;
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, car, bits, tmp2);
+  LOCAL_SET(place, car, tmp2);
   NIL_SET(place, cdr);
   /* (1 _ _ _) */
   place = tmp2;
   INTEGER_SET(place, car, 1);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, cdr, bits, tmp2);
+  LOCAL_SET(place, cdr, tmp2);
   /* (_ 2 _ _) */
   place = tmp2;
   INTEGER_SET(place, car, 2);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, cdr, bits, tmp2);
+  LOCAL_SET(place, cdr, tmp2);
   /* (_ _ 3 _) */
   place = tmp2;
   INTEGER_SET(place, car, 3);
   tmp2 = open_space(place);
   AT(tmp2).refs++;
-  LOCAL_SET(place, cdr, bits, tmp2);
+  LOCAL_SET(place, cdr, tmp2);
   /* (_ _ _ 4) */
   place = tmp2;
   INTEGER_SET(place, car, 4);
