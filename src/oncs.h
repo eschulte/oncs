@@ -97,7 +97,8 @@
   { fprintf(stderr, "ERROR: %s\n", message); exit(1); }
 
 /* structures inhabiting the world */
-typedef struct { int x, y; } coord;
+#define BIT(x,n) (x & (1 << n-1) != 0)
+typedef struct { int X, Y, x, y, bits; } coord;
 typedef struct { int hdr, car, cdr; } ptr;
 typedef struct { ptr mcar, mcdr; coord place; } msg;
 typedef struct { ptr car, cdr, mcar, mcdr; int refs, num_msgs; } onc;
