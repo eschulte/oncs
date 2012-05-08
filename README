@@ -71,13 +71,15 @@ received in the order in which they are sent.
 : +---------------------+
 
 The message values and their meanings are.
-| value   | interpretation                                    |
-|---------+---------------------------------------------------|
-| NIL     | default, runs the waiting loop                    |
-| INTEGER | increments or decrements the ref counter by value |
-| LAMBDA  | λ-application, ptrs specify variable and value    |
-| EXTEND  | extend the end of the expression with by value    |
-| others  | undefined                                         |
+| value     | interpretation                                    |
+|-----------+---------------------------------------------------|
+| NIL       | default, runs the waiting loop                    |
+| INTEGER   | increments or decrements the ref counter by value |
+| LAMBDA    | λ-application, ptrs specify variable and value    |
+| EXTEND    | extend the end of the expression with by value    |
+| DUPLICATE | request target to duplicate itself to location    |
+| Replace   | request location to replace itself with contents  |
+| others    | undefined                                         |
 
 * Usage
 1. Build
