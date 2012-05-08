@@ -38,8 +38,10 @@
 #define DIVIDE 3
 #define EQUAL  4
 #define LESS   5
-#define TRUE   1
 #define FALSE  0
+#define TRUE   1
+#define LEFT   0
+#define RIGHT  1
 
 /* world access */
 #define AT(point) world[point.x][point.y]
