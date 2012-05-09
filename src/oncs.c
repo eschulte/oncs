@@ -171,22 +171,18 @@ void duplicate_msgs(coord from, coord to){
   }
 }
 
-/* TODO: maybe pass through original location for co-location */
-ptr duplicate_ptr(ptr old_p, int refs, int locked){
+ptr duplicate_ptr(ptr old_p, coord place, int locked){
   coord orig, new;
+  msg msg;
   ptr new_p;
   new_p = old_p;
   switch(new_p.hdr){
   case LOCAL:
-    COORD_OF_PTR(orig, new_p);
-    new = open_space(orig);
-    AT(new).refs = refs;
-    PTR_OF_COORD(new_p, new);
-    duplicate_msgs(orig, new);
-    AT(new).car = duplicate_ptr(AT(orig).car, refs, locked);
-    /* the bodies of lambdas should be locked after insertion */
-    if(AT(orig).car.hdr == LAMBDA) locked = TRUE;
-    AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked);
+    COORD_OF_PTR(msg.coord, new_p);
+    msg.mcar.hdr == DUPLICATE;
+    PTR_OF_COORD(msg.mcar.car, place);
+    msg.mcdr.car = 0;
+    enqueue(msg);
     break;
   case LCURRIED:
   case CURRIED:
@@ -324,7 +320,10 @@ int onc_to_string(coord place, char *buf, int index){
   return index;
 }
 
-ptr lambda_app(msg l_msg, ptr ptr, int refs){
+ptr lambda_app(msg l_msg, coord place, int dir){
+  ptr ptr;
+  if(dir == LEFT) ptr = AT(place).car;
+  else            ptr = AT(place).cdr;
   switch(ptr.hdr){
   case NIL:
   case INTEGER:
@@ -344,7 +343,7 @@ ptr lambda_app(msg l_msg, ptr ptr, int refs){
     break;
   case SYMBOL:
     if(l_msg.mcar.car == ptr.car)
-      ptr = duplicate_ptr(l_msg.mcdr, refs, l_msg.mcar.cdr);
+      ptr = duplicate_ptr(l_msg.mcdr, place, l_msg.mcar.cdr);
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.place, ptr);
@@ -529,7 +528,7 @@ int run(coord place){
   case LAMBDA:                  /* perform lambda application */
     msg.mcar = AT(place).mcar; msg.mcdr = AT(place).mcdr;
     if(AT(place).mcdr.hdr == LOCAL) COORD_OF_PTR(c2, AT(place).mcdr);
-    AT(place).car = lambda_app(msg, AT(place).car, AT(place).refs);
+    AT(place).car = lambda_app(msg, place, LEFT);
     /* don't descend down shadowing lambdas */
     if(AT(place).car.hdr != LAMBDA ||
        AT(place).car.car != msg.mcar.car){
@@ -538,7 +537,7 @@ int run(coord place){
       DEBUG2("copy_ptr(%d,%d) from lambda message\n",
              msg.mcdr.car, msg.mcdr.cdr);
       copy_ptr(msg.mcdr);
-      AT(place).cdr = lambda_app(msg, AT(place).cdr, AT(place).refs);
+      AT(place).cdr = lambda_app(msg, place, RIGHT);
     }
     ran = TRUE;
     break;
@@ -569,6 +568,35 @@ int run(coord place){
       break;
     }
     ran = TRUE;
+    break;
+  case DUPLICATE:
+    msg.mcar.hdr == REPLACE;
+    COORD_OF_PTR(msg.place, AT(place).mcar.car);
+    /* send off car message */
+    msg.mcar.car = LEFT;
+    msg.mcdr = AT(place).car;
+    enqueue(msg);
+    /* send off cdr message */
+    msg.mcar.car = RIGHT;
+    msg.mcdr = AT(place).cdr;
+    enqueue(msg);
+    /* propagate downwards car */
+    if(AT(place).car.hdr == LOCAL){
+      msg.mcar = AT(place).mcar;
+      COORD_OF_PTR(msg.place, AT(place).car);
+      /* add a LEFT to msg.mcdr */
+      
+    }
+    break;
+  case REPLACE:
+    /* new = open_space(orig); */
+    /* AT(new).refs = refs; */
+    /* new_p.car = new.x; new_p.cdr = new.y; */
+    /* duplicate_msgs(orig, new); */
+    /* AT(new).car = duplicate_ptr(AT(orig).car, refs, locked); */
+    /* /\* the bodies of lambdas should be locked after insertion *\/ */
+    /* if(AT(orig).car.hdr == LAMBDA) locked = TRUE; */
+    /* AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked); */
     break;
   }
   /* TODO: don't nullify message if we haven't run? */

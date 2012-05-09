@@ -1,6 +1,16 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* anatomy of a duplicate message
+| msg.place    | coord of to be duplicated              |
+| msg.mcar.hdr | DUPLICATE                              |
+| msg.mcar.car | coord of target of duplication         |
+| msg.mcdr.car | length of LEFT/RIGHT path in bits      |
+| msg.mcdr.cdr | bit-array specifying LEFT/RIGHT path   |
+|              | to take traversing down the linked ONC |
+|              | structure starting at the target of    |
+|              | duplication                            |
+
 * Pthreads C implementation
 All threads share the same address space, and each thread has its own
 thread ID.  So the solution would be to make one world and message
