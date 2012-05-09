@@ -23,7 +23,7 @@ New long coordinates will stretch across multiple worlds.
 Will have to fit two integers into one integer with bit-shifting
 magic.
 
-** implementation
+** implementation -- packing chars into ints
 #+begin_src C :results output
   int x = 1024;
   char* bits = (char*)&x;
@@ -47,6 +47,39 @@ magic.
 : 002312 -> [08][09]
 : 002312 -> [08][09]
 : 001024 -> [00][04]
+
+** implementation -- bit arrays
+#+begin_src C
+  int x, i;
+  x = 4;
+  printf("poping\n");
+  for(i=0;i<4;i++){
+    /* pop */
+    printf("x=%d, x[%d]=%d\n", x, i, (x & 1));
+    x=x>>1;
+  }
+  printf("pushing\n");
+  for(i=0;i<4;i++){
+    /* push */
+    if(i==1) x = x | 1;
+    printf("x=%d, x[%d]=%d\n", x, i, (x & 1));
+    x=x<<1;
+   }
+#+end_src
+
+#+RESULTS:
+#+begin_example
+poping
+x=4, x[0]=0
+x=2, x[1]=0
+x=1, x[2]=1
+x=0, x[3]=0
+pushing
+x=0, x[0]=0
+x=1, x[1]=1
+x=2, x[2]=0
+x=4, x[3]=0
+#+end_example
 
 * make ONC duplication message based
 So =duplicate_ptr= should not set a value directly, but should rather

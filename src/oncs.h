@@ -57,6 +57,9 @@
     coord.x=(char)ptr.cdr;                      \
     coord.y=(char)(ptr.cdr>>8) & 0x7F;          \
   }
+#define POP(x, i)  { i=x&1; x=x>>1; }
+#define PUSH(x, i) { x=x<<1; if(i) x=x|1; }
+
 #define INTEGER_APP(where, msg)                 \
   if(where.hdr == LOCAL){                       \
     COORD_OF_PTR(msg.place, where);             \

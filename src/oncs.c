@@ -181,7 +181,7 @@ ptr duplicate_ptr(ptr old_p, coord place, int locked){
     COORD_OF_PTR(msg.coord, new_p);
     msg.mcar.hdr == DUPLICATE;
     PTR_OF_COORD(msg.mcar.car, place);
-    msg.mcdr.car = 0;
+    msg.mcdr.car = msg.mcdr.cdr = 0;
     enqueue(msg);
     break;
   case LCURRIED:
@@ -585,7 +585,16 @@ int run(coord place){
       msg.mcar = AT(place).mcar;
       COORD_OF_PTR(msg.place, AT(place).car);
       /* add a LEFT to msg.mcdr */
-      
+      msg.mcdr.car++;
+      PUSH(msg.mcdr.cdr, LEFT);
+    }
+    /* propagate downwards cdr */
+    if(AT(place).cdr.hdr == LOCAL){
+      msg.mcar = AT(place).mcdr;
+      COORD_OF_PTR(msg.place, AT(place).cdr);
+      /* add a LEFT to msg.mcdr */
+      msg.mcdr.car++;
+      PUSH(msg.mcdr.cdr, RIGHT);
     }
     break;
   case REPLACE:
