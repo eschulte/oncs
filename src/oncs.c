@@ -155,50 +155,6 @@ ptr replace_ptr(ptr old_p, ptr new_p){
   return new_p;
 }
 
-void duplicate_msgs(coord from, coord to){
-  msg msg;
-  int i, end;
-  end = qend;
-  for(i=qbeg;i!=end;i=QWRAP(i+1)){
-    msg = queue[i];
-    if(msg.mcar.hdr != INTEGER &&
-       msg.place.x == from.x &&
-       msg.place.y == from.y){
-      msg.place = to;
-      copy_ptr(msg.mcdr);
-      enqueue(msg);
-    }
-  }
-}
-
-ptr duplicate_ptr(ptr old_p, coord place, int locked){
-  coord orig, new;
-  msg msg;
-  ptr new_p;
-  new_p = old_p;
-  switch(new_p.hdr){
-  case LOCAL:
-    COORD_OF_PTR(msg.coord, new_p);
-    msg.mcar.hdr == DUPLICATE;
-    PTR_OF_COORD(msg.mcar.car, place);
-    msg.mcdr.car = msg.mcdr.cdr = 0;
-    enqueue(msg);
-    break;
-  case LCURRIED:
-  case CURRIED:
-    if(locked) new_p.hdr = LCURRIED;
-    else       new_p.hdr = CURRIED;
-    return new_p;
-    break;
-  case LAMBDA:
-  case PRIMOPT:
-    new_p.cdr = locked;
-  default:
-    break;
-  }
-  return new_p;
-}
-
 int argument_p(ptr ptr){
   #if EVALUATION_STRATEGY == CALL_BY_NAME
   return !(ptr.hdr == NIL);
@@ -322,6 +278,7 @@ int onc_to_string(coord place, char *buf, int index){
 
 ptr lambda_app(msg l_msg, coord place, int dir){
   ptr ptr;
+  msg msg;
   if(dir == LEFT) ptr = AT(place).car;
   else            ptr = AT(place).cdr;
   switch(ptr.hdr){
@@ -342,8 +299,17 @@ ptr lambda_app(msg l_msg, coord place, int dir){
     ptr.cdr = l_msg.mcar.cdr;
     break;
   case SYMBOL:
-    if(l_msg.mcar.car == ptr.car)
-      ptr = duplicate_ptr(l_msg.mcdr, place, l_msg.mcar.cdr);
+    if(l_msg.mcar.car == ptr.car){
+      if(l_msg.mcdr.hdr == LOCAL){
+        msg.mcar.hdr = DUPLICATE;
+        COORD_OF_PTR(msg.place, l_msg.mcdr);
+        PTR_OF_COORD(msg.mcar, place);
+        enqueue(msg);
+        /* TODO: fit dir in here */
+      } else {
+        ptr = l_msg.mcdr;
+      }
+    }
     break;
   case LOCAL:
     COORD_OF_PTR(l_msg.place, ptr);
@@ -445,16 +411,18 @@ int run(coord place){
     case LOCAL:
       COORD_OF_PTR(c1, AT(place).car);
       /* apply unlocked λ's */
-      if(AT(c1).car.hdr == LAMBDA && AT(c1).car.cdr == FALSE)
+      if(AT(c1).car.hdr == LAMBDA &&
+         AT(c1).car.cdr == FALSE)
         ran = app_abs(place);
       /* eliminate redundant nested parenthesis */
-      else if(AT(c1).cdr.hdr == NIL && has_incoming_msgs(c1) == 0){
+      else if(AT(c1).cdr.hdr == NIL &&
+              has_incoming_msgs(c1) == 0){
         AT(place).car = replace_ptr(AT(place).car, AT(c1).car);
         ran = TRUE;
       }
       break;
     case PRIMOPT:
-      if(AT(place).car.cdr == FALSE){ /* only PRIMOPT if unlocked */
+      if(AT(place).car.cdr == FALSE){ /* locked? */
         ran = TRUE;
         switch(AT(place).cdr.hdr){
         case INTEGER:
@@ -479,7 +447,7 @@ int run(coord place){
         break;
       }
       break;
-    case LCURRIED: break; /* don't touch locked curried messages */
+    case LCURRIED: break; /* don't touch if locked */
     case CURRIED:
       if(AT(place).cdr.hdr != LOCAL)
         ERROR("curried application must point to something");
@@ -570,14 +538,19 @@ int run(coord place){
     ran = TRUE;
     break;
   case DUPLICATE:
-    msg.mcar.hdr == REPLACE;
-    COORD_OF_PTR(msg.place, AT(place).mcar.car);
+    /* TODO: need to lock λ prim-cond and prim-opt */
+    msg.mcar.hdr = REPLACE;
+    COORD_OF_PTR(msg.place, AT(place).mcar);
     /* send off car message */
-    msg.mcar.car = LEFT;
+    msg.mcar = AT(place).mcdr;
+    msg.mcar.hdr = REPLACE;
+    PUSH(msg.mcar.cdr, LEFT);
     msg.mcdr = AT(place).car;
     enqueue(msg);
     /* send off cdr message */
-    msg.mcar.car = RIGHT;
+    msg.mcar = AT(place).mcdr;
+    msg.mcar.hdr = REPLACE;
+    PUSH(msg.mcar.cdr, RIGHT);
     msg.mcdr = AT(place).cdr;
     enqueue(msg);
     /* propagate downwards car */
@@ -585,30 +558,68 @@ int run(coord place){
       msg.mcar = AT(place).mcar;
       COORD_OF_PTR(msg.place, AT(place).car);
       /* add a LEFT to msg.mcdr */
-      msg.mcdr.car++;
-      PUSH(msg.mcdr.cdr, LEFT);
+      msg.mcdr.car = AT(place).mcdr.car+1;
+      if(AT(place).cdr.hdr == LOCAL) PUSH(msg.mcdr.cdr, LEFT);
+      enqueue(msg);
     }
     /* propagate downwards cdr */
     if(AT(place).cdr.hdr == LOCAL){
-      msg.mcar = AT(place).mcdr;
+      msg.mcar = AT(place).mcar;
       COORD_OF_PTR(msg.place, AT(place).cdr);
-      /* add a LEFT to msg.mcdr */
-      msg.mcdr.car++;
-      PUSH(msg.mcdr.cdr, RIGHT);
+      /* add a RIGHT to msg.mcdr */
+      msg.mcdr.car = AT(place).mcdr.car+1;
+      if(AT(place).car.hdr == LOCAL) PUSH(msg.mcdr.cdr, RIGHT);
+      enqueue(msg);
     }
+    ran = TRUE;
     break;
   case REPLACE:
-    /* new = open_space(orig); */
-    /* AT(new).refs = refs; */
-    /* new_p.car = new.x; new_p.cdr = new.y; */
-    /* duplicate_msgs(orig, new); */
-    /* AT(new).car = duplicate_ptr(AT(orig).car, refs, locked); */
-    /* /\* the bodies of lambdas should be locked after insertion *\/ */
-    /* if(AT(orig).car.hdr == LAMBDA) locked = TRUE; */
-    /* AT(new).cdr = duplicate_ptr(AT(orig).cdr, refs, locked); */
+    if(AT(place).mcar.car > 0){
+      /* propagate down the queue */
+      if(AT(place).car.hdr == LOCAL &&
+         AT(place).cdr.hdr == LOCAL){
+        /* propagate down the ONC */
+        POP(AT(place).mcar.cdr, i1);
+        if(i1 == LEFT){
+          COORD_OF_PTR(msg.place, AT(place).car);
+        } else {
+          COORD_OF_PTR(msg.place, AT(place).cdr);
+        }
+      } else if(AT(place).car.hdr == LOCAL){
+        COORD_OF_PTR(msg.place, AT(place).car);
+      } else if(AT(place).cdr.hdr == LOCAL){
+        COORD_OF_PTR(msg.place, AT(place).cdr);
+      } else {
+        ERROR("can't propagate down bottomed out ONC.");
+      }
+      msg.mcar = AT(place).mcar;
+      msg.mcar.car = AT(place).mcar.car-1;
+      msg.mcdr = AT(place).mcdr;
+      enqueue(msg);
+    } else {
+      /* apply here */
+      POP(AT(place).mcar.cdr, i1);
+      if(AT(place).mcdr.hdr == LOCAL){
+        c1 = open_space(place);
+        AT(c1).refs = AT(place).refs;
+        if(i1 == LEFT){
+          AT(place).car.hdr = LOCAL;
+          PTR_OF_COORD(AT(place).car, c1);
+        } else {
+          AT(place).cdr.hdr = LOCAL;
+          PTR_OF_COORD(AT(place).cdr, c1);
+        }
+      } else {
+        if(i1 == LEFT){
+          AT(place).car = AT(place).mcdr;
+        } else {
+          AT(place).cdr = AT(place).mcdr;
+        }
+      }
+    }
+    ran = TRUE;
     break;
   }
-  /* TODO: don't nullify message if we haven't run? */
   if(ran) AT(place).mcar.hdr = NIL;
   return ran;
 }

@@ -310,6 +310,7 @@ void fix(coord place){
     printf("\n");
     show_world();
     onc_to_string(place, buf, 0);
+    debug(1, "queue(%d)\n", queue_population());
     debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
     hash_old = hash_new;
     hash_new = world_hash() ^ queue_hash();

@@ -1,15 +1,26 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
-* anatomy of a duplicate message
-| msg.place    | coord of to be duplicated              |
-| msg.mcar.hdr | DUPLICATE                              |
-| msg.mcar.car | coord of target of duplication         |
-| msg.mcdr.car | length of LEFT/RIGHT path in bits      |
-| msg.mcdr.cdr | bit-array specifying LEFT/RIGHT path   |
-|              | to take traversing down the linked ONC |
-|              | structure starting at the target of    |
-|              | duplication                            |
+* debugging duplicate messages
+: break run if (world[place.x][place.y].mcar.hdr != 0)
+
+* anatomy of duplicate and replace messages
+Duplicate
+| msg.place    | coord of to be duplicated                |
+| msg.mcar.hdr | DUPLICATE                                |
+| msg.mcar.car | coord of target of duplication           |
+| msg.mcdr.car | number of steps to follow down structure |
+| msg.mcdr.cdr | bit-array specifying LEFT/RIGHT path     |
+|              | to take traversing down the linked ONC   |
+|              | structure starting at the target of      |
+|              | duplication                              |
+
+Replace
+| msg.place    | target of duplication                    |
+| msg.mcar.hdr | REPLACE                                  |
+| msg.mcar.car | number of steps to follow down structure |
+| msg.mcar.cdr | bit-array specifying LEFT/RIGHT path     |
+| msg.mcdr     | contents                                 |
 
 * Pthreads C implementation
 All threads share the same address space, and each thread has its own

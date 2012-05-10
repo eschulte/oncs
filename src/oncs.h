@@ -156,8 +156,6 @@ void update_ref_msg(coord place, int diff);
 ptr copy_ptr(ptr ptr);
 ptr delete_ptr(ptr ptr);
 ptr replace_ptr(ptr old_p, ptr new_p);
-void duplicate_msgs(coord from, coord to);
-ptr duplicate_ptr(ptr old_p, int refs, int locked);
 int argument_p(ptr ptr);
 int value_p(ptr ptr);
 
@@ -166,7 +164,7 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p);
 int onc_to_string(coord place, char *buf, int index);
 
 /* apply the lambda message L_MSG to PTR */
-ptr lambda_app(msg l_msg, coord place);
+ptr lambda_app(msg l_msg, coord place, int dir);
 
 /* perform lambda application at PLACE */
 int app_abs(coord place);
