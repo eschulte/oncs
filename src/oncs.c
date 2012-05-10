@@ -202,7 +202,10 @@ int ptr_to_string(ptr ptr, char *buf, int index, int car_p){
   char s[20];
   coord coord;
   switch(ptr.hdr){
-  case NIL: index--; break;
+  case NIL:
+    if(car_p) { buf[index] = '_'; index++; }
+    else      { index--; }
+    break;
   case LOCAL:
     COORD_OF_PTR(coord, ptr);
     if(car_p) { buf[index] = '('; index++; }
