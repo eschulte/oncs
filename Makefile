@@ -1,6 +1,6 @@
 CC:=gcc
 CFLAGS:=-Wall -pedantic -Werror -Wundef -Winline -Wextra
-SIZE:=32
+SIZE:=16
 QLENGTH:=1024
 BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) -D QLENGTH=$(QLENGTH)
 READLINE_LIB:=-lreadline

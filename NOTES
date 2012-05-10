@@ -1,6 +1,17 @@
 # -*- mode:org -*-
 #+Options: ^:nil
 
+* another reference counting bug
+file:test/fact-o-4.c throws an error depending on the =SIZE=.
+| SIZE | errors |
+|------+--------|
+| 16   | yes    |
+| 24   | no     |
+| 32   | yes    |
+
+Also, in many tests ONCS may be seen disappearing briefly and then
+reappearing.  Interleaved ref+ and ref- messages must be to blame.
+
 * debugging duplicate messages
 : break run if (world[place.x][place.y].mcar.hdr != 0)
 
