@@ -1,6 +1,6 @@
 CC:=gcc
 CFLAGS:=-Wall -pedantic -Werror -Wundef -Winline -Wextra
-SIZE:=24
+SIZE:=32
 QLENGTH:=1024
 DEBUG_P=0
 BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) \

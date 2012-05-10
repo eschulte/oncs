@@ -498,9 +498,16 @@ int run(coord place){
     break;
   case INTEGER:                 /* update number of references */
     AT(place).refs += AT(place).mcar.car;
-    msg.mcar = AT(place).mcar;
-    INTEGER_APP(AT(place).car, msg);
-    INTEGER_APP(AT(place).cdr, msg);
+    if(AT(place).refs == 0 && AT(place).num_msgs != 0){
+      AT(place).refs -= AT(place).mcar.car;
+      msg.mcar = AT(place).mcar;
+      msg.place = place;
+      enqueue(msg);
+    } else {
+      msg.mcar = AT(place).mcar;
+      INTEGER_APP(AT(place).car, msg);
+      INTEGER_APP(AT(place).cdr, msg);
+    }
     ran = TRUE;
     break;
   case LAMBDA:                  /* perform lambda application */
