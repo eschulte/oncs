@@ -25,8 +25,8 @@ probably need to switch from pushing to appending
 * anatomy of duplicate and replace messages
 Duplicate
 | msg.place    | coord of to be duplicated                  |
-| msg.mcar.hdr | DUPLICATE                                  |
-| msg.mcar.car | coord of target of duplication             |
+| msg.mcar.hdr | DUPLICATE or LDUPLICATE                    |
+| msg.mcar     | coord of target of duplication             |
 | msg.mcdr.hdr | dir-length (on way down we append to dirs) |
 | msg.mcdr.car | number of steps to follow down structure   |
 | msg.mcdr.cdr | bit-array specifying LEFT/RIGHT path       |

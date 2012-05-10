@@ -18,18 +18,20 @@
 #endif
 
 /* types of pointers */
-#define NIL       0
-#define LOCAL     1
-#define INTEGER   2
-#define SYMBOL    3
-#define LAMBDA    4
-#define PRIMOPT   5
-#define CURRIED   6
-#define LCURRIED  7
-#define BOOLEAN   8
-#define EXTEND    9
-#define DUPLICATE 10
-#define REPLACE   11
+#define NIL        0
+#define LOCAL      1
+#define INTEGER    2
+#define SYMBOL     3
+#define LAMBDA     4
+#define PRIMOPT    5
+#define CURRIED    6
+#define LCURRIED   7
+#define BOOLEAN    8
+#define EXTEND     9
+#define DUPLICATE  10
+#define LDUPLICATE 11
+#define REPLACE    12
+#define LREPLACE   13
 
 /* types of primitive operations */
 #define PLUS   0

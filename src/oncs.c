@@ -306,7 +306,8 @@ ptr lambda_app(msg l_msg, coord place, int dir){
         AT(msg.place).refs = AT(place).refs;
         ptr.hdr = LOCAL;
         PTR_OF_COORD(ptr, msg.place);
-        msg.mcar.hdr = DUPLICATE;
+        if(l_msg.mcar.cdr) msg.mcar.hdr = LDUPLICATE;
+        else               msg.mcar.hdr = DUPLICATE;
         PTR_OF_COORD(msg.mcar, msg.place);
         COORD_OF_PTR(msg.place, l_msg.mcdr);
         msg.mcdr.hdr=0;
@@ -413,8 +414,8 @@ int app_abs(coord place){
 int run(coord place){
   msg msg;
   coord c1, c2;
-  int ran, i1, i2;
-  ran = FALSE;
+  int ran, i1, i2, locked;
+  locked = ran = FALSE;
   switch(AT(place).mcar.hdr){
   case NIL:                     /* waiting loop */
     switch(AT(place).car.hdr){
@@ -547,6 +548,8 @@ int run(coord place){
     }
     ran = TRUE;
     break;
+  case LDUPLICATE:
+    locked = TRUE;
   case DUPLICATE:
     /* TODO: need to lock λ prim-cond and prim-opt */
     msg.mcar.hdr = REPLACE;
@@ -555,14 +558,18 @@ int run(coord place){
     msg.mcar = AT(place).mcdr;
     printf("APPEND2\n");
     APPEND(msg.mcar.cdr, LEFT, msg.mcar.hdr);
-    msg.mcar.hdr = REPLACE;
+    if(locked) msg.mcar.hdr = LREPLACE;
+    else       msg.mcar.hdr = REPLACE;
     msg.mcdr = AT(place).car;
     enqueue(msg);
     /* send off cdr message */
     msg.mcar = AT(place).mcdr;
+    /* the bodies of λs should be locked after insertion */
+    if(AT(place).car.hdr == LAMBDA) locked=TRUE;
     printf("APPEND3\n");
     APPEND(msg.mcar.cdr, RIGHT, msg.mcar.hdr);
-    msg.mcar.hdr = REPLACE;
+    if(locked) msg.mcar.hdr = LREPLACE;
+    else       msg.mcar.hdr = REPLACE;
     msg.mcdr = AT(place).cdr;
     enqueue(msg);
     /* propagate downwards car */
@@ -579,6 +586,9 @@ int run(coord place){
     /* propagate downwards cdr */
     if(AT(place).cdr.hdr == LOCAL){
       msg.mcar = AT(place).mcar;
+      /* the bodies of λs should be locked after insertion */
+      if(AT(place).car.hdr == LAMBDA)
+        msg.mcar.hdr = LDUPLICATE;
       COORD_OF_PTR(msg.place, AT(place).cdr);
       /* add a RIGHT to msg.mcdr */
       msg.mcdr = AT(place).mcdr;
@@ -589,6 +599,8 @@ int run(coord place){
     }
     ran = TRUE;
     break;
+  case LREPLACE:
+    locked = TRUE;
   case REPLACE:
     if(AT(place).mcar.car > 0){
       /* propagate down the queue */
@@ -636,6 +648,23 @@ int run(coord place){
           AT(place).car = AT(place).mcdr;
         } else {
           AT(place).cdr = AT(place).mcdr;
+        }
+        switch(AT(place).car.hdr){
+        case LCURRIED:
+        case CURRIED:
+          if(i1 == LEFT){
+            if(locked) AT(place).car.hdr = LCURRIED;
+            else       AT(place).car.hdr = CURRIED;
+          } else {
+            if(locked) AT(place).cdr.hdr = LCURRIED;
+            else       AT(place).cdr.hdr = CURRIED;
+          }
+          break;
+        case PRIMOPT:
+        case LAMBDA:
+          if(i1 == LEFT) AT(place).car.cdr = locked;
+          else           AT(place).cdr.cdr = locked;
+          break;
         }
       }
     }

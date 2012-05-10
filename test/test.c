@@ -89,15 +89,17 @@ void show_queue(){
     shown++;
     msg = queue[i];
     switch(msg.mcar.hdr){
-    case NIL:       c='_'; break;
-    case LOCAL:     c='^'; break;
-    case INTEGER:   c='i'; break;
-    case SYMBOL:    c='s'; break;
-    case LAMBDA:    c='l'; break;
-    case EXTEND:    c='e'; break;
-    case DUPLICATE: c='d'; break;
-    case REPLACE:   c='r'; break;
-    default:        c='?'; break;
+    case NIL:        c='_'; break;
+    case LOCAL:      c='^'; break;
+    case INTEGER:    c='i'; break;
+    case SYMBOL:     c='s'; break;
+    case LAMBDA:     c='l'; break;
+    case EXTEND:     c='e'; break;
+    case DUPLICATE:  c='d'; break;
+    case LDUPLICATE: c='D'; break;
+    case REPLACE:    c='r'; break;
+    case LREPLACE:   c='R'; break;
+    default:         c='?'; break;
     }
     printf("(%d,%d)%c", msg.place.x, msg.place.y, c);
   }
