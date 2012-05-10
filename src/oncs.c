@@ -309,11 +309,13 @@ ptr lambda_app(msg l_msg, coord place, int dir){
         msg.mcar.hdr = DUPLICATE;
         PTR_OF_COORD(msg.mcar, msg.place);
         COORD_OF_PTR(msg.place, l_msg.mcdr);
-        msg.mcdr.car=0;
         msg.mcdr.hdr=0;
+        msg.mcdr.car=0;
+        msg.mcdr.cdr=0;
+        printf("APPEND1\n");
         APPEND(msg.mcdr.cdr, dir, msg.mcdr.hdr);
+        msg.mcdr.hdr--;
         enqueue(msg);
-        /* TODO: fit dir in here */
       } else {
         ptr = l_msg.mcdr;
       }
@@ -551,12 +553,14 @@ int run(coord place){
     COORD_OF_PTR(msg.place, AT(place).mcar);
     /* send off car message */
     msg.mcar = AT(place).mcdr;
+    printf("APPEND2\n");
     APPEND(msg.mcar.cdr, LEFT, msg.mcar.hdr);
     msg.mcar.hdr = REPLACE;
     msg.mcdr = AT(place).car;
     enqueue(msg);
     /* send off cdr message */
     msg.mcar = AT(place).mcdr;
+    printf("APPEND3\n");
     APPEND(msg.mcar.cdr, RIGHT, msg.mcar.hdr);
     msg.mcar.hdr = REPLACE;
     msg.mcdr = AT(place).cdr;
@@ -616,6 +620,7 @@ int run(coord place){
     } else {
       /* apply here */
       POP(AT(place).mcar.cdr, i1);
+      printf("applying with i1=%d\n", i1);
       if(AT(place).mcdr.hdr == LOCAL){
         c1 = open_space(place);
         AT(c1).refs = AT(place).refs;

@@ -16,6 +16,7 @@ int main(int argc, char *argv[]){
 
   init(argc, argv);
   expr_to_expr(expr);
+  /* TODO: not locking #l4 */
   SHOULD(strcmp(expr, "(#L2 (#l3 (#l4 #S4)))") == 0);
 
   /* return indicates success or failure */

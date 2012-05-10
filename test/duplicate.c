@@ -19,6 +19,7 @@ int main(int argc, char *argv[]){
   msg.place = place;
   msg.mcar.hdr = DUPLICATE;
   PTR_OF_COORD(msg.mcar, holder);
+  msg.mcdr.hdr = 0;
   msg.mcdr.car = 0;
   msg.mcdr.cdr = 0;
   enqueue(msg);

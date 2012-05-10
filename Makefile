@@ -37,7 +37,6 @@ TESTS = \
 	test/fact-3	\
 	test/y-comb-1	\
 	test/examp-3	\
-	test/examp-4	\
 	test/y-comb-2	\
 	test/fact-o-4
 
