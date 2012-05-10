@@ -8,7 +8,7 @@ int main(int argc, char *argv[]){
   char expr1[] = "/ 8 2";
   char expr2[] = "* + 1 2 - 8 32";
   init(argc, argv);
-  place.x = 4; place.y = 4;
+  place.x = place.y = SIZE/2;
 
   run_expr(expr0, place);
   run_down(place);

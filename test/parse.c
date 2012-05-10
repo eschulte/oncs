@@ -3,7 +3,7 @@
 
 void insert_into_world(coord place, char *buf){
   clear_world();
-  place.x = place.y = 3;
+  place.x = place.y = SIZE/2;
   debug(1, "exp:%s\n", buf);
   string_to_onc(place, FALSE, buf);
   show_all(place);
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
   char buf8[] = "(#L1 (#L2 #S1)) ((#L1 (#L2 #S1)) (3 4))";
   char buf9[] = "#L1 (#L2 #S1)";
   init(argc, argv);
-  place.x = place.y = 4;
+  place.x = place.y = 0;
 
   debug(1, "simple parsing of an integer\n");
   index = 4;

@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
   char expr4[] = "(#L1 (#L2 #S1)) (3 4) 8";
 
   init(argc, argv);
-  place.x = 4; place.y = 4;
+  place.x = place.y = SIZE/2;
 
   run_expr(expr0, place);
   SHOULD(count(LAMBDA) == 0);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
   if(fail_p) ERROR("failed expr3");
 
   run_expr(expr4, place);
-  place.x = place.y = 4;
+  place.x = place.y = SIZE/2;
   run_down(place);
   debug(2, "lambda:%d symbol:%d integer:%d\n",
         count(LAMBDA), count(SYMBOL), count(INTEGER));

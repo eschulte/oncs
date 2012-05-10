@@ -8,8 +8,8 @@ int main(int argc, char *argv[]){
   coord place, holder;
   msg msg;
   init(argc, argv);
-  place.x = place.y = 4;
-  holder.x = holder.y = 6;
+  place.x = place.y = SIZE/2;
+  holder.x = holder.y = 0;
   AT(holder).refs = 1;
   AT(holder).car.hdr = INTEGER;
   AT(holder).car.car = 8;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
   SHOULD(count(LAMBDA)  == 0);
   SHOULD(count(SYMBOL)  == 0);
 
-  place.x = place.y = 4;
+  place.x = place.y = SIZE/2;
   onc_to_string(place, buf, 0);
   debug(1, "(%d,%d):%s\n", place.x, place.y, buf);
   debug(1, "integer:%d local:%d lambda:%d symbol:%d\n",

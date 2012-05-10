@@ -5,7 +5,7 @@ int main(int argc, char *argv[]){
   char buf[BUF_SIZE];
   coord place;
   init(argc, argv);
-  place.x = place.y = 4;
+  place.x = place.y = SIZE/2;
 
   simple_app(place);
   debug(1, "\n");

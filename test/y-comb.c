@@ -3,7 +3,7 @@
 int main(int argc, char *argv[]){
   init(argc, argv);
   coord place;
-  place.x = 4; place.y = 4;
+  place.x = place.y = SIZE/2;
 
   /* (λ m (λ f (m (λ a ((f f) a))))
    *      (λ f (m (λ a ((f f) a)))))

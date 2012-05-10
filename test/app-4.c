@@ -7,7 +7,7 @@ int main(int argc, char *argv[]){
   char buf[BUF_SIZE];
   coord place, holder;
   init(argc, argv);
-  holder.x = holder.y = place.x = place.y = 4;
+  holder.x = holder.y = place.x = place.y = SIZE/2;
 
   app(place); show_all(holder);
   run(place); show_all(holder);
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
   SHOULD(count(LAMBDA)  == 0);
   SHOULD(count(SYMBOL)  == 0);
 
-  place.x = place.y = 4;
+  place.x = place.y = SIZE/2;
   onc_to_string(place, buf, 0);
   debug(1, "(%d,%d):%s\n", place.x, place.y, buf);
   debug(1, "integer:%d local:%d lambda:%d symbol:%d\n",

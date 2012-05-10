@@ -550,7 +550,6 @@ int run(coord place){
   case LDUPLICATE:
     locked = TRUE;
   case DUPLICATE:
-    /* TODO: need to lock λ prim-cond and prim-opt */
     msg.mcar.hdr = REPLACE;
     COORD_OF_PTR(msg.place, AT(place).mcar);
     /* send off car message */

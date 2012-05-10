@@ -361,7 +361,7 @@ void run_expr(char *expr, coord place){
   string_to_onc(place, FALSE, expr);
   show_all(place);
   run_down(place);
-  place.x = place.y = 4;
+  place.x = place.y = SIZE/2;
   run_down(place);
   debug(2, "leaving full_run\n");
 }
@@ -381,7 +381,7 @@ int read_int(char *buf, unsigned int *index){
 
 void expr_to_expr(char *expr){
   coord place;
-  place.x = SIZE/2; place.y = SIZE/2;
+  place.x = place.y = SIZE/2;
   clear_world();
   string_to_onc(place, FALSE, expr);
   show_all(place);

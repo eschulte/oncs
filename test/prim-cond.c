@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
   char expr6[] = "((= 1 1) 1 2)";
 
   init(argc, argv);
-  place.x = 4; place.y = 4;
+  place.x = place.y = SIZE/2;
 
   run_expr(expr0, place);
   run_down(place);

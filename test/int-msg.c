@@ -4,8 +4,8 @@
 int main(int argc, char *argv[]){
   coord place, target, temp;
   init(argc, argv);
-  place.x = place.y = 4;
-  target.x = target.y = 6;
+  place.x = place.y = 0;
+  target.x = target.y = SIZE/2;
 
   AT(place).refs = 1;
   AT(place).car.hdr = LOCAL;
