@@ -6,14 +6,15 @@
 
 * anatomy of duplicate and replace messages
 Duplicate
-| msg.place    | coord of to be duplicated                |
-| msg.mcar.hdr | DUPLICATE                                |
-| msg.mcar.car | coord of target of duplication           |
-| msg.mcdr.car | number of steps to follow down structure |
-| msg.mcdr.cdr | bit-array specifying LEFT/RIGHT path     |
-|              | to take traversing down the linked ONC   |
-|              | structure starting at the target of      |
-|              | duplication                              |
+| msg.place    | coord of to be duplicated                  |
+| msg.mcar.hdr | DUPLICATE                                  |
+| msg.mcar.car | coord of target of duplication             |
+| msg.mcdr.hdr | dir-length (on way down we append to dirs) |
+| msg.mcdr.car | number of steps to follow down structure   |
+| msg.mcdr.cdr | bit-array specifying LEFT/RIGHT path       |
+|              | to take traversing down the linked ONC     |
+|              | structure starting at the target of        |
+|              | duplication                                |
 
 Replace
 | msg.place    | target of duplication                    |
@@ -60,6 +61,7 @@ magic.
 : 001024 -> [00][04]
 
 ** implementation -- bit arrays
+*** simple
 #+begin_src C
   int x, i;
   x = 4;
@@ -91,6 +93,75 @@ x=1, x[1]=1
 x=2, x[2]=0
 x=4, x[3]=0
 #+end_example
+
+*** LIFO
+#+begin_src C
+  int x, i, y;
+  x=0;
+  printf("pushing 1010110\n");
+  x=x<<1;
+  x=x|1;
+  x=x<<1;
+  x=x|0;
+  x=x<<1;
+  x=x|1;
+  x=x<<1;
+  x=x|0;
+  x=x<<1;
+  x=x|1;
+  x=x<<1;
+  x=x|1;
+  x=x<<1;
+  x=x|0;
+  printf("poping 0110101\n");
+  for(i=0;i<7;i++){
+    y=x&1;
+    x=x>>1;
+    printf("%d", y);
+   }
+  printf("\n");
+#+end_src
+
+#+RESULTS:
+: pushing 1010110
+: poping 0110101
+: 0110101
+
+*** FIFO
+#+begin_src C
+  int x, i, y;
+  i=x=0;
+  printf("2^=%d 2^1=%d 2^2=%d\n",
+         1<<0, 1<<1, 1<<2);
+  printf("appending 1010110\n");
+  x=x|1<<i;
+  i++;
+  x=x|0<<i;
+  i++;
+  x=x|1<<i;
+  i++;
+  x=x|0<<i;
+  i++;
+  x=x|1<<i;
+  i++;
+  x=x|1<<i;
+  i++;
+  x=x|0<<i;
+  i++;
+  printf("poping 1010110\n");
+  for(i=0;i<7;i++){
+    y=x&1;
+    x=x>>1;
+    printf("%d", y);
+   }
+  printf("\n");
+#+end_src
+
+#+RESULTS:
+: 2^=1 2^1=2 2^2=4
+: appending 1010110
+: poping 1010110
+: 1010110
 
 * make ONC duplication message based
 So =duplicate_ptr= should not set a value directly, but should rather

@@ -76,20 +76,28 @@ void show_ptr(ptr ptr){
 void show_queue(){
   msg msg;
   char c;
-  int i, end;
+  int i, end, shown;
+  shown=0;
   end = qend;
   if(!verbose) return;
   printf("Q[%d]:", queue_population());
   for(i=qbeg;i!=end;i=QWRAP(i+1)){
+    if(shown>(((SIZE*3)/5)-1)){
+      printf("...");
+      break;
+    }
+    shown++;
     msg = queue[i];
     switch(msg.mcar.hdr){
-    case NIL:     c='_'; break;
-    case LOCAL:   c='^'; break;
-    case INTEGER: c='i'; break;
-    case SYMBOL:  c='s'; break;
-    case LAMBDA:  c='l'; break;
-    case EXTEND:  c='e'; break;
-    default:      c='?'; break;
+    case NIL:       c='_'; break;
+    case LOCAL:     c='^'; break;
+    case INTEGER:   c='i'; break;
+    case SYMBOL:    c='s'; break;
+    case LAMBDA:    c='l'; break;
+    case EXTEND:    c='e'; break;
+    case DUPLICATE: c='d'; break;
+    case REPLACE:   c='r'; break;
+    default:        c='?'; break;
     }
     printf("(%d,%d)%c", msg.place.x, msg.place.y, c);
   }
@@ -308,9 +316,9 @@ void fix(coord place){
       run(msg.place);
     } else { run_one(); }
     printf("\n");
+    show_queue();
     show_world();
     onc_to_string(place, buf, 0);
-    debug(1, "queue(%d)\n", queue_population());
     debug(1, "expr(%d,%d):%s\n", place.x, place.y, buf);
     hash_old = hash_new;
     hash_new = world_hash() ^ queue_hash();
@@ -400,6 +408,10 @@ void simple_app(coord place){
   debug(2, "(%d,%d) -- (x x)\n", tmp1.x, tmp1.y);
   LOCAL_SET(place, cdr, tmp1);
   /* (x x) */
+  place = tmp1;
+  tmp1 = open_space(place);
+  AT(tmp1).refs++;
+  LOCAL_SET(place, car, tmp1);
   place = tmp1;
   SYMBOL_SET(place, car, 1);
   tmp1 = open_space(place);

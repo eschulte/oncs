@@ -16,7 +16,7 @@ int main(int argc, char *argv[]){
   } while(queue_population() > 0);
 
   SHOULD(count(INTEGER) == 6);
-  SHOULD(count(LOCAL)   == 7);
+  SHOULD(count(LOCAL)   == 8);
   SHOULD(count(LAMBDA)  == 0);
   SHOULD(count(SYMBOL)  == 0);
 

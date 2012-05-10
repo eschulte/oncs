@@ -26,7 +26,8 @@ int main(int argc, char *argv[]){
   onc_to_string(place, buf, 0);
   debug(1, "(%d,%d):%s\n", place.x, place.y, buf);
   debug(1, "integer:%d local:%d lambda:%d symbol:%d\n",
-        count(INTEGER), count(LOCAL), count(LAMBDA), count(SYMBOL));
+        count(INTEGER), count(LOCAL),
+        count(LAMBDA), count(SYMBOL));
   
   /* return indicates success or failure */
   return fail_p;

@@ -301,9 +301,18 @@ ptr lambda_app(msg l_msg, coord place, int dir){
   case SYMBOL:
     if(l_msg.mcar.car == ptr.car){
       if(l_msg.mcdr.hdr == LOCAL){
+        /* make an empty LOCAL pointer */
+        msg.place = open_space(place);
+        AT(msg.place).refs = AT(place).refs;
+        ptr.hdr = LOCAL;
+        PTR_OF_COORD(ptr, msg.place);
         msg.mcar.hdr = DUPLICATE;
+        PTR_OF_COORD(msg.mcar, msg.place);
         COORD_OF_PTR(msg.place, l_msg.mcdr);
-        PTR_OF_COORD(msg.mcar, place);
+        msg.mcdr.car=0;
+        msg.mcdr.hdr=0;
+        /* APPEND(msg.mcdr.cdr, dir, msg.mcdr.hdr); */
+        PUSH(msg.mcdr.cdr, dir);
         enqueue(msg);
         /* TODO: fit dir in here */
       } else {
@@ -544,12 +553,14 @@ int run(coord place){
     /* send off car message */
     msg.mcar = AT(place).mcdr;
     msg.mcar.hdr = REPLACE;
+    /* APPEND(msg.mcar.cdr, LEFT, msg.mcdr.hdr); */
     PUSH(msg.mcar.cdr, LEFT);
     msg.mcdr = AT(place).car;
     enqueue(msg);
     /* send off cdr message */
     msg.mcar = AT(place).mcdr;
     msg.mcar.hdr = REPLACE;
+    /* APPEND(msg.mcar.cdr, RIGHT, msg.mcdr.hdr); */
     PUSH(msg.mcar.cdr, RIGHT);
     msg.mcdr = AT(place).cdr;
     enqueue(msg);
@@ -559,7 +570,9 @@ int run(coord place){
       COORD_OF_PTR(msg.place, AT(place).car);
       /* add a LEFT to msg.mcdr */
       msg.mcdr.car = AT(place).mcdr.car+1;
-      if(AT(place).cdr.hdr == LOCAL) PUSH(msg.mcdr.cdr, LEFT);
+      if(AT(place).cdr.hdr == LOCAL)
+        /* APPEND(msg.mcdr.cdr, LEFT, msg.mcdr.hdr); */
+        PUSH(msg.mcdr.cdr, LEFT);
       enqueue(msg);
     }
     /* propagate downwards cdr */
@@ -568,7 +581,9 @@ int run(coord place){
       COORD_OF_PTR(msg.place, AT(place).cdr);
       /* add a RIGHT to msg.mcdr */
       msg.mcdr.car = AT(place).mcdr.car+1;
-      if(AT(place).car.hdr == LOCAL) PUSH(msg.mcdr.cdr, RIGHT);
+      if(AT(place).car.hdr == LOCAL)
+        /* APPEND(msg.mcdr.cdr, RIGHT, msg.mcdr.hdr); */
+        PUSH(msg.mcdr.cdr, RIGHT);
       enqueue(msg);
     }
     ran = TRUE;
@@ -590,6 +605,11 @@ int run(coord place){
       } else if(AT(place).cdr.hdr == LOCAL){
         COORD_OF_PTR(msg.place, AT(place).cdr);
       } else {
+        printf("(%d,%d) depth(%d) value=(%d,%d,%d)\n",
+               place.x, place.y, AT(place).mcar.car,
+               AT(place).mcdr.hdr,
+               AT(place).mcdr.car,
+               AT(place).mcdr.cdr);
         ERROR("can't propagate down bottomed out ONC.");
       }
       msg.mcar = AT(place).mcar;

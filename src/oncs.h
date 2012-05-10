@@ -59,6 +59,7 @@
   }
 #define POP(x, i)  { i=x&1; x=x>>1; }
 #define PUSH(x, i) { x=x<<1; if(i) x=x|1; }
+#define APPEND(x, i, j) { x=x|i<<j; j++; }
 
 #define INTEGER_APP(where, msg)                 \
   if(where.hdr == LOCAL){                       \
