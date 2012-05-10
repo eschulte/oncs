@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Oncs &ndash; A distributed lisp virtual machine</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="title" content="Oncs &ndash; A distributed lisp virtual machine"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2012-05-10T19:57-0400"/>
+<meta name="author" content="Eric Schulte"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #add8e6; font-weight:normal }
+  .target { }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  p.verse { margin-left: 3% }
+  pre {
+ border: 1pt solid #AEBDCC;
+    padding: 5pt;
+ font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">Oncs &ndash; A distributed lisp virtual machine</h1>
+
+<p>There is a large grid world of ONC structures linked by local relative
+pointers.  These linked ONC structures encode λ-expressions and
+perform calculations through λ-application.  All actions consist of
+passing messages between ONCS.  Messages are used to maintain
+reference counts, to duplicate and replace linked ONC structures, and
+to propagate λ-applications across large structures.
+</p>
+<p>
+The main design goals of this effort are
+</p>
+<ul>
+<li>physicality of the computational abstraction
+  meaning no action at a distance and indefinite scalability
+
+</li>
+<li>homogeneity among elements
+  meaning no privileged points in space or time
+
+</li>
+<li>fully implicitly parallel
+  meaning every portion of the world executes simultaneously
+</li>
+</ul>
+
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Structures</a>
+<ul>
+<li><a href="#sec-1-1">1.1 ONC</a></li>
+<li><a href="#sec-1-2">1.2 Pointer</a></li>
+<li><a href="#sec-1-3">1.3 Message</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2 Usage</a></li>
+<li><a href="#sec-3">3 Platforms</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Structures</h2>
+<div class="outline-text-2" id="text-1">
+
+
+</div>
+
+<div id="outline-container-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> ONC</h3>
+<div class="outline-text-3" id="text-1-1">
+
+<p>Composed of an integer reference counter and four pointers.
+</p><pre class="example">
+        an ONC
++-------------------+
+|  #refs  |  #msgs  |
++---------+---------+
+|  mcar   |  car    |
+|         |         |
++---------+---------+
+|  mcdr   |  cdr    |
+|         |         |
++---------+---------+
+</pre>
+
+
+<p>
+Oncs perform the following actions.
+</p><ul>
+<li>reference count maintenance, an onc with ref≡0 is free
+</li>
+<li>propagate a λ-application message through self
+</li>
+<li>replace self with a value or ONC
+</li>
+<li>find nearby free space for new oncs
+</li>
+</ul>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Pointer</h3>
+<div class="outline-text-3" id="text-1-2">
+
+<p>Composed of a header indicating type of contents, then car and cdr
+which hold integer values.
+</p><pre class="example">
+     a Pointer
++-----------------+
+| hdr | car | cdr |
++-----------------+
+</pre>
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">header</th><th scope="col" class="left">interpretation</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">NIL</td><td class="left">nil</td></tr>
+<tr><td class="left">POINTER</td><td class="left">local pointer (car,cdr)</td></tr>
+<tr><td class="left">INTEGER</td><td class="left">integer car+cdr</td></tr>
+<tr><td class="left">SYMBOL</td><td class="left">symbol car (cdr for disambiguation?)</td></tr>
+<tr><td class="left">LAMBDA</td><td class="left">λ same as symbol</td></tr>
+<tr><td class="left">PRIMOPT</td><td class="left">primitive integer operation</td></tr>
+<tr><td class="left">CURRIED</td><td class="left">curried primitive integer operation</td></tr>
+<tr><td class="left">BOOLEAN</td><td class="left">Boolean true or false</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Message</h3>
+<div class="outline-text-3" id="text-1-3">
+
+<p>Composed of a coordinate and two pointers.  Messages are passed
+between ONCS and cause ONCS to perform local actions.  No global order
+on messages is required, only that for each particular onc (maybe even
+just for any given sender/receiver pair of oncs), the messages are
+received in the order in which they are sent.
+</p><pre class="example">
+       a Message
++---------------------+
+| coord | mcar | mcdr |
++---------------------+
+</pre>
+
+
+<p>
+The message values and their meanings are.
+</p><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">value</th><th scope="col" class="left">interpretation</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">NIL</td><td class="left">default, runs the waiting loop</td></tr>
+<tr><td class="left">INTEGER</td><td class="left">increments or decrements the ref counter by value</td></tr>
+<tr><td class="left">LAMBDA</td><td class="left">λ-application, ptrs specify variable and value</td></tr>
+<tr><td class="left">EXTEND</td><td class="left">extend the end of the expression with by value</td></tr>
+<tr><td class="left">DUPLICATE</td><td class="left">request target to duplicate itself to location</td></tr>
+<tr><td class="left">Replace</td><td class="left">request location to replace itself with contents</td></tr>
+<tr><td class="left">others</td><td class="left">undefined</td></tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Usage</h2>
+<div class="outline-text-2" id="text-2">
+
+<ol>
+<li>Build
+<pre class="example">
+make
+</pre>
+
+
+</li>
+<li>Optionally run all tests
+<pre class="example">
+make check
+</pre>
+
+
+<p>
+   To run a particular test with verbose output do the following and
+   press SPACEBAR to step through stages of evaluation.
+</p><pre class="example">
+oncs$ ./test/fact-o-4.test -v|more -c
+</pre>
+
+<p>   Or, to just see the sequence of unique expressions.
+</p><pre class="example">
+oncs$ ./test/fact-o-4.test -v|grep expr|uniq
+</pre>
+
+
+</li>
+<li>Run a REPL
+<pre class="example">
+oncs$ ./repl
+&gt; help
+    quit -- quit the repl
+     fix -- run until reaching a fixed point
+    show -- show the contents of the ONC world
+   clear -- clear the ONC world
+ verbose -- toggle verbose execution
+    help -- show this help message
+    step -- run a single step
+   print -- print a point in the world
+   queue -- run down the queue
+   showq -- show the queue
+
+All other inputs should be lambda calculus
+expressions.  Allowed atoms include...
+#Ln -- λn, `n' is an integer symbol identifier
+#Sn -- symbol n, `n' is an integer symbol identifier
+  n -- literal integer `n'
+ op -- where `op' is a primitive integer operation
+       and op is one of (+ - * / = &lt;)
+&gt; (#L1 (= #S1 0) 1 (* #S1 2)) 0
+(#L1 (= #S1 0) 1 (* #S1 2)) 0
+&gt; show
+     0   1   2   3   4   5   6   7   8   9
+ 0                  p1^ i1_                
+ 1                  ^1_ s1^                
+ 2                  i1^ p1^                
+ 3                      ^1^                
+ 4                  i1_ L1^                
+ 5                      ^1^                
+ 6                                         
+ 7                                         
+ 8                  i1_                    
+ 9                  s1^                    
+&gt; fix
+1
+&gt; show
+     0   1   2   3   4   5   6   7   8   9
+ 0                                         
+ 1                                         
+ 2                                         
+ 3                                         
+ 4                                         
+ 5                      i1_                
+ 6                                         
+ 7                                         
+ 8                                         
+ 9                                         
+&gt; clear
+&gt; (#L1 (= #S1 0) 1 (* #S1 2)) 8
+(#L1 (= #S1 0) 1 (* #S1 2)) 8
+&gt; fix
+16
+&gt; quit
+bye
+</pre>
+
+
+</li>
+<li>To view the progression of world states over the course of a test
+   run execute the following.  Note, this will only run if called from
+   withing a gnu screen session as some screen scripting magic is used
+   to turn the <code>more</code> command into a movie player.  This <b>will</b> eat up
+   your CPU and may well cause slower single-core computers to freeze.
+<pre class="example">
+make play TEST=test/y-comb-2
+</pre>
+
+
+<p>
+   Here's a video of the above.
+     <p>
+     <video width="928" height="384" controls preload>
+         <source src="fact-o-4.avi" type="video/avi" />
+         <source src="fact-o-4.ogg" type="video/ogg" />
+     </video>
+     </p>
+</p></li>
+</ol>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Platforms</h2>
+<div class="outline-text-2" id="text-3">
+
+<ol>
+<li>Single threaded C.
+
+</li>
+<li>Distributed across a tribe of IXM.
+   <a href="http://www.liquidware.com/shop/show/ixm/illuminato+x+machina">http://www.liquidware.com/shop/show/ixm/illuminato+x+machina</a>
+
+</li>
+<li>Distributed across multiple GPU units with OpenCL.
+   <a href="http://www.khronos.org/opencl/">http://www.khronos.org/opencl/</a>
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+
+<div id="postamble">
+<p class="date">Date: 2012-05-10T19:57-0400</p>
+<p class="author">Author: Eric Schulte</p>
+<p class="creator">Org version Schulte with Emacs version 24</p>
+<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,178 @@
+# -*- mode:org -*-
+#+Title: Oncs -- A distributed lisp virtual machine
+#+Author: Eric Schulte
+
+There is a large grid world of ONC structures linked by local relative
+pointers.  These linked ONC structures encode λ-expressions and
+perform calculations through λ-application.  All actions consist of
+passing messages between ONCS.  Messages are used to maintain
+reference counts, to duplicate and replace linked ONC structures, and
+to propagate λ-applications across large structures.
+
+The main design goals of this effort are
+
+- physicality of the computational abstraction
+  meaning no action at a distance and indefinite scalability
+
+- homogeneity among elements
+  meaning no privileged points in space or time
+
+- fully implicitly parallel
+  meaning every portion of the world executes simultaneously
+
+* Structures
+** ONC
+Composed of an integer reference counter and four pointers.
+:         an ONC
+: +-------------------+
+: |  #refs  |  #msgs  |
+: +---------+---------+
+: |  mcar   |  car    |
+: |         |         |
+: +---------+---------+
+: |  mcdr   |  cdr    |
+: |         |         |
+: +---------+---------+
+
+Oncs perform the following actions.
+- reference count maintenance, an onc with ref≡0 is free
+- propagate a λ-application message through self
+- replace self with a value or ONC
+- find nearby free space for new oncs
+
+** Pointer
+Composed of a header indicating type of contents, then car and cdr
+which hold integer values.
+:      a Pointer
+: +-----------------+
+: | hdr | car | cdr |
+: +-----------------+
+
+| header  | interpretation                       |
+|---------+--------------------------------------|
+| NIL     | nil                                  |
+| POINTER | local pointer (car,cdr)              |
+| INTEGER | integer car+cdr                      |
+| SYMBOL  | symbol car (cdr for disambiguation?) |
+| LAMBDA  | λ same as symbol                     |
+| PRIMOPT | primitive integer operation          |
+| CURRIED | curried primitive integer operation  |
+| BOOLEAN | Boolean true or false                |
+
+** Message
+Composed of a coordinate and two pointers.  Messages are passed
+between ONCS and cause ONCS to perform local actions.  No global order
+on messages is required, only that for each particular onc (maybe even
+just for any given sender/receiver pair of oncs), the messages are
+received in the order in which they are sent.
+:        a Message
+: +---------------------+
+: | coord | mcar | mcdr |
+: +---------------------+
+
+The message values and their meanings are.
+| value     | interpretation                                    |
+|-----------+---------------------------------------------------|
+| NIL       | default, runs the waiting loop                    |
+| INTEGER   | increments or decrements the ref counter by value |
+| LAMBDA    | λ-application, ptrs specify variable and value    |
+| EXTEND    | extend the end of the expression with by value    |
+| DUPLICATE | request target to duplicate itself to location    |
+| Replace   | request location to replace itself with contents  |
+| others    | undefined                                         |
+
+* Usage
+1. Build
+   : make
+
+2. Optionally run all tests
+   : make check
+
+   To run a particular test with verbose output do the following and
+   press SPACEBAR to step through stages of evaluation.
+   : oncs$ ./test/fact-o-4.test -v|more -c
+   Or, to just see the sequence of unique expressions.
+   : oncs$ ./test/fact-o-4.test -v|grep expr|uniq
+
+3. Run a REPL
+   : oncs$ ./repl
+   : > help
+   :     quit -- quit the repl
+   :      fix -- run until reaching a fixed point
+   :     show -- show the contents of the ONC world
+   :    clear -- clear the ONC world
+   :  verbose -- toggle verbose execution
+   :     help -- show this help message
+   :     step -- run a single step
+   :    print -- print a point in the world
+   :    queue -- run down the queue
+   :    showq -- show the queue
+   : 
+   : All other inputs should be lambda calculus
+   : expressions.  Allowed atoms include...
+   : #Ln -- λn, `n' is an integer symbol identifier
+   : #Sn -- symbol n, `n' is an integer symbol identifier
+   :   n -- literal integer `n'
+   :  op -- where `op' is a primitive integer operation
+   :        and op is one of (+ - * / = <)
+   : > (#L1 (= #S1 0) 1 (* #S1 2)) 0
+   : (#L1 (= #S1 0) 1 (* #S1 2)) 0
+   : > show
+   :      0   1   2   3   4   5   6   7   8   9
+   :  0                  p1^ i1_                
+   :  1                  ^1_ s1^                
+   :  2                  i1^ p1^                
+   :  3                      ^1^                
+   :  4                  i1_ L1^                
+   :  5                      ^1^                
+   :  6                                         
+   :  7                                         
+   :  8                  i1_                    
+   :  9                  s1^                    
+   : > fix
+   : 1
+   : > show
+   :      0   1   2   3   4   5   6   7   8   9
+   :  0                                         
+   :  1                                         
+   :  2                                         
+   :  3                                         
+   :  4                                         
+   :  5                      i1_                
+   :  6                                         
+   :  7                                         
+   :  8                                         
+   :  9                                         
+   : > clear
+   : > (#L1 (= #S1 0) 1 (* #S1 2)) 8
+   : (#L1 (= #S1 0) 1 (* #S1 2)) 8
+   : > fix
+   : 16
+   : > quit
+   : bye
+
+4. To view the progression of world states over the course of a test
+   run execute the following.  Note, this will only run if called from
+   withing a gnu screen session as some screen scripting magic is used
+   to turn the =more= command into a movie player.  This *will* eat up
+   your CPU and may well cause slower single-core computers to freeze.
+   : make play TEST=test/y-comb-2
+
+   Here's a video of the above.
+   #+begin_html
+     <p>
+       <video width="928" height="384" controls preload>
+         <source src="fact-o-4.avi" type="video/avi" />
+         <source src="fact-o-4.ogg" type="video/ogg" />
+       </video>
+     </p>
+   #+end_html
+
+* Platforms
+1. Single threaded C.
+
+2. Distributed across a tribe of IXM.
+   http://www.liquidware.com/shop/show/ixm/illuminato+x+machina
+
+3. Distributed across multiple GPU units with OpenCL.
+   http://www.khronos.org/opencl/
