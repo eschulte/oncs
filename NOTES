@@ -12,6 +12,11 @@ file:test/fact-o-4.c throws an error depending on the =SIZE=.
 Also, in many tests ONCS may be seen disappearing briefly and then
 reappearing.  Interleaved ref+ and ref- messages must be to blame.
 
+Also, file:test/fact-2.c errors out when =SIZE= is 8.
+
+In file:test/examp-1.c you'll notice a λ at (3,2) disappears briefly
+and then reappears before it is done being used.
+
 * debugging duplicate messages
 : break run if (world[place.x][place.y].mcar.hdr != 0)
 

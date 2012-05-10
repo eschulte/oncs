@@ -2,7 +2,9 @@ CC:=gcc
 CFLAGS:=-Wall -pedantic -Werror -Wundef -Winline -Wextra
 SIZE:=24
 QLENGTH:=1024
-BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) -D QLENGTH=$(QLENGTH)
+DEBUG_P=0
+BUILD=$(CC) $(CFLAGS) -D SIZE=$(SIZE) \
+	-D QLENGTH=$(QLENGTH) -D DEBUG_P=$(DEBUG_P)
 READLINE_LIB:=-lreadline
 LIB=src/oncs.c src/oncs.h
 TEST_LIB=test/test.c test/test.h
