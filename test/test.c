@@ -317,7 +317,7 @@ void fix(coord place){
       /* run destination either way */
       run(msg.place);
     } else { run_one(); }
-    printf("\n");
+    if(verbose) printf("\n");
     show_queue();
     show_world();
     onc_to_string(place, buf, 0);

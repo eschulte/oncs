@@ -313,7 +313,6 @@ ptr lambda_app(msg l_msg, coord place, int dir){
         msg.mcdr.hdr=0;
         msg.mcdr.car=0;
         msg.mcdr.cdr=0;
-        printf("APPEND1\n");
         APPEND(msg.mcdr.cdr, dir, msg.mcdr.hdr);
         msg.mcdr.hdr--;
         enqueue(msg);
@@ -556,7 +555,6 @@ int run(coord place){
     COORD_OF_PTR(msg.place, AT(place).mcar);
     /* send off car message */
     msg.mcar = AT(place).mcdr;
-    printf("APPEND2\n");
     APPEND(msg.mcar.cdr, LEFT, msg.mcar.hdr);
     if(locked) msg.mcar.hdr = LREPLACE;
     else       msg.mcar.hdr = REPLACE;
@@ -566,7 +564,6 @@ int run(coord place){
     msg.mcar = AT(place).mcdr;
     /* the bodies of λs should be locked after insertion */
     if(AT(place).car.hdr == LAMBDA) locked=TRUE;
-    printf("APPEND3\n");
     APPEND(msg.mcar.cdr, RIGHT, msg.mcar.hdr);
     if(locked) msg.mcar.hdr = LREPLACE;
     else       msg.mcar.hdr = REPLACE;
@@ -632,7 +629,6 @@ int run(coord place){
     } else {
       /* apply here */
       POP(AT(place).mcar.cdr, i1);
-      printf("applying with i1=%d\n", i1);
       if(AT(place).mcdr.hdr == LOCAL){
         c1 = open_space(place);
         AT(c1).refs = AT(place).refs;
