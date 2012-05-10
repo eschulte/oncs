@@ -18,10 +18,10 @@ int main(int argc, char *argv[]){
 
   init(argc, argv);
 
-  /* debug(1, "starting expr\n"); */
-  /* expr_to_expr(expr); */
-  /* SHOULD(strcmp(expr, "(#L1 (#l0 #S0) #S1)") == 0); */
-  /* if(fail_p) ERROR("failed expr"); */
+  debug(1, "starting expr\n");
+  expr_to_expr(expr);
+  SHOULD(strcmp(expr, "(#L1 (#l0 #S0) #S1)") == 0);
+  if(fail_p) ERROR("failed expr");
 
   debug(1, "starting expr0\n");
   expr_to_expr(expr0);

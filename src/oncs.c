@@ -311,8 +311,7 @@ ptr lambda_app(msg l_msg, coord place, int dir){
         COORD_OF_PTR(msg.place, l_msg.mcdr);
         msg.mcdr.car=0;
         msg.mcdr.hdr=0;
-        /* APPEND(msg.mcdr.cdr, dir, msg.mcdr.hdr); */
-        PUSH(msg.mcdr.cdr, dir);
+        APPEND(msg.mcdr.cdr, dir, msg.mcdr.hdr);
         enqueue(msg);
         /* TODO: fit dir in here */
       } else {
@@ -552,16 +551,14 @@ int run(coord place){
     COORD_OF_PTR(msg.place, AT(place).mcar);
     /* send off car message */
     msg.mcar = AT(place).mcdr;
+    APPEND(msg.mcar.cdr, LEFT, msg.mcar.hdr);
     msg.mcar.hdr = REPLACE;
-    /* APPEND(msg.mcar.cdr, LEFT, msg.mcdr.hdr); */
-    PUSH(msg.mcar.cdr, LEFT);
     msg.mcdr = AT(place).car;
     enqueue(msg);
     /* send off cdr message */
     msg.mcar = AT(place).mcdr;
+    APPEND(msg.mcar.cdr, RIGHT, msg.mcar.hdr);
     msg.mcar.hdr = REPLACE;
-    /* APPEND(msg.mcar.cdr, RIGHT, msg.mcdr.hdr); */
-    PUSH(msg.mcar.cdr, RIGHT);
     msg.mcdr = AT(place).cdr;
     enqueue(msg);
     /* propagate downwards car */
@@ -569,10 +566,10 @@ int run(coord place){
       msg.mcar = AT(place).mcar;
       COORD_OF_PTR(msg.place, AT(place).car);
       /* add a LEFT to msg.mcdr */
-      msg.mcdr.car = AT(place).mcdr.car+1;
+      msg.mcdr = AT(place).mcdr;
+      msg.mcdr.car++;
       if(AT(place).cdr.hdr == LOCAL)
-        /* APPEND(msg.mcdr.cdr, LEFT, msg.mcdr.hdr); */
-        PUSH(msg.mcdr.cdr, LEFT);
+        APPEND(msg.mcdr.cdr, LEFT, msg.mcdr.hdr);
       enqueue(msg);
     }
     /* propagate downwards cdr */
@@ -580,10 +577,10 @@ int run(coord place){
       msg.mcar = AT(place).mcar;
       COORD_OF_PTR(msg.place, AT(place).cdr);
       /* add a RIGHT to msg.mcdr */
-      msg.mcdr.car = AT(place).mcdr.car+1;
+      msg.mcdr = AT(place).mcdr;
+      msg.mcdr.car++;
       if(AT(place).car.hdr == LOCAL)
-        /* APPEND(msg.mcdr.cdr, RIGHT, msg.mcdr.hdr); */
-        PUSH(msg.mcdr.cdr, RIGHT);
+        APPEND(msg.mcdr.cdr, RIGHT, msg.mcdr.hdr);
       enqueue(msg);
     }
     ran = TRUE;

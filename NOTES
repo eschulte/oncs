@@ -4,6 +4,24 @@
 * debugging duplicate messages
 : break run if (world[place.x][place.y].mcar.hdr != 0)
 
+probably need to switch from pushing to appending
+: Q[2]:(3,3)r(2,3)r
+:      0   1   2   3   4   5   6   7   8   9
+:  0                                         
+:  1                                         
+:  2          _1_                            
+:  3          ^1_ l1s                        
+:  4              ^1^                        
+:  5                  L1^ ^1_                
+:  6                                         
+:  7                                         
+:  8                                         
+:  9                                         
+: ERROR: can't propagate down bottomed out ONC.
+: expr(5,5):(#L1 (#l0 #S1) ))
+: hash:4c564098
+: (3,3) depth(1) value=(3,0,0)
+
 * anatomy of duplicate and replace messages
 Duplicate
 | msg.place    | coord of to be duplicated                  |
@@ -136,18 +154,25 @@ x=4, x[3]=0
   printf("appending 1010110\n");
   x=x|1<<i;
   i++;
+  printf("x=%d\n", x);
   x=x|0<<i;
   i++;
+  printf("x=%d\n", x);
   x=x|1<<i;
   i++;
+  printf("x=%d\n", x);
   x=x|0<<i;
   i++;
+  printf("x=%d\n", x);
   x=x|1<<i;
   i++;
+  printf("x=%d\n", x);
   x=x|1<<i;
   i++;
+  printf("x=%d\n", x);
   x=x|0<<i;
   i++;
+  printf("x=%d\n", x);
   printf("poping 1010110\n");
   for(i=0;i<7;i++){
     y=x&1;
@@ -158,10 +183,19 @@ x=4, x[3]=0
 #+end_src
 
 #+RESULTS:
-: 2^=1 2^1=2 2^2=4
-: appending 1010110
-: poping 1010110
-: 1010110
+#+begin_example
+2^=1 2^1=2 2^2=4
+appending 1010110
+x=1
+x=1
+x=5
+x=5
+x=21
+x=53
+x=53
+poping 1010110
+1010110
+#+end_example
 
 * make ONC duplication message based
 So =duplicate_ptr= should not set a value directly, but should rather
