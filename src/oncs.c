@@ -186,9 +186,8 @@ int value_p(ptr ptr){
         }
       }
     default:
-      DEBUG3(".car(%d,%d,%d) ",
-             AT(place).car.hdr, AT(place).car.car, AT(place).car.cdr);
-      return argument_p(AT(place).car);
+      /* guess we don't need to recurse here */
+      return TRUE;
       break;
     }
     break;
