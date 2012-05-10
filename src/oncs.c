@@ -61,6 +61,8 @@ int free_p(coord place){
 coord open_space(coord place){
   int index, cntrl, tried;
   index = cntrl = tried = 0;
+  if(rand()&7) cntrl=0;
+  else         cntrl=2;
   do {
     if (index == (cntrl/2)) {
       index = 0;
