@@ -428,7 +428,7 @@ locally will the action actually be run.
    (like maybe =-Wall=) or the fact that we're now using a C++
    compiler are causing errors.
 
-* try out call by need rather than call by value [2/4]
+* try out call by need rather than call by value
 Rather than copying arguments into the bodies of λ-expressions, just
 copy in a link to the original.  Then when it is updated in place, it
 will be updated for all.  This will allow for more efficient
@@ -438,7 +438,27 @@ Also, need to check how this variant of call-by-name will be different
 from call-by-value... how will laziness affect the semantics, e.g., do
 I need a different Y-combinator?
 
-Actions for call-by-name
+** call-by-name in action
+:                                              Locked until recieves a DUP
+:                                           Does not send REP until it is a value
+:                                                     +---
+:                                         DUP         |   \--+
+: - replace x with locked DUP     +-----------------> | arg  |
+: - unlock DUP and send DUP when  |                   +------+
+:   used in an app_abs            |                    |
+:                                 |                    |
+:              /---------         |        REP         |
+:          /---  λx.     \------\   <------------------+
+:        +-                      \
+:        |       /---+            \
+:        |      /    |             \
+:        +------     \             --
+:                     |        ---/
+:                     +-------/
+:                              
+:                  (λ x (... x ... x ...)) (arg)
+
+** Actions for call-by-name
 1. The outermost λ-application is always applied first, arguments are
    *not* evaluated.  The locking here may have to be /more/
    restrictive than in call-by-value, as we want to enforce laziness.
@@ -452,13 +472,15 @@ Actions for call-by-name
    the result must be duplicated for each insertion... as they may be
    passed different argument.
 
-will have to
-- [X] add in some =#ifdef= declarations to compile out different
-  evaluation strategies
+** Tasks [1/4]
+Will have to
+- [ ] wrap all relevant code in =#ifdef= declarations to compile out
+  different evaluation strategies
 - [X] update the =value_p= function to allow un-applied λ-apps to be
   counted as value arguments (rename to =argument_p=).
-- [ ] update mechanism used in =lambda_app= to insert arguments, so
-  that links are used rather than =duplicate_ptr=.
+- [ ] update mechanism used in =lambda_app= to insert locked DUPs.
+- [ ] update the DUP rule to evaluate before sending a response.
+- [ ] update the app_abs rule to unlock relevant locked DUPS.
 - [ ] update all tests which currently rely on call-by-value
   evaluation order.
 
