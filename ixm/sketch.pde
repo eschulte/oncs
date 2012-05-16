@@ -4,15 +4,27 @@
  *
  * License: GPLV3
  */
-#include "../src/oncs.h"
+#include "../test/test.h"
 
 int loop_delay = 1000;
 
 void setup(){ QLED.begin(); }
 
 void loop() {
+  msg msg;
   delay(loop_delay);
   QLED.on(BODY_RGB_BLUE_PIN, 500);
+  if(queue_population() > 0){
+    msg = queue[qbeg];
+    /* only pop from queue if dest. is empty */
+    if(AT(msg.place).mcar.hdr == NIL){
+      msg = dequeue();
+      AT(msg.place).mcar = msg.mcar;
+      AT(msg.place).mcdr = msg.mcdr;
+    }
+    /* run destination either way */
+    run(msg.place);
+  } else { run_one(); }
   QLED.off(BODY_RGB_BLUE_PIN, 500);
 }
 

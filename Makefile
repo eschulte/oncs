@@ -86,11 +86,10 @@ play: $(TEST:=.test)
 
 ixm/Makefile:
 	SKETCH_DIR="$$(pwd)/ixm"; \
-	pushd $(IXM_BASEDIR); \
-	make SKETCH_DIR=$$SKETCH_DIR sketchinit; \
+	$(MAKE) -C $(IXM_BASEDIR) SKETCH_DIR=$$SKETCH_DIR sketchinit;
 
-ixm/sketch.hex: ixm/Makefile ixm/sketch.pde
-	pushd ixm/; make
+ixm/sketch.hex: ixm/Makefile ixm/sketch.pde ixm/test.o
+	$(MAKE) -C ixm/ sketch.hex SKETCH_EXTRA_CPPFLAGS="-I../src/ -I../test/"
 
 burn: ixm/sketch.hex
 	SKETCH_DIR="$$(pwd)/ixm"; \

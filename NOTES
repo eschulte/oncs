@@ -428,7 +428,35 @@ locally will the action actually be run.
    (like maybe =-Wall=) or the fact that we're now using a C++
    compiler are causing errors.
 
-** moving into IXM ecosystem [0/5]
+** moving into IXM ecosystem [0/6]
+*** TODO get everything compiling together
+having difficulties
+
+Made this change to the IXM code.
+#+begin_src diff
+--- config/Makecommon.mk.orig	2012-05-16 11:54:28.840603264 -0400
++++ config/Makecommon.mk	2012-05-16 11:52:19.533937898 -0400
+@@ -39,7 +39,7 @@
+ CPPFLAGS+=-I$(INCLUDEDIR) 
+ CFLAGS+=-I$(INCLUDEDIR) 
+ 
+-SKETCH_EXTRA_CPPFLAGS=-DSKETCH_BUILD_DATE=`date -u +0x%Y%m%d` -DSKETCH_BUILD_TIME=`date -u +0x%H%M%S` -DSKETCH_ARCH_CODE=$(ARCH_CODE)
++override SKETCH_EXTRA_CPPFLAGS+=-DSKETCH_BUILD_DATE=`date -u +0x%Y%m%d` -DSKETCH_BUILD_TIME=`date -u +0x%H%M%S` -DSKETCH_ARCH_CODE=$(ARCH_CODE)
+ 
+ # Pattern rule for c files
+ $(OBJDIR)/%.o:	%.c $(ALLDEP) $(OBJDIR)/%.d
+#+end_src
+
+Getting these errors during compilation.
+: sketch-wrapper.o: In function `loop()':
+: sketch-wrapper.cpp:(.text._Z4loopv+0x24): undefined reference to `queue_population()'
+: sketch-wrapper.cpp:(.text._Z4loopv+0x98): undefined reference to `dequeue()'
+: sketch-wrapper.cpp:(.text._Z4loopv+0xe4): undefined reference to `run(coord)'
+: sketch-wrapper.cpp:(.text._Z4loopv+0x104): undefined reference to `run_one()'
+: sketch-wrapper.cpp:(.text._Z4loopv+0x114): undefined reference to `qbeg'
+: sketch-wrapper.cpp:(.text._Z4loopv+0x118): undefined reference to `queue'
+: sketch-wrapper.cpp:(.text._Z4loopv+0x11c): undefined reference to `world'
+
 *** TODO using the IXM main loop
 *** TODO saving the world/queue into IXM memory
 *** TODO convert between ONC/IXM messages
