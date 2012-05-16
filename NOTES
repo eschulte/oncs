@@ -428,6 +428,12 @@ locally will the action actually be run.
    (like maybe =-Wall=) or the fact that we're now using a C++
    compiler are causing errors.
 
+** moving into IXM ecosystem [0/5]
+*** TODO using the IXM main loop
+*** TODO saving the world/queue into IXM memory
+*** TODO convert between ONC/IXM messages
+*** TODO find open space on other boards
+*** TODO check values on other boards
 * try out call by need rather than call by value
 Rather than copying arguments into the bodies of λ-expressions, just
 copy in a link to the original.  Then when it is updated in place, it
