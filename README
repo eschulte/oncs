@@ -164,6 +164,7 @@ The message values and their meanings are.
        <video width="928" height="384" controls preload>
          <source src="fact-o-4.avi" type="video/avi" />
          <source src="fact-o-4.ogg" type="video/ogg" />
+         <source src="fact-o-4.mp4" type="video/mp4" />
        </video>
      </p>
    #+end_html
